@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #c20330;
+  --secondary: #c2723b;
+  --tertiary: #5a4529;
+  --appButton1: #f5024a;
+  --appButton2: #8f0116;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-btn: var(--appButton1);
+  --color-btn-hover: var(--appButton2);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spin buttons in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+
+} */
+
+html,
+body {
+  /* overflow-x: hidden; */
+}
+
+@keyframes zoomInOut {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.image-zoom {
+  animation: zoomInOut 6s ease-in-out infinite;
+  transition: transform 1s ease-in-out;
+}
+
+.features-section {
+  position: relative;
+}
+
+.features-section::before {
+  content: "";
+  position: absolute;
+  background-image: url("/images/whyChooseUsMan.png");
+  width: 500px;
+  height: 344px;
+  background-size: cover;
+  left: calc(50% - 250px);
+  top: -139px;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .features-section::before {
+    width: 291px;
+    height: 200px;
+    left: calc(50% - 140px);
+    top: -48px;
+  }
+}
