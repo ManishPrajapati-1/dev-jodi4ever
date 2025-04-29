@@ -11,7 +11,7 @@ import { toogleTheme } from "@/lib/features/themeSlice";
 export default function Home() {
   const [image, setImage] = useState("/images/banner1.jpg");
   const [showModal, setShowModal] = useState(false);
-
+  console.log("Hello Wrl");
   const {
     register,
     handleSubmit,
