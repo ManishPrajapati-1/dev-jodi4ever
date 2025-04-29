@@ -1,13 +1,19 @@
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Icons } from "@/app/icons";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { useLoginUserMutation, useVerifyLoginOtpMutation } from "@/lib/services/api";
 
 export default function Modal({ isVisible, setIsVisible }) {
+  // const router = useRouter();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(30); // Seconds for resend timer
+  const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [otp, setOtp] = useState(["", "", "", ""]);
+  const [loginUser, { isLoading }] = useLoginUserMutation();
+  const [verifyLoginOtp, { isOTPLoading }] = useVerifyLoginOtpMutation();
 
   const {
     register,
@@ -19,7 +25,7 @@ export default function Modal({ isVisible, setIsVisible }) {
     mode: "onChange",
   });
 
-  const mobile = watch("mobile");
+  const phone = watch("phone");
 
   // Timer effect
   useEffect(() => {
@@ -34,12 +40,18 @@ export default function Modal({ isVisible, setIsVisible }) {
     return () => clearInterval(interval);
   }, [timer, step]);
 
-  const sendOTP = () => {
+  const sendOTP = async () => {
     setLoading(true);
+    try {
+      await loginUser({phone: phone}).unwrap();
+    }
+    catch (err) {
+      console.log(`Error: ${err}`)
+    }
     setTimeout(() => {
       setLoading(false);
       setStep(2);
-      setTimer(30);
+      setTimer(60);
       setCanResend(false);
     }, 1500);
   };
@@ -83,6 +95,19 @@ export default function Modal({ isVisible, setIsVisible }) {
 
   const allOtpEntered = otp.every((digit) => digit !== "");
 
+  const handleVerifyOtp = async () => {
+    try {
+          const res = await verifyLoginOtp({ phone, otp: otp.join("") }).unwrap();
+          console.log(res.data.token);
+          if (res.success && res.data.token) {
+            localStorage.setItem('token', res.data.token); // 🔐 Save token
+            // onClose(); // Close modal
+          }
+        } catch (err) {
+          alert(err?.data?.message || 'Invalid OTP');
+        }
+  }
+
   return (
     <>
       {isVisible && (
@@ -106,38 +131,40 @@ export default function Modal({ isVisible, setIsVisible }) {
             {step === 1 ? (
               <form onSubmit={handleSubmit(onSubmit)}>
                 <label
-                  htmlFor="mobile"
+                  htmlFor="phone"
                   className="block text-sm font-medium mb-1"
                 >
-                  Mobile Number
+                  phone Number
                 </label>
                 <input
-                  id="mobile"
+                  id="phone"
                   type="number"
                   inputMode="numeric"
-                  placeholder="Enter your mobile number"
+                  placeholder="Enter your phone number"
                   className={`w-full px-4 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 transition ${
-                    errors.mobile
+                    errors.phone
                       ? "border-red-500"
                       : "border-gray-300 focus:ring-black/40"
                   }`}
-                  {...register("mobile", {
-                    required: "Mobile number is required",
+                  {...register("phone", {
+                    required: "phone number is required",
                     pattern: {
                       value: /^[0-9]{10}$/,
-                      message: "Enter a valid 10-digit mobile number",
+                      message: "Enter a valid 10-digit phone number",
                     },
                   })}
                 />
-                {errors.mobile && (
+                {errors.phone && (
                   <p className="text-red-500 text-sm mb-3">
-                    {errors.mobile.message}
+                    {errors.phone.message}
                   </p>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full py-2 bg-btn text-white rounded-lg transition font-semibold flex items-center justify-center"
+                  className={`${
+                    !isValid ? "bg-gray-800/60" : "bg-btn hover:bg-btn-hover"
+                  } w-full py-2 text-white rounded-lg transition font-semibold flex items-center justify-center`}
                   disabled={!isValid || loading}
                 >
                   {loading ? (
@@ -172,7 +199,7 @@ export default function Modal({ isVisible, setIsVisible }) {
                 </div>
 
                 <button
-                  onClick={(e) => console.log(otp)}
+                  onClick={handleVerifyOtp}
                   className={`w-full mt-4 py-2 ${
                     !allOtpEntered
                       ? "bg-gray-800/60"
@@ -185,14 +212,19 @@ export default function Modal({ isVisible, setIsVisible }) {
 
                 <div className="text-center mt-3 text-sm text-gray-600">
                   {canResend ? (
-                      <button
-                        onClick={handleResend}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Resend OTP
-                      </button>
+                    <button
+                      onClick={handleResend}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Resend OTP
+                    </button>
                   ) : (
-                      <p><span className="text-primary">Didn&apos;t receive the OTP?</span> Resend OTP in {timer}s</p>
+                    <p>
+                      <span className="text-primary">
+                        Didn&apos;t receive the OTP?
+                      </span>{" "}
+                      Resend OTP in {timer}s
+                    </p>
                   )}
                 </div>
               </div>
@@ -201,12 +233,12 @@ export default function Modal({ isVisible, setIsVisible }) {
             {step === 1 && (
               <p className="text-center mt-6 text-sm text-gray-600">
                 New to Jodi4Ever?{" "}
-                <a
-                  href="#"
+                <Link
+                  href="/create-profile"
                   className="text-blue-600 hover:underline font-medium"
                 >
-                  Sign Up Free &gt;
-                </a>
+                  Register for Free &gt;
+                </Link>
               </p>
             )}
           </div>

@@ -5,40 +5,34 @@ import Image from "next/image";
 
 const trustData = [
     {
-      image: "/images/trust1.jfif",
+      image: "/images/trust1.jpg",
       name: "John & Emily",
       city: "New York",
       description: "We found true love through Jodi4Ever. It's been magical!",
     },
     {
-      image: "/images/trust2.jfif",
+      image: "/images/trust2.jpg",
       name: "Sarah & Michael",
       city: "Los Angeles",
       description: "Our journey started here, and now we’re inseparable!",
     },
     {
-      image: "/images/trust3.jfif",
+      image: "/images/trust3.jpg",
       name: "Anna & David",
       city: "Chicago",
       description: "Thanks to Jodi4Ever, we are a perfect match.",
     },
     {
-      image: "/images/trust4.jfif",
+      image: "/images/trust4.jpg",
       name: "Lucas & Emma",
       city: "San Francisco",
       description: "From a swipe to a forever bond. We’re grateful!",
     },
     {
-      image: "/images/trust5.jfif",
+      image: "/images/trust5.jpg",
       name: "Liam & Olivia",
       city: "Miami",
       description: "Jodi4Ever brought us together. It's a dream come true.",
-    },
-    {
-      image: "/images/trust1.jfif",
-      name: "John & Emily",
-      city: "New York",
-      description: "We’re now living our happily ever after.",
     },
   ];
   
@@ -57,8 +51,19 @@ export default function TrustSection() {
 
     handleResize();
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) =>
+        prevIndex < trustData.length - visibleCards ? prevIndex + 1 : 0
+      );
+    }, 1000);
+  
+    return () => clearInterval(interval); 
+  }, [currentIndex, visibleCards]);
 
   const maxIndex = trustData.length - visibleCards;
 

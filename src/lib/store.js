@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
-import Theme from '@/lib/features/themeSlice'
+import { api } from '@/lib/services/api';
+import profileReducer from '@/lib/features/profile/profileSlice'
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      theme: Theme,
+      [api.reducerPath]: api.reducer,
+      profile: profileReducer,
     },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(api.middleware),
   })
 }

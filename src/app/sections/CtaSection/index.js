@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function CtaSection() {
   return (
     <div className="flex flex-col items-center justify-center gap-16 text-white py-16 px-3">
@@ -16,19 +18,15 @@ export default function CtaSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <button className="bg-btn text-white px-6 py-3 rounded-md font-semibold hover:bg-btn-hover transition-all duration-300">
+          <Link href="/create-profile" className="bg-btn text-white px-6 py-3 rounded-md font-semibold hover:bg-btn-hover transition-all duration-300">
             Create Free Profile
-          </button>
+          </Link>
           <button className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold border border-white hover:bg-gray-300 transition-all duration-300">
             Help and Support
           </button>
         </div>
       </div>
-      <div className="text-sm md:text-base bg-primary text-center py-4 px-12 md:px-22 rounded shadow-lg flex flex-col md:flex-row justify-center gap-4">
-        <span className="">Free support: +92 (8800) 68 - 8960 </span>
-        <span className="hidden md:inline"> | </span>
-        <span> Email: jodi4ever@support.com</span>
-      </div>
+      
     </div>
   );
 }

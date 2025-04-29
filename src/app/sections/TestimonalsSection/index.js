@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Icons } from "@/app/icons";
 
@@ -36,6 +36,15 @@ const testimonials = [
 export default function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const total = testimonials.length;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === total - 1 ? 0 : prev + 1));
+    }, 5000); // Change testimonial every 5 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+
+  }, [currentIndex, total]);
 
   const prevTestimonial = () => {
     setCurrentIndex((prev) => (prev === 0 ? total - 1 : prev - 1));

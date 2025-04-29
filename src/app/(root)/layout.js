@@ -3,7 +3,7 @@ import StoreProvider from "@/app/store/StoreProvider";
 import Image from "next/image";
 import Footer from "@/app/components/Footer/footer";
 
-import "./globals.css";
+import "@/app/globals.css";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -21,14 +21,17 @@ const poppins = Poppins({
 
 export const metadata = {
   title: "Jodi4Ever – Find Your Perfect Match | Trusted Matrimony Platform",
-  description: "Join Jodi4Ever, a trusted matrimony platform to connect with like-minded singles and discover your soulmate for a lifetime of happiness. Find your partner today and start your journey to love.",
-  keywords: "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships",
+  description:
+    "Join Jodi4Ever, a trusted matrimony platform to connect with like-minded singles and discover your soulmate for a lifetime of happiness. Find your partner today and start your journey to love.",
+  keywords:
+    "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships",
   author: "Jodi4Ever Team",
   robots: "index, follow", // to ensure search engines index and follow links
   // Open Graph tags for Facebook and other social media platforms
   openGraph: {
     title: "Jodi4Ever – Find Your Perfect Match",
-    description: "Discover your soulmate with Jodi4Ever, the leading matrimony platform. Join now and begin your journey to lifelong love and happiness.",
+    description:
+      "Discover your soulmate with Jodi4Ever, the leading matrimony platform. Join now and begin your journey to lifelong love and happiness.",
     url: "https://www.jodi4ever.com", // replace with your website URL
     type: "website",
     images: [
@@ -36,8 +39,8 @@ export const metadata = {
         url: "https://www.jodi4ever.com/images/og-image.jpg", // replace with actual image URL
         width: 1200,
         height: 630,
-        alt: "Jodi4Ever - Matrimony Platform"
-      }
+        alt: "Jodi4Ever - Matrimony Platform",
+      },
     ],
   },
 
@@ -45,9 +48,10 @@ export const metadata = {
   twitter: {
     card: "summary_large_image", // use a large image summary card
     title: "Jodi4Ever – Find Your Perfect Match",
-    description: "Join Jodi4Ever, a trusted matrimony platform that connects like-minded singles. Find your soulmate today.",
+    description:
+      "Join Jodi4Ever, a trusted matrimony platform that connects like-minded singles. Find your soulmate today.",
     image: "https://www.jodi4ever.com/images/twitter-card.jpg", // replace with actual image URL
-    site: "@jodi4ever" // Replace with your Twitter handle if available
+    site: "@jodi4ever", // Replace with your Twitter handle if available
   },
 
   // Additional metadata for better search engine visibility
@@ -57,26 +61,31 @@ export const metadata = {
   ],
 };
 
+// console.log("metadata", metadata);
+
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         {/* <Header /> */}
         <StoreProvider>
-          <Image
-            src={"/images/leafl.png"}
-            alt="leaf left"
-            width={100}
-            height={100}
-            className="fixed top-20 -left-5 z-90 w-auto h-auto opacity-85 invisible md:visible"
-          />
-          <Image
-            src={"/images/leafr.png"}
-            alt="leaf right"
-            width={65}
-            height={90}
-            className="fixed bottom-0 right-0 z-90 w-auto h-auto opacity-85 invisible md:visible"
-          />
+          <>
+            <Image
+              src={"/images/leafl.png"}
+              alt="leaf left"
+              width={100}
+              height={100}
+              className="fixed top-20 -left-5 z-90 w-auto h-auto opacity-85 invisible md:visible"
+            />
+            <Image
+              src={"/images/leafr.png"}
+              alt="leaf right"
+              width={65}
+              height={90}
+              className="fixed bottom-0 right-0 z-90 w-auto h-auto opacity-85 invisible md:visible"
+            />
+          </>
           {children}
           <Footer />
         </StoreProvider>

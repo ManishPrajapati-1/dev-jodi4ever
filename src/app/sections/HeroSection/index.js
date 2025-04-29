@@ -2,16 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Icons } from "@/app/icons";
 import Modal from "./Components/Modal";
 import Image from "next/image";
-import { useAppSelector, useAppDispatch, useAppStore } from "@/lib/hooks";
-import { toogleTheme } from "@/lib/features/themeSlice";
+import { useDispatch } from "react-redux";
+import qs from "query-string";
+import { updatePreferences } from "@/lib/features/profile/profileSlice";
 
 export default function Home() {
   const [image, setImage] = useState("/images/banner1.jpg");
   const [showModal, setShowModal] = useState(false);
-  console.log("Hello Wrl");
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -33,7 +38,8 @@ export default function Home() {
 
   const submitForm = (data) => {
     console.log("Form submitted with data:", data);
-    // Handle form submission logic here
+    const queryString = new URLSearchParams(data).toString();
+    router.push(`/create-profile?${queryString}`);
   };
 
   return (
