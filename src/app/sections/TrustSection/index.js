@@ -60,7 +60,7 @@ export default function TrustSection() {
       setCurrentIndex((prevIndex) =>
         prevIndex < trustData.length - visibleCards ? prevIndex + 1 : 0
       );
-    }, 1000);
+    }, 2000);
   
     return () => clearInterval(interval); 
   }, [currentIndex, visibleCards]);

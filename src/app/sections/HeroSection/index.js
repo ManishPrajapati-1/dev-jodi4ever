@@ -62,7 +62,8 @@ export default function Home() {
         {/* Overlay + Main */}
         <div className="w-screen bg-black/80 p-8">
           <div className="flex justify-between items-center">
-            <span className="font-bold text-3xl text-white">J4E</span>
+            <Image src="/images/jodi4ever_logo.png" width={100} height={100} className="w-14 md:w-18" alt="Logo" />
+            {/* <span className="font-bold text-3xl text-white">J4E</span> */}
             <span
               className="flex items-center gap-2 font-semibold text-2xl text-white hover:underline underline-offset-2 cursor-pointer"
               onClick={() => setShowModal(true)}

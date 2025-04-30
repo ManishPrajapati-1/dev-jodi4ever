@@ -77,7 +77,7 @@ export default function Footer() {
             </h3>
             <div className="flex space-x-6">
               <a
-                href="https://www.facebook.com"
+                href="https://www.facebook.com/jodii4ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-appButton1"
@@ -85,7 +85,7 @@ export default function Footer() {
                 <Icons.Facebook className="h-6 w-6" />
               </a>
               <a
-                href="https://www.twitter.com"
+                href="https://www.x.com/Jodi4E7313"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-appButton1"
@@ -93,7 +93,7 @@ export default function Footer() {
                 <Icons.Twitter className="h-6 w-6" />
               </a>
               <a
-                href="https://www.instagram.com"
+                href="https://www.instagram.com/jodi4.ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white hover:text-appButton1"
