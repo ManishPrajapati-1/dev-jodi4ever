@@ -8,6 +8,7 @@ import Step4CulturalDetails from '@/app/components/RegistrationForm/Step4Cultura
 import Step5LifestyleDetails from '@/app/components/RegistrationForm/Step5LifestyleDetails';
 import Step6ProfileImage from '@/app/components/RegistrationForm/Step6ProfileImage';
 import Step7Preferences from '@/app/components/RegistrationForm/Step7Preferences'
+import { Suspense } from 'react';
 // ... other step imports
 
 const steps = [
@@ -27,7 +28,9 @@ export default function CreateProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
+    <Suspense fallback={<div>Loading...</div>}>
       <StepComponent />
+    </Suspense>
     </div>
   );
 }

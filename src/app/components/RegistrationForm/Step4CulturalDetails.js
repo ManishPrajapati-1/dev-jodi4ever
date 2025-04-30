@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { setStep, updateFormData } from "@/lib/features/profile/profileSlice";
