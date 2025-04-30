@@ -86,6 +86,8 @@ const Step6ProfileImage = () => {
           {previews.map((src, idx) => (
             <div key={idx} className="border rounded overflow-hidden">
               <Image
+                width={200}
+                height={200}
                 src={src}
                 alt={`Preview ${idx + 1}`}
                 className="w-full h-32 object-cover"
