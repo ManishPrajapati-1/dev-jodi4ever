@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateFormData, setStep } from '@/lib/features/profile/profileSlice';
 import { useUpdateProfileMutation } from '@/lib/services/api';
+import Image from 'next/image';
 
 const Step6ProfileImage = () => {
   const { register, handleSubmit, watch, setValue } = useForm();
@@ -84,7 +85,7 @@ const Step6ProfileImage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
           {previews.map((src, idx) => (
             <div key={idx} className="border rounded overflow-hidden">
-              <img
+              <Image
                 src={src}
                 alt={`Preview ${idx + 1}`}
                 className="w-full h-32 object-cover"

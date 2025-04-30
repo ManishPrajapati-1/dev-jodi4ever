@@ -79,7 +79,7 @@ const Step1PersonalDetails = () => {
         const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
         return (
           <option key={i} value={`${feet}'${inches}"`}>
-            {feet}'{inches}" ({cm} cm)
+            {feet}&apos;{inches}" ({cm} cm)
           </option>
         );
       })}

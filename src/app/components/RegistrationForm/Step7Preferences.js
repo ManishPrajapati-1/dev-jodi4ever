@@ -230,7 +230,7 @@ const PreferencesForm = () => {
             <option value="">Select</option>
             <option>No</option>
             <option>Yes</option>
-            <option>Doesn't Matter</option>
+            <option>Doesn&apos;t Matter</option>
           </select>
         </div>
 

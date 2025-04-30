@@ -25,8 +25,8 @@ const Step2EducationalDetails = () => {
         <option value="">Select Education</option>
         <option value="High School">High School</option>
         <option value="Diploma">Diploma</option>
-        <option value="Bachelor's Degree">Bachelor's Degree</option>
-        <option value="Master's Degree">Master's Degree</option>
+        <option value="Bachelor's Degree">Bachelor&apos;s Degree</option>
+        <option value="Master's Degree">Master&apos;s Degree</option>
         <option value="Doctorate/PhD">Doctorate/PhD</option>
         <option value="Other">Other</option>
       </select>
