@@ -34,7 +34,7 @@ export default function Home() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [images]);
+  }, []);
 
   const submitForm = (data) => {
     console.log("Form submitted with data:", data);
