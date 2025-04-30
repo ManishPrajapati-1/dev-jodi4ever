@@ -79,7 +79,7 @@ export default function OtpModal({ phone, onClose }) {
           width={48}
           height={48}
           alt="Logo"
-          className="w-10 md:w-12 bg-gray-800 shadow-lg mx-auto mb-4"
+          className="w-10 md:w-12 invert shadow-lg mx-auto mb-4"
         />
         <h2 className="text-2xl font-semibold text-center text-pink-600 mb-2">
           Verify OTP

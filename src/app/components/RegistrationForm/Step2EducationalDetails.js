@@ -1,12 +1,16 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setStep, updateFormData } from '@/lib/features/profile/profileSlice';
 
 const Step2EducationalDetails = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
+  const [isCourseVisible, setIsCourseVisible] = useState(false);
   const dispatch = useDispatch();
+
+  const education = watch('highestEducation', '');
 
   const onSubmit = (data) => {
     console.log('Step2 Data:', data);
@@ -14,25 +18,45 @@ const Step2EducationalDetails = () => {
     dispatch(setStep(3));
   };
 
+  useEffect(() => {
+    setIsCourseVisible(education === 'Below High School' || education === 'High School (12th)' || education === '');
+  }, [education, isCourseVisible]);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
-    <h2 className="text-2xl font-bold text-gray-800 mb-4">Educational Information</h2>
+    <h2 className="text-xl font-bold text-gray-800 mb-1">
+        Talk about education & career
+      </h2>
+      <p className="text-xs font-bold text-gray-400">Mentioning this would help profiles know you better</p>
+
   
     {/* Highest Education */}
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">Highest Education<span className="text-red-500">*</span></label>
       <select {...register('highestEducation', { required: true })} className="input-select w-full">
         <option value="">Select Education</option>
-        <option value="High School">High School</option>
+        <option value="Below High School">Below High School</option>
+        <option value="High School (12th)">High School (12th)</option>
         <option value="Diploma">Diploma</option>
-        <option value="Bachelor's Degree">Bachelor&apos;s Degree</option>
-        <option value="Master's Degree">Master&apos;s Degree</option>
-        <option value="Doctorate/PhD">Doctorate/PhD</option>
-        <option value="Other">Other</option>
+        <option value="Bachelor's">Bachelor&apos;s</option>
+        <option value="Master's">Master&apos;s</option>
+        <option value="Doctorate">Doctorate/PhD</option>
       </select>
       {errors.highestEducation && <p className="text-red-500 text-sm mt-1">This field is required</p>}
     </div>
-  
+
+    {/* Courses on condition */}
+    {!isCourseVisible ? (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Course<span className="text-red-500">*</span></label>
+        <select {...register('course', { required: true })} className="input-select w-full">
+          <option value="">Course</option>
+          {/* Add options from fieldsData.json */}
+        </select>
+        {errors.highestEducation && <p className="text-red-500 text-sm mt-1">This field is required</p>}
+      </div>
+    ) : null}
+
     {/* Degree */}
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">Degree<span className="text-red-500">*</span></label>

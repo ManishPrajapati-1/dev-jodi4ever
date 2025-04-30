@@ -12,8 +12,8 @@ import { Suspense } from 'react';
 // ... other step imports
 
 const steps = [
-  Step0BasicInfo,
-  Step1PersonalDetails,
+  // Step0BasicInfo,
+  // Step1PersonalDetails,
   Step2EducationalDetails,
   Step3ProfessionalDetails,
   Step4CulturalDetails,
