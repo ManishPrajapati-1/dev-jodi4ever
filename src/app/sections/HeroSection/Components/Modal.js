@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Icons } from "@/app/icons";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import Link from "next/link";
 import { useLoginUserMutation, useVerifyLoginOtpMutation } from "@/lib/services/api";
 
@@ -124,7 +125,7 @@ export default function Modal({ isVisible, setIsVisible }) {
                 <Icons.ArrowLeft className="w-5 h-5" />
               </button>
               <h2 className="text-lg md:text-xl font-semibold text-center">
-                {step === 1 ? "Welcome back! Please login" : "Enter OTP"}
+                {step === 1 ? "Welcome back! Please login" : ""}
               </h2>
             </div>
 
@@ -179,8 +180,23 @@ export default function Modal({ isVisible, setIsVisible }) {
               </form>
             ) : (
               <div>
+                <Image
+                          src="/images/jodi4ever_logo_named.png"
+                          width={48}
+                          height={48}
+                          alt="Logo"
+                          className="w-10 md:w-12 invert shadow-lg mx-auto mb-4"
+                        />
+                        {/* <h2 className="text-2xl font-semibold text-center text-pink-600 mb-2">
+                          Verify OTP
+                        </h2> */}
+                
+                        <p className="text-center text-gray-700">
+                          Enter the 4-digit verification code sent to your phone number{" "}
+                          <strong>+91 {phone}</strong>
+                        </p>
                 <label htmlFor="otp" className="block text-sm font-medium mb-1">
-                  Enter OTP
+                  {/* Enter OTP */}
                 </label>
                 <div className="flex justify-between gap-2">
                   {otp.map((digit, index) => (

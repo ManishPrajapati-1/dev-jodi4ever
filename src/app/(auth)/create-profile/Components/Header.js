@@ -31,7 +31,7 @@ export default function Header() {
           />
         </Link>
         <h1 className="text-base md:text-xl font-semibold">
-          Jodi4Ever - Create your profile
+          Jodi4Ever - Create Your Profile
         </h1>
       </div>
 

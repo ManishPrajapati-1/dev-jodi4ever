@@ -62,7 +62,7 @@ const Step6ProfileImage = () => {
         <p className="text-gray-500 text-sm">Select 1-5 good photos. First photo will be your main photo.</p>
       </div>
 
-      <div className="border-2 border-dashed border-blue-300 p-6 rounded-lg flex flex-col items-center justify-center">
+      <div className="border-2 border-dashed border-secondary p-6 rounded-lg flex flex-col items-center justify-center">
         <input
           type="file"
           {...register('images')}
@@ -74,7 +74,7 @@ const Step6ProfileImage = () => {
         />
         <label
           htmlFor="image-upload"
-          className="cursor-pointer bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          className="cursor-pointer bg-btn text-white px-6 py-2 rounded hover:bg-btn-hover"
         >
           Select Images
         </label>

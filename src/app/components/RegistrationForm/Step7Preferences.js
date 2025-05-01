@@ -288,7 +288,7 @@ const PreferencesForm = () => {
         <input
           type="checkbox"
           {...register("any_caste")}
-          className="form-checkbox h-4 w-4 text-blue-600"
+          className="form-checkbox h-4 w-4 text-btn"
         />
         <span>Any Caste</span>
       </label>
@@ -297,7 +297,7 @@ const PreferencesForm = () => {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full mt-6 bg-blue-600 hover:bg-blue-700 transition text-white font-semibold py-2 px-4 rounded disabled:opacity-50"
+        className="w-full mt-6 bg-btn hover:bg-btn-hover transition text-white font-semibold py-2 px-4 rounded disabled:opacity-50"
       >
         {isLoading ? "Saving..." : "Save Preferences"}
       </button>

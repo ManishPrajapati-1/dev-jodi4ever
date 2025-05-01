@@ -4,13 +4,13 @@ import Link from "next/link";
 import "@/app/globals.css";
 
 export const metadata = {
-  title: "Create Your Profile | MyApp",
-  description: "Complete your profile to get the most out of MyApp.",
-  keywords: ["create profile", "onboarding", "user setup", "MyApp"],
+  title: "Create Your Profile | Jodi4Ever",
+  description: "Complete your profile to get the most out of Jodi4Ever.",
+  keywords: ["create profile", "onboarding", "user setup", "Jodi4Ever"],
   robots: "noindex, nofollow",
   openGraph: {
-    title: "Create Your Profile | MyApp",
-    description: "Set up your profile and start using MyApp today.",
+    title: "Create Your Profile | Jodi4Ever",
+    description: "Set up your profile and start using Jodi4Ever today.",
     type: "website",
   },
 };

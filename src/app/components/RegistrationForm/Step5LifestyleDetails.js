@@ -64,7 +64,7 @@ const Step5LifestyleDetails = () => {
   {/* Submit Button */}
   <button
     type="submit"
-    className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
+    className="w-full mt-4 bg-btn hover:bg-btn-hover text-white py-2 px-4 rounded transition"
   >
     Next
   </button>

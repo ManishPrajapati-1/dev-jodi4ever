@@ -85,7 +85,7 @@ const Step4CulturalDetails = () => {
       {/* Submit */}
       <button
         type="submit"
-        className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition disabled:opacity-50"
+        className="w-full mt-4 bg-btn hover:bg-btn-hover text-white py-2 px-4 rounded transition disabled:opacity-50"
       >
         Next
       </button>
