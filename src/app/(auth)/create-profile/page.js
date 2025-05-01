@@ -15,7 +15,7 @@ const steps = [
   Step0BasicInfo,
   Step1PersonalDetails,
   Step2EducationalDetails,
-  Step3ProfessionalDetails,
+  // Step3ProfessionalDetails, // Need to remove because we have alreay added this in Step2EducationalDetails
   Step4CulturalDetails,
   Step5LifestyleDetails,
   Step6ProfileImage,

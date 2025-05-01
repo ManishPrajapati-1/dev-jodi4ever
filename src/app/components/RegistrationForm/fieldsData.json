@@ -215,5 +215,11 @@
     "Vegan",
     "Jain",
     "Occasionally Non-Veg"
+  ],
+  "motherTongue": [
+    "Hindi", "English", "Bengali", "Telugu", "Marathi", "Tamil", "Gujarati", 
+    "Kannada", "Odia", "Punjabi", "Malayalam", "Assamese", "Maithili", "Bhojpuri", 
+    "Urdu", "Sindhi", "Santhali", "Kashmiri", "Nepali", "Konkani", "Dogri", 
+    "Manipuri (Meitei)", "Bodo", "Tulu", "Khasi", "Garo", "Mizo"
   ]
 }

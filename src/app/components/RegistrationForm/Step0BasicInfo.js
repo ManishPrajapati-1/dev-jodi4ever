@@ -63,7 +63,7 @@ export default function Step0BasicInfo() {
           </label>
           <select
             {...register("profile_for", { required: true })}
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
+            className="w-full px-4 py-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
           >
             <option value="">Select Profile For</option>
             <option value="Self">Self</option>
@@ -103,7 +103,7 @@ export default function Step0BasicInfo() {
               },
             })}
             placeholder="Enter Your Full Name"
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
+            className="w-full px-4 py-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
           />
           {errors.fullName && (
             <span className="text-red-500 text-sm mt-1 block">
@@ -126,7 +126,7 @@ export default function Step0BasicInfo() {
               },
             })}
             placeholder="Enter Your Email"
-            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
+            className="w-full px-4 py-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-600"
           />
           {errors.email && (
             <span className="text-red-500 text-sm mt-1 block">
@@ -140,7 +140,7 @@ export default function Step0BasicInfo() {
             Phone Number
           </label>
           <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-100 text-gray-700 text-sm">
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-400 bg-gray-100 text-gray-700 text-sm">
               🇮🇳 +91
             </span>
             <input
@@ -155,7 +155,7 @@ export default function Step0BasicInfo() {
               })}
               placeholder="Enter your phone number"
               maxLength={10}
-              className="w-full px-4 py-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-pink-600"
+              className="w-full px-4 py-3 border border-gray-400 rounded-r-md focus:outline-none focus:ring-2 focus:ring-pink-600"
             />
           </div>
           {errors.phone && (

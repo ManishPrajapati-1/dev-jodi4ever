@@ -132,7 +132,7 @@ const Step1PersonalDetails = () => {
           Marital Status <span className="text-red-500">*</span>
         </label>
         <select
-          {...register("maritalStatus", {
+          {...register("marital_status", {
             required: "Please select your marital status",
           })}
           className="input-select w-full"

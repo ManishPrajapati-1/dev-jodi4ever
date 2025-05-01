@@ -37,7 +37,7 @@ const Step6ProfileImage = () => {
       console.log('Submitting Final Profile:', formDataToSend);
   
       await updateProfile(formDataToSend).unwrap();
-      dispatch(setStep(7));
+      dispatch(setStep(6));
       // alert('Profile created successfully!');
       // Optionally navigate to success page
     } catch (error) {
@@ -58,8 +58,15 @@ const Step6ProfileImage = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-2">Upload Your Profile Photos</h2>
-        <p className="text-gray-500 text-sm">Select 1-5 good photos. First photo will be your main photo.</p>
+        {/* <h2 className="text-2xl font-semibold mb-2">Upload Your Profile Photos</h2>
+        <p className="text-gray-500 text-sm">Select 1-5 good photos. First photo will be your main photo.</p> */}
+        <h2 className="text-xl font-bold text-gray-800 mb-1">
+        Add your photos to complete your profile
+      </h2>
+      <p className="text-gray-500 text-sm">
+       Profiles with photos get 10x more responses. So, add your best photos to get more responses.
+       Your photos are 100% safe and private. Only you can see them. except your profile photo.
+      </p>
       </div>
 
       <div className="border-2 border-dashed border-secondary p-6 rounded-lg flex flex-col items-center justify-center">
@@ -102,7 +109,7 @@ const Step6ProfileImage = () => {
         disabled={isLoading}
         className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded w-full"
       >
-        {isLoading ? 'Submitting...' : 'Finish & Create Profile'}
+        {isLoading ? 'Submitting...' : 'Upload and Continue'}
       </button>
 
       {isError && (
