@@ -110,12 +110,12 @@ export default function PartnerPreferencesPage() {
                       onChange={(e) => setPreferences({...preferences, heightRange: {...preferences.heightRange, min: e.target.value}})}
                       className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                      <option>4'6"</option>
+                      {/* <option>4'6"</option>
                       <option>4'8"</option>
                       <option>5'0"</option>
                       <option>5'2"</option>
                       <option>5'4"</option>
-                      <option>5'6"</option>
+                      <option>5'6"</option> */}
                     </select>
                     <span>to</span>
                     <select
@@ -123,12 +123,12 @@ export default function PartnerPreferencesPage() {
                       onChange={(e) => setPreferences({...preferences, heightRange: {...preferences.heightRange, max: e.target.value}})}
                       className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                      <option>5'4"</option>
+                      {/* <option>5'4"</option>
                       <option>5'6"</option>
                       <option>5'8"</option>
                       <option>5'10"</option>
                       <option>6'0"</option>
-                      <option>6'2"</option>
+                      <option>6'2"</option> */}
                     </select>
                   </div>
                 ) : (
@@ -309,7 +309,7 @@ export default function PartnerPreferencesPage() {
                     <option>Vegetarian</option>
                     <option>Non-Vegetarian</option>
                     <option>Eggetarian</option>
-                    <option>Doesn't matter</option>
+                    <option>Doesn&apos;t matter</option>
                   </select>
                 ) : (
                   <p className="text-gray-800">{preferences.diet}</p>
@@ -326,7 +326,7 @@ export default function PartnerPreferencesPage() {
                   >
                     <option>Never</option>
                     <option>Occasionally is fine</option>
-                    <option>Doesn't matter</option>
+                    <option>Doesn&apos;t matter</option>
                   </select>
                 ) : (
                   <p className="text-gray-800">{preferences.smoking}</p>
@@ -343,7 +343,7 @@ export default function PartnerPreferencesPage() {
                   >
                     <option>Never</option>
                     <option>Occasional is fine</option>
-                    <option>Doesn't matter</option>
+                    <option>Doesn&apos;t matter</option>
                   </select>
                 ) : (
                   <p className="text-gray-800">{preferences.drinking}</p>

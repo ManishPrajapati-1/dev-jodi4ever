@@ -50,6 +50,14 @@ export const api = createApi({
     }),
 
     // Profile
+
+    getUserProfile: builder.query({
+      query: () => ({
+        url: "user/profile",
+        method: "GET",
+      }),
+    }),
+
     updateProfile: builder.mutation({
       query: (data) => ({
         url: "user/profile",
@@ -95,6 +103,7 @@ export const {
   useVerifyLoginOtpMutation,
   useSignUpUserMutation,
   useVerifyOtpSignUpMutation,
+  useGetUserProfileQuery,
   useUpdateProfileMutation,
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,

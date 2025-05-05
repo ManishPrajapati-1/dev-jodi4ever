@@ -33,5 +33,5 @@ const profileSlice = createSlice({
   }
 });
 
-export const { setStep, setOTPVerified, updateFormData, updatePreferences } = profileSlice.actions;
+export const { setStep, setOTPVerified, updateFormData, updatePreferences, setProfile } = profileSlice.actions;
 export default profileSlice.reducer;

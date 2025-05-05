@@ -8,11 +8,11 @@ export default function Footer() {
   };
   return (
     <footer>
-      <div className="text-white w-[90%] md:w-[70%] mx-auto text-sm md:text-base bg-primary text-center py-4 px-12 md:px-22 rounded shadow-lg flex flex-col md:flex-row justify-center gap-4">
+      {/* <div className="text-white w-[90%] md:w-[70%] mx-auto text-sm md:text-base bg-primary text-center py-4 px-12 md:px-22 rounded shadow-lg flex flex-col md:flex-row justify-center gap-4">
         <Link href={`tel:${info.phone}`}>Free support: {info.phone} </Link>
         <span className="hidden md:inline"> | </span>
         <Link href={`mailto:${info.email}`}> Email: {info.email}</Link>
-      </div>
+      </div> */}
 
       <div className="bg-primary text-white py-10 mt-4">
         <div className="flex flex-col md:flex-row justify-between max-w-screen-xl mx-auto px-4">

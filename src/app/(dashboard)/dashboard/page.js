@@ -104,11 +104,11 @@ export default function DashboardPage() {
           <div>
             <label htmlFor="height" className="block text-sm font-medium text-gray-700 mb-1">Height</label>
             <select id="height" className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
-              <option>4'0" - 4'6"</option>
-              <option>4'7" - 5'0"</option>
-              <option>5'1" - 5'6"</option>
-              <option>5'7" - 6'0"</option>
-              <option>6'1" and above</option>
+              {/* <option>4&apos;0" - 4'6"</option>
+              <option>4&apos;7" - 5'0"</option>
+              <option>5&apos;1" - 5'6"</option>
+              <option>5&apos;7" - 6'0"</option>
+              <option>6&apos;1" and above</option> */}
             </select>
           </div>
           <div>
