@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useSelector, useDispatch } from 'react-redux'
-import { toast } from 'react-hot-toast' // Assuming you use react-hot-toast for notifications
+import { toast } from 'react-hot-toast'
 
 // Import your RTK query mutation
 import { useUpdateProfileMutation } from '@/lib/services/api';
@@ -87,7 +87,7 @@ export default function ProfilePage() {
     ? userProfile.profile_image[0].startsWith('http')
       ? userProfile.profile_image[0]
       : baseUrl + userProfile.profile_image[0]
-    : "/images/default-profile.png"
+    : "/images/default-user.jpg"
 
   const handleInputChange = (e) => {
     const { name, value } = e.target

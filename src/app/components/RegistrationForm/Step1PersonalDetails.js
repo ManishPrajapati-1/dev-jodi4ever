@@ -122,7 +122,7 @@ const Step1PersonalDetails = () => {
                       className="block w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all duration-200"
                     />
                     {calculatedAge && !errors.dob && (
-                      <div className="absolute right-3 top-3 text-gray-500 text-sm">
+                      <div className="right-10 top-3.5 text-gray-500 text-sm">
                         {calculatedAge} years old
                       </div>
                     )}

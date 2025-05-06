@@ -4,9 +4,10 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 const baseQuery = fetchBaseQuery({
   baseUrl: "http://65.1.117.252:5002/api/",
   prepareHeaders: (headers) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+      headers.set("Authorization", `Bearer ${token}`);
     }
     return headers;
   },
@@ -50,7 +51,6 @@ export const api = createApi({
     }),
 
     // Profile
-
     getUserProfile: builder.query({
       query: () => ({
         url: "user/profile",
@@ -66,14 +66,24 @@ export const api = createApi({
       }),
     }),
 
+    // Matching/Profiles
+    getMatchingProfiles: builder.query({
+      query: (page) => ({
+        url: `user/matchedProfiles?page=${page}`,
+        method: "GET",
+      }),
+      // Optional: Add caching configuration if needed
+      // keepUnusedDataFor: 300, // Keep data for 5 minutes
+    }),
+
     // Update and get preferences
     getUserPreferences: builder.query({
-      query: () => 'user/yourPreference',
+      query: () => "user/yourPreference",
     }),
     postUserPreferences: builder.mutation({
       query: (body) => ({
-        url: 'user/preferences',
-        method: 'POST',
+        url: "user/preferences",
+        method: "POST",
         body,
       }),
     }),
@@ -105,6 +115,7 @@ export const {
   useVerifyOtpSignUpMutation,
   useGetUserProfileQuery,
   useUpdateProfileMutation,
+  useGetMatchingProfilesQuery,
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
   useGetStatesQuery,

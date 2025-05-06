@@ -44,25 +44,25 @@ export default function Header() {
           {/* Navigation Menu - Desktop */}
           <nav className="hidden md:flex space-x-8">
             <Link
-              href="/"
+              href="/dashboard"
               className="text-gray-800 hover:text-red-600 font-medium"
             >
               Home
             </Link>
             <Link
-              href="/messages"
+              href="/dashboard/messages"
               className="text-gray-800 hover:text-red-600 font-medium"
             >
               Messages
             </Link>
             <Link
-              href="/activity"
+              href="/dashboard/activity"
               className="text-gray-800 hover:text-red-600 font-medium"
             >
               Activity
             </Link>
             <Link
-              href="/partner-preferences"
+              href="/dashboard/preferences"
               className="text-gray-800 hover:text-red-600 font-medium"
             >
               Partner Preferences
@@ -280,8 +280,9 @@ export default function Header() {
               <button className="flex items-center focus:outline-none">
                 <Image
                   src={
-                    baseUrl + userProfile?.data?.user?.profile_image?.[0] ||
-                    "/images/default-profile.png"
+                    userProfile.data.user.profile_image.length > 0 ?
+                    baseUrl + userProfile.data.user.profile_image[0] :
+                    "/images/default-user.jpg"
                   }
                   alt="Profile"
                   width={40}
@@ -406,37 +407,37 @@ export default function Header() {
         <div className="md:hidden hidden" id="mobile-menu">
           <div className="px-4 py-3 space-y-3 border-t">
             <Link
-              href="/"
+              href="/dashboard"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Home
             </Link>
             <Link
-              href="/messages"
+              href="/dashboard/messages"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Messages
             </Link>
             <Link
-              href="/activity"
+              href="/dashboard/activity"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Activity
             </Link>
             <Link
-              href="/partner-preferences"
+              href="/dashboard/preferences"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Partner Preferences
             </Link>
             <Link
-              href="/favourites"
+              href="/dashboard/favourites"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Favourites
             </Link>
             <Link
-              href="/notifications"
+              href="/dashboard/notifications"
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Notifications

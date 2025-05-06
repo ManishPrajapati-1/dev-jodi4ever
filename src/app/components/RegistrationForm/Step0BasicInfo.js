@@ -8,6 +8,7 @@ import { updateFormData, updatePreferences } from "@/lib/features/profile/profil
 import OtpModal from "./OtpModal";
 import { useSearchParams } from "next/navigation";
 import { User, Mail, Phone, Send, AlertCircle } from "lucide-react";
+import toast, { Toaster } from 'react-hot-toast'
 
 export default function Step0BasicInfo() {
   const searchParams = useSearchParams();
@@ -42,9 +43,12 @@ export default function Step0BasicInfo() {
       await signUpUser(data).unwrap();
       setUserPhone(data.phone);
       dispatch(updateFormData(data));
+      toast.success("OTP sent successfully! Please check your phone.");
+      // Open the OTP modal
       setOtpModalOpen(true);
     } catch (error) {
       setErrorMessage(error?.data?.message || "Something went wrong. Please try again.");
+      toast.error(error?.data?.message || "Something went wrong. Please try again.")
     }
   };
 
@@ -57,12 +61,13 @@ export default function Step0BasicInfo() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {errorMessage && (
+          {/* {errorMessage && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-md flex items-start">
               <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
               <p>{errorMessage}</p>
             </div>
-          )}
+          )} */}
+          <Toaster position="right-bottom"/>
 
           <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">
