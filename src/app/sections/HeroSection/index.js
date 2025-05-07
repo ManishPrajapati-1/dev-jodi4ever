@@ -64,12 +64,12 @@ export default function Home() {
           <div className="flex justify-between items-center">
             <Image src="/images/jodi4ever_logo.png" width={100} height={100} className="w-14 md:w-18" alt="Logo" />
             {/* <span className="font-bold text-3xl text-white">J4E</span> */}
-            <span
+            {/* <span
               className="flex items-center gap-2 font-semibold text-2xl text-white hover:underline underline-offset-2 cursor-pointer"
               onClick={() => setShowModal(true)}
             >
               Login <Icons.ArrowDown />
-            </span>
+            </span> */}
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-7xl mx-auto gap-8 mt-12">
