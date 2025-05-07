@@ -75,7 +75,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-7xl mx-auto gap-8 mt-12">
             {/* Text Section */}
             <div className="text-center md:text-left text-white flex flex-col gap-4">
-              <h3 className="text-3xl">
+              <h3 className="text-3xl" onClick={() => setShowModal(true)}>
                 <span className="font-bold text-4xl">#</span>1 Matrimony
               </h3>
               <div>
