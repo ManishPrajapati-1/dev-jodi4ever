@@ -76,9 +76,34 @@ export const api = createApi({
       // keepUnusedDataFor: 300, // Keep data for 5 minutes
     }),
 
+    // Connect Profiles
+    connectProfile: builder.mutation({
+      query: (profileId) => ({
+        url: `user/connection/`,
+        method: "POST",
+        body: { receiverId: profileId },
+      }),
+    }),
+
+    // Like/Dislike Profiles
+    likeProfile: builder.mutation({
+      query: (profileId) => ({
+        url: `user/like_user/${profileId}`,
+        method: "GET",
+      }),
+    }),
+
+    dislikeProfile: builder.mutation({
+      query: (profileId) => ({
+        url: `user/unlike_user/${profileId}`,
+        method: "GET",
+      }),
+    }),
+
     // Update and get preferences
     getUserPreferences: builder.query({
       query: () => "user/yourPreference",
+      method: "GET",
     }),
     postUserPreferences: builder.mutation({
       query: (body) => ({
@@ -116,6 +141,9 @@ export const {
   useGetUserProfileQuery,
   useUpdateProfileMutation,
   useGetMatchingProfilesQuery,
+  useLikeProfileMutation,
+  useDislikeProfileMutation,
+  useConnectProfileMutation,
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
   useGetStatesQuery,

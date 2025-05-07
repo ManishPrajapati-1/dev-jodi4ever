@@ -72,7 +72,7 @@ export default function Header() {
           {/* User Profile Section */}
           <div className="flex items-center space-x-4">
             {/* Favourites Dropdown */}
-            <div className="relative group">
+            <div className="relative group mt-2">
               <button className="text-gray-700 hover:text-red-600 focus:outline-none">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@ export default function Header() {
             </div>
 
             {/* Notifications Dropdown */}
-            <div className="relative group">
+            <div className="relative group mt-2">
               <button className="text-gray-700 hover:text-red-600 focus:outline-none">
                 <div className="relative">
                   <svg

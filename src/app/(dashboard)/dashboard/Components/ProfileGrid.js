@@ -1,14 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Heart, UserPlus, MessageCircle, GraduationCap, Briefcase, MapPin, Crown } from 'lucide-react';
+import { Heart, UserPlus, MessageCircle, GraduationCap, Briefcase, MapPin, Crown, MessageSquareWarning } from 'lucide-react';
+import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation } from '@/lib/services/api';
+import toast, { Toaster } from 'react-hot-toast'
 
 const ProfileCard = ({ profile }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [connectProfile, { isLoadingConnect, isErrorConnect }] = useConnectProfileMutation();
+  const [likeProfile, { isLoadingLike, isErrorLike }] = useLikeProfileMutation();
+  const [dislikeProfile, { isLoadingDislike, isErrorDislike }] = useDislikeProfileMutation();
+  const [isLiked, setIsLiked] = useState(profile.isLiked);
   
   const hasMultipleImages = profile.profile_image && profile.profile_image.length > 1;
   
+  const toggleLike = async () => {
+    try {
+      if(isLiked) {
+        const res = await dislikeProfile(profile._id).unwrap();
+        setIsLiked(false);
+        toast.success(res.message);
+      } else {
+        const res = await likeProfile(profile._id).unwrap();
+        setIsLiked(true); 
+        toast.success(res.message);
+      }
+    }
+    catch (error) {
+      console.log('Like failed:', error);
+      toast.error('Failed to like the profile. Please try again.');
+    }
+  }
+
+
+  const handleConnect = async () => {
+    try {
+      const res = await connectProfile(profile._id).unwrap();
+      if(res.message.includes('already')) {
+        toast.error(res.message, {icon: <MessageSquareWarning className='stroke-yellow-600'/>},);
+      } else {
+        toast.success(res.message);
+      }
+      // toast.success(`${res.message} to ${profile.fullName}`, {icon: <MessageSquareWarning className='stroke-yellow-600'/>},);
+      // Handle successful connection (e.g., show a success message)
+    } catch (error) {
+      // Handle error (e.g., show an error message)
+      console.log('Connection failed:', error);
+      toast.error('Failed to send connection request. Please try again.');
+    }
+  }
+
   const goToNextImage = (e) => {
     e.preventDefault();
     if (hasMultipleImages) {
@@ -100,8 +142,8 @@ const ProfileCard = ({ profile }) => {
         )}
         
         {/* Favorite Button */}
-        <button className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full p-2 transition shadow-sm z-20">
-          <Heart size={20} className="text-primary" fill={profile.isLiked ? "#ff3366" : "none"} />
+        <button onClick={toggleLike} className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full p-2 transition shadow-sm z-20 cursor-pointer">
+          <Heart size={20} className="text-primary" fill={isLiked ? "#ff3366" : "none"} />
         </button>
         
         {/* Premium Badge */}
@@ -164,12 +206,12 @@ const ProfileCard = ({ profile }) => {
       
       {/* Action Buttons */}
       <div className="flex border-t border-gray-100">
-        <button className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center">
+        <button onClick={handleConnect} className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer">
           <UserPlus size={18} className="mr-2 text-primary" />
           Connect
         </button>
         <div className="w-px bg-gray-100"></div>
-        <button className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center">
+        <button className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer">
           <MessageCircle size={18} className="mr-2 text-primary" />
           Message
         </button>
@@ -181,6 +223,7 @@ const ProfileCard = ({ profile }) => {
 const ProfileGrid = ({ profiles }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Toaster position="right-bottom"/>
       {profiles.map((profile) => (
         <ProfileCard key={profile._id} profile={profile} />
       ))}
