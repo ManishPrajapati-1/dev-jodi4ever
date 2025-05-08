@@ -3,19 +3,22 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Heart, UserPlus, MessageCircle, GraduationCap, Briefcase, MapPin, Crown, MessageSquareWarning } from 'lucide-react';
-import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation } from '@/lib/services/api';
+import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation, useViewSingleProfileQuery } from '@/lib/services/api';
 import toast, { Toaster } from 'react-hot-toast'
+import { Loader2 } from 'lucide-react';
+import ProfileModal from './ProfileModal';
 
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile, onProfileClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [connectProfile, { isLoadingConnect, isErrorConnect }] = useConnectProfileMutation();
   const [likeProfile, { isLoadingLike, isErrorLike }] = useLikeProfileMutation();
   const [dislikeProfile, { isLoadingDislike, isErrorDislike }] = useDislikeProfileMutation();
   const [isLiked, setIsLiked] = useState(profile.isLiked);
-  
+
   const hasMultipleImages = profile.profile_image && profile.profile_image.length > 1;
-  
-  const toggleLike = async () => {
+
+  const toggleLike = async (e) => {
+    e.stopPropagation();
     try {
       if(isLiked) {
         const res = await dislikeProfile(profile._id).unwrap();
@@ -42,8 +45,6 @@ const ProfileCard = ({ profile }) => {
       } else {
         toast.success(res.message);
       }
-      // toast.success(`${res.message} to ${profile.fullName}`, {icon: <MessageSquareWarning className='stroke-yellow-600'/>},);
-      // Handle successful connection (e.g., show a success message)
     } catch (error) {
       // Handle error (e.g., show an error message)
       console.log('Connection failed:', error);
@@ -53,6 +54,7 @@ const ProfileCard = ({ profile }) => {
 
   const goToNextImage = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (hasMultipleImages) {
       setCurrentImageIndex((prev) => 
         prev === profile.profile_image.length - 1 ? 0 : prev + 1
@@ -62,6 +64,7 @@ const ProfileCard = ({ profile }) => {
   
   const goToPrevImage = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     if (hasMultipleImages) {
       setCurrentImageIndex((prev) => 
         prev === 0 ? profile.profile_image.length - 1 : prev - 1
@@ -69,14 +72,15 @@ const ProfileCard = ({ profile }) => {
     }
   };
   
-  const goToImage = (index) => {
+  const goToImage = (e, index) => {
+    e.stopPropagation();
     setCurrentImageIndex(index);
   };
   
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden transition transform hover:shadow-md hover:translate-y-[-4px]">
       {/* Profile Image with Slider */}
-      <div className="relative aspect-[1/1]">
+      <div className="relative aspect-[1/1] cursor-pointer" onClick={() => {onProfileClick(profile._id)}}>
         {profile.profile_image && profile.profile_image.length > 0 ? (
           <div className="relative w-full h-full">
             {/* Current image display */}
@@ -124,7 +128,7 @@ const ProfileCard = ({ profile }) => {
                       <button 
                         key={index} 
                         className={`w-2 h-2 rounded-full ${index === currentImageIndex ? 'bg-white' : 'bg-white/70 hover:bg-white'} transition-colors`}
-                        onClick={() => goToImage(index)}
+                        onClick={(e) => goToImage(e, index)}
                         aria-label={`View image ${index + 1}`}
                       ></button>
                     ))}
@@ -216,18 +220,111 @@ const ProfileCard = ({ profile }) => {
           Message
         </button>
       </div>
+
     </div>
   );
 };
 
 const ProfileGrid = ({ profiles }) => {
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { 
+    data: singleProfileData, 
+    isLoading: isLoadingProfile,
+    error: profileError
+  } = useViewSingleProfileQuery(selectedProfileId, {
+    skip: !selectedProfileId,
+  });
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  
+    // Clean up when the component unmounts or modal closes
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
+  const handleProfileClick = (profileId) => {
+    setSelectedProfileId(null);
+    setSelectedProfileId(profileId);
+    setIsModalOpen(true);
+    window.target
+    // Make sure query is triggered
+    // The actual data fetching is handled by the RTK Query hook
+  };
+
+  // Close modal and reset selected profile
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // We can choose to keep the profile data cached or reset it
+    setSelectedProfileId(null); // Uncomment to reset on close
+  };
+
+  const handleLikeChange = (profileId, isLiked) => {
+    // Update the profiles state with the new like status
+    setProfiles(prevProfiles => 
+      prevProfiles.map(profile => 
+        profile._id === profileId 
+          ? { ...profile, isLiked } 
+          : profile
+      )
+    );
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Toaster position="right-bottom"/>
-      {profiles.map((profile) => (
-        <ProfileCard key={profile._id} profile={profile} />
-      ))}
+    <div className='relative'>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Toaster position="right-bottom"/>
+        {profiles.map((profile) => (
+          <ProfileCard key={profile._id} profile={profile} onProfileClick={handleProfileClick}/>
+        ))}
+      </div>
+
+      {isLoadingProfile && selectedProfileId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl flex items-center">
+            <Loader2 className="animate-spin mr-2 text-primary" size={24} />
+            <span className="text-gray-700 font-medium">Loading profile...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Error handling for profile fetch */}
+      {profileError && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsModalOpen(false)}>
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md">
+            <h3 className="text-red-600 font-bold text-lg mb-2">Error Loading Profile</h3>
+            <p className="text-gray-700">
+              There was a problem loading this profile. Please try again later.
+            </p>
+            <button 
+              className="mt-4 w-full py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Profile Modal */}
+      {singleProfileData && (
+        <ProfileModal 
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          profileData={singleProfileData.data}
+          onLikeChange={handleLikeChange}
+        />
+      )}
+
     </div>
+    
   );
 };
 

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Save } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast';
+import fieldsData from '../fieldsData.json';
 import {
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
@@ -91,7 +92,7 @@ export default function PartnerPreferencesPage() {
     if (match) {
       const feet = parseInt(match[1]);
       const inches = parseInt(match[2]);
-      return (feet * 30.48 + inches * 2.54).toFixed(1);
+      return (feet * 30.48 + inches * 2.54).toFixed(2);
     }
     return "0.0";
   };
@@ -315,9 +316,9 @@ export default function PartnerPreferencesPage() {
                         className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.manglik ? "border-red-500" : "border-gray-300"}`}
                       >
                         <option value="">Select</option>
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                        <option value="Doesn't Matter">Doesn&apos;t Matter</option>
+                        <option value="Non-manglik">Non-manglik</option>
+                        <option value="Manglik">Manglik</option>
+                        <option value="Anshik-manglik">Anshik-manglik</option>
                       </select>
                       {errors.manglik && (
                         <p className="text-red-500 text-xs mt-1">{errors.manglik.message}</p>
@@ -405,12 +406,12 @@ export default function PartnerPreferencesPage() {
                       {...register("highest_education", { required: "Education is required" })}
                       className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.highest_education ? "border-red-500" : "border-gray-300"}`}
                     >
-                      <option value="High School">High School</option>
-                      <option value="Diploma">Diploma</option>
-                      <option value="Bachelors or higher">Bachelors or higher</option>
-                      <option value="Masters or higher">Masters or higher</option>
-                      <option value="Doctorate">Doctorate</option>
-                      <option value="Any">Any</option>
+                      <option value="Below High School">Below High School</option>
+                    <option value="High School (12th)">High School (12th)</option>
+                    <option value="Diploma">Diploma</option>
+                    <option value="Bachelor's">Bachelor&apos;s</option>
+                    <option value="Master's">Master&apos;s</option>
+                    <option value="Doctorate">Doctorate/PhD</option>
                     </select>
                     {errors.highest_education && (
                       <p className="text-red-500 text-xs mt-1">{errors.highest_education.message}</p>
@@ -426,12 +427,11 @@ export default function PartnerPreferencesPage() {
                       {...register("employed_in", { required: "Employment is required" })}
                       className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.employed_in ? "border-red-500" : "border-gray-300"}`}
                     >
-                      <option value="Private Sector">Private Sector</option>
-                      <option value="Government">Government</option>
-                      <option value="Defense">Defense</option>
-                      <option value="Business">Business</option>
-                      <option value="Self-Employed">Self-Employed</option>
-                      <option value="Not Working">Not Working</option>
+                      {fieldsData.employeeInOptions.map((employed_in, index) => (
+                                            <option key={index} value={employed_in}>
+                                              {employed_in}
+                                            </option>
+                                          ))}
                     </select>
                     {errors.employed_in && (
                       <p className="text-red-500 text-xs mt-1">{errors.employed_in.message}</p>
@@ -447,13 +447,11 @@ export default function PartnerPreferencesPage() {
                       {...register("annual_income", { required: "Income is required" })}
                       className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.annual_income ? "border-red-500" : "border-gray-300"}`}
                     >
-                      <option value="Less than 5 LPA">Less than 5 LPA</option>
-                      <option value="5 - 10 Lakhs">5 - 10 Lakhs</option>
-                      <option value="10 - 20 Lakhs">10 - 20 Lakhs</option>
-                      <option value="20 - 30 Lakhs">20 - 30 Lakhs</option>
-                      <option value="30 - 50 Lakhs">30 - 50 Lakhs</option>
-                      <option value="50 Lakhs - 1 Crore">50 Lakhs - 1 Crore</option>
-                      <option value="More than 1 Crore">More than 1 Crore</option>
+                      {fieldsData.annualIncomeOptions.map((annual_income, index) => (
+                        <option key={index} value={annual_income}>
+                          {annual_income}
+                        </option>
+                      ))}
                     </select>
                     {errors.annual_income && (
                       <p className="text-red-500 text-xs mt-1">{errors.annual_income.message}</p>

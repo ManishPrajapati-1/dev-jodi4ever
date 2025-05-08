@@ -76,14 +76,14 @@ export default function RootLayout({ children }) {
               alt="leaf left"
               width={100}
               height={100}
-              className="fixed top-20 -left-5 z-90 w-auto h-auto opacity-85 invisible md:visible"
+              className="fixed top-30 -left-5.5 z-90 w-auto h-auto opacity-75 invisible md:visible"
             />
             <Image
               src={"/images/leafr.png"}
               alt="leaf right"
               width={65}
               height={90}
-              className="fixed bottom-0 right-0 z-90 w-auto h-auto opacity-85 invisible md:visible"
+              className="fixed bottom-0 right-0 z-90 w-auto h-auto opacity-75 invisible md:visible"
             />
           </>
           {children}

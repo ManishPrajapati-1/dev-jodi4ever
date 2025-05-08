@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useSelector, useDispatch } from 'react-redux'
-import { toast } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 
 // Import your RTK query mutation
 import { useUpdateProfileMutation } from '@/lib/services/api';
@@ -93,7 +93,8 @@ export default function ProfilePage() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      ...(name === "height" && { heightInCm: getSelectedCm(value) })
     }))
   }
   
@@ -142,6 +143,16 @@ export default function ProfilePage() {
     }
   }
 
+  const getSelectedCm = (heightString) => {
+    const match = heightString.match(/(\d+)'(\d+)"/);
+    if (match) {
+      const feet = parseInt(match[1]);
+      const inches = parseInt(match[2]);
+      return (feet * 30.48 + inches * 2.54).toFixed(2);
+    }
+    return "0.0";
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -155,6 +166,7 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Toaster position='bottom-right'/>
       {/* Profile Header */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         {/* Cover Photo */}
@@ -473,7 +485,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <label htmlFor="height" className="block text-sm font-medium text-gray-700 mb-2">Height</label>
-                      <input
+                      {/* <input
                         type="text"
                         id="height"
                         name="height"
@@ -481,7 +493,25 @@ export default function ProfilePage() {
                         value={formData.height}
                         onChange={handleInputChange}
                         placeholder="e.g. 5'10''"
-                      />
+                      /> */}
+                      <select 
+                      onChange={handleInputChange} 
+                      id="height"
+                      name="height"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      value={formData.height}
+                      >
+                      {Array.from({ length: 37 }, (_, i) => {
+                            const feet = Math.floor(i / 12) + 4; // Start at 4 feet
+                            const inches = i % 12;
+                            const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
+                            return (
+                              <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
+                                {feet}&apos;{inches}&quot; ({cm} cm)
+                              </option>
+                            );
+                          })}
+                      </select>
                     </div>
                     <div>
                       <label htmlFor="marital_status" className="block text-sm font-medium text-gray-700 mb-2">Marital Status</label>

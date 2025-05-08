@@ -113,6 +113,14 @@ export const api = createApi({
       }),
     }),
 
+    // View Profile
+    viewSingleProfile: builder.query({
+      query: (id) => ({
+        url: `user/single_match/${id}`,
+        method: "GET"
+      }),
+    }),
+
     // State/City
     getStates: builder.query({
       query: () => ({
@@ -146,6 +154,7 @@ export const {
   useConnectProfileMutation,
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
+  useViewSingleProfileQuery,
   useGetStatesQuery,
   useGetCitiesQuery,
 } = api;

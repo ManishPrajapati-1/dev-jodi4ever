@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { redirect } from "next/navigation";
 import { ChevronDown, Check, Save } from "lucide-react";
+import fieldsData from "./fieldsData.json"
 
 import {
   usePostUserPreferencesMutation,
@@ -57,8 +58,10 @@ const PreferencesForm = () => {
     try {
       // Convert checkbox boolean to string boolean for API
       data.any_caste = data.any_caste === true;
-      data.min_height_in_cm = parseInt(data.min_height_in_cm, 10);
-      data.max_height_in_cm = parseInt(data.max_height_in_cm, 10);
+      data.min_height = `${data.min_height_in_cm}`;
+      data.max_height = `${data.max_height_in_cm}`;
+      data.min_height_in_cm = Number(getSelectedCm(data.min_height_in_cm));
+      data.max_height_in_cm = Number(getSelectedCm(data.max_height_in_cm));
 
       await postUserPreferences(data).unwrap();
       
@@ -70,6 +73,16 @@ const PreferencesForm = () => {
       // Error will be handled by the isError state
       console.error("Failed to save preferences:", error);
     }
+  };
+
+  const getSelectedCm = (heightString) => {
+    const match = heightString.match(/(\d+)'(\d+)"/);
+    if (match) {
+      const feet = parseInt(match[1]);
+      const inches = parseInt(match[2]);
+      return (feet * 30.48 + inches * 2.54).toFixed(2);
+    }
+    return "0.0";
   };
 
   // Helper for form section toggle
@@ -152,12 +165,16 @@ const PreferencesForm = () => {
                       {...register("min_height_in_cm", { required: "Required" })}
                       className={`input-select w-full ${errors.min_height_in_cm ? "border-red-500" : ""}`}
                     >
-                      <option value="">Min</option>
-                      {[...Array(51).keys()].map((i) => (
-                        <option key={i} value={i + 150}>
-                          {i + 150} cm
-                        </option>
-                      ))}
+                     {Array.from({ length: 37 }, (_, i) => {
+                            const feet = Math.floor(i / 12) + 4; // Start at 4 feet
+                            const inches = i % 12;
+                            const cm = (feet * 30.48 + inches * 2.54).toFixed(1);
+                            return (
+                              <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
+                                {feet}&apos;{inches}&quot; ({cm} cm)
+                              </option>
+                            );
+                          })}
                     </select>
                     {errors.min_height_in_cm && (
                       <p className="text-red-500 text-xs mt-1">{errors.min_height_in_cm.message}</p>
@@ -169,12 +186,16 @@ const PreferencesForm = () => {
                       {...register("max_height_in_cm", { required: "Required" })}
                       className={`input-select w-full ${errors.max_height_in_cm ? "border-red-500" : ""}`}
                     >
-                      <option value="">Max</option>
-                      {[...Array(51).keys()].map((i) => (
-                        <option key={i} value={i + 150}>
-                          {i + 150} cm
-                        </option>
-                      ))}
+                      {Array.from({ length: 37 }, (_, i) => {
+                            const feet = Math.floor(i / 12) + 4; // Start at 4 feet
+                            const inches = i % 12;
+                            const cm = (feet * 30.48 + inches * 2.54).toFixed(1);
+                            return (
+                              <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
+                                {feet}&apos;{inches}&quot; ({cm} cm)
+                              </option>
+                            );
+                          })}
                     </select>
                     {errors.max_height_in_cm && (
                       <p className="text-red-500 text-xs mt-1">{errors.max_height_in_cm.message}</p>
@@ -275,9 +296,9 @@ const PreferencesForm = () => {
                     className={`input-select w-full ${errors.manglik ? "border-red-500" : ""}`}
                   >
                     <option value="">Select</option>
-                    <option>No</option>
-                    <option>Yes</option>
-                    <option>Doesn&apos;t Matter</option>
+                    <option value="Non-manglik">Non-manglik</option>
+                      <option value="Manglik">Manglik</option>
+                      <option value="Anshik-manglik">Anshik-manglik</option>
                   </select>
                   {errors.manglik && (
                     <p className="text-red-500 text-xs mt-1">{errors.manglik.message}</p>
@@ -367,12 +388,12 @@ const PreferencesForm = () => {
                   className={`input-select w-full ${errors.highest_education ? "border-red-500" : ""}`}
                 >
                   <option value="">Select</option>
-                  <option>High School</option>
-                  <option>Diploma</option>
-                  <option>Undergraduate</option>
-                  <option>Postgraduate</option>
-                  <option>Doctorate</option>
-                  <option>Professional Degree</option>
+                  <option value="Below High School">Below High School</option>
+                    <option value="High School (12th)">High School (12th)</option>
+                    <option value="Diploma">Diploma</option>
+                    <option value="Bachelor's">Bachelor&apos;s</option>
+                    <option value="Master's">Master&apos;s</option>
+                    <option value="Doctorate">Doctorate/PhD</option>
                 </select>
                 {errors.highest_education && (
                   <p className="text-red-500 text-xs mt-1">{errors.highest_education.message}</p>
@@ -388,13 +409,11 @@ const PreferencesForm = () => {
                   {...register("employed_in", { required: "Employment is required" })}
                   className={`input-select w-full ${errors.employed_in ? "border-red-500" : ""}`}
                 >
-                  <option value="">Select</option>
-                  <option>Private Sector</option>
-                  <option>Government</option>
-                  <option>Defense</option>
-                  <option>Business</option>
-                  <option>Self-Employed</option>
-                  <option>Not Working</option>
+                  {fieldsData.employeeInOptions.map((employed_in, index) => (
+                                        <option key={index} value={employed_in}>
+                                          {employed_in}
+                                        </option>
+                                      ))}
                 </select>
                 {errors.employed_in && (
                   <p className="text-red-500 text-xs mt-1">{errors.employed_in.message}</p>
@@ -411,13 +430,11 @@ const PreferencesForm = () => {
                   className={`input-select w-full ${errors.annual_income ? "border-red-500" : ""}`}
                 >
                   <option value="">Select</option>
-                  <option>Less than 5 Lakhs</option>
-                  <option>5 - 10 Lakhs</option>
-                  <option>10 - 20 Lakhs</option>
-                  <option>20 - 30 Lakhs</option>
-                  <option>30 - 50 Lakhs</option>
-                  <option>50 Lakhs - 1 Crore</option>
-                  <option>More than 1 Crore</option>
+                  {fieldsData.annualIncomeOptions.map((annual_income, index) => (
+                    <option key={index} value={annual_income}>
+                      {annual_income}
+                    </option>
+                  ))}
                 </select>
                 {errors.annual_income && (
                   <p className="text-red-500 text-xs mt-1">{errors.annual_income.message}</p>
