@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Heart, UserPlus, MessageCircle, GraduationCap, Briefcase, MapPin, Crown, MessageSquareWarning } from 'lucide-react';
 import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation, useViewSingleProfileQuery } from '@/lib/services/api';
 import toast, { Toaster } from 'react-hot-toast'
@@ -39,7 +40,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
 
   const handleConnect = async () => {
     try {
-      const res = await connectProfile(profile._id).unwrap();
+      const res = await connectProfile({profileId: profile._id, status: "Accepted"}).unwrap();
       if(res.message.includes('already')) {
         toast.error(res.message, {icon: <MessageSquareWarning className='stroke-yellow-600'/>},);
       } else {
@@ -88,8 +89,10 @@ const ProfileCard = ({ profile, onProfileClick }) => {
               <Image
                 src={`http://65.1.117.252:5002/${profile.profile_image[currentImageIndex]}`}
                 alt={`${profile.fullName}`}
-                fill
-                className="object-cover"
+                width={500}
+                height={500}
+                priority={true}
+                className="object-cover w-full h-full"
               />
             </div>
             
@@ -163,7 +166,9 @@ const ProfileCard = ({ profile, onProfileClick }) => {
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <div>
-            <h3 className="text-lg font-bold text-gray-800">{profile.fullName}</h3>
+            <Link href={`/dashboard/profile/${profile._id}`}>
+              <h3 className="text-lg font-bold text-gray-800">{profile.fullName}</h3>
+            </Link>
             <p className="text-sm text-gray-500 flex items-center">
               <MapPin size={14} className="mr-1" />
               {profile.city || profile.state || 'Location not specified'}

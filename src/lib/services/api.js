@@ -76,12 +76,12 @@ export const api = createApi({
       // keepUnusedDataFor: 300, // Keep data for 5 minutes
     }),
 
-    // Connect Profiles
+    // Connect Profiles - Fixed with optional status parameter
     connectProfile: builder.mutation({
-      query: (profileId) => ({
+      query: ({ profileId, status = '' }) => ({
         url: `user/connection/`,
         method: "POST",
-        body: { receiverId: profileId },
+        body: { receiverId: profileId, status },
       }),
     }),
 
@@ -100,10 +100,59 @@ export const api = createApi({
       }),
     }),
 
+    // Get Notifications
+    getNotifications: builder.query({
+      query: () => ({
+        url: `user/get_notification`,
+        method: "GET",
+      })
+    }),
+
+    // Get Favourites
+    getFavourites: builder.query({
+      query: () => ({
+        url: 'user/get_liked_users',
+        method: "GET"
+      })
+    }),
+
+    // Get Connections List
+    getConnections: builder.query({
+      query: () => ({
+        url: "user/connections",
+        method: "GET"
+      })
+    }),
+
+    // Get Send and Receive requests List - Fixed request functions
+    sendRequest: builder.query({
+      query: () => ({
+        url: "user/connections/sent",
+        method: "GET"
+      })
+    }),
+
+    getRequests: builder.query({
+      query: () => ({
+        url: "user/connections/received",
+        method: "GET"
+      })
+    }),
+
+    // Cancel send request - Fixed to use parameter
+    cancelRequest: builder.mutation({
+      query: (connectionId) => ({
+        url: `user/connections/${connectionId}`,
+        method: "DELETE"
+      })
+    }),
+
     // Update and get preferences
     getUserPreferences: builder.query({
-      query: () => "user/yourPreference",
-      method: "GET",
+      query: () => ({
+        url: "user/yourPreference",
+        method: "GET",
+      }),
     }),
     postUserPreferences: builder.mutation({
       query: (body) => ({
@@ -155,6 +204,12 @@ export const {
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
   useViewSingleProfileQuery,
+  useGetNotificationsQuery,
+  useGetFavouritesQuery,
+  useGetConnectionsQuery,
+  useSendRequestQuery,
+  useGetRequestsQuery,
+  useCancelRequestMutation,
   useGetStatesQuery,
   useGetCitiesQuery,
 } = api;

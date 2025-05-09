@@ -2,29 +2,74 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useGetUserProfileQuery } from "@/lib/services/api";
+import { useGetUserProfileQuery, useGetNotificationsQuery, useGetFavouritesQuery } from "@/lib/services/api";
 import { updateUserProfile } from "@/lib/features/user/userSlice";
+import { useRouter } from 'next/navigation'
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 
 export default function Header() {
   const dispatch = useDispatch();
   const { data: userProfile, isLoading, isError } = useGetUserProfileQuery();
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
+  const { data: notificationData, isNotificationLoading, isNotificationError} = useGetNotificationsQuery();
+  const { data: favouritesData, isFavouritesLoading, isFavouritesError } = useGetFavouritesQuery();
+  const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
 
- 
+  // Get unread notifications count
+  const unreadCount = notificationData?.data?.filter(notification => !notification.isRead)?.length || 0;
 
-    useEffect(() => {
-      if (userProfile && !isLoading && !isError) {
-        dispatch(updateUserProfile(userProfile?.data?.user));
-      }
-    }, [userProfile, dispatch, isLoading, isError]);
+  // Get the three most recent notifications
+  const recentNotifications = notificationData?.data?.slice(0, 3) || [];
 
-  // console.log(userProfile, "userProfile");
+  // Get the favourites data
+  const favourites = favouritesData?.data || [];
+  const recentFavourites = favourites.slice(0, 3);
+
+  useEffect(() => {
+    if (userProfile && !isLoading && !isError) {
+      dispatch(updateUserProfile(userProfile?.data?.user));
+    }
+  }, [userProfile, dispatch, isLoading, isError]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.replace('/create-profile')
+    }
+  }, [router])
   
   if (isLoading) return <div></div>;
-  if (isError) return <div>Error loading profile</div>;
+  if (isError) return <div></div>;
+
+  // Helper function to generate time ago string
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    }
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `${diffInWeeks} week${diffInWeeks > 1 ? 's' : ''} ago`;
+  };
 
   return (
     <>
@@ -37,7 +82,7 @@ export default function Header() {
               alt="Jodi Banao Logo"
               width={70}
               height={70}
-              className="mr-2"
+              className="mr-2 w-auto h-auto"
             />
           </Link>
 
@@ -48,12 +93,6 @@ export default function Header() {
               className="text-gray-800 hover:text-red-600 font-medium"
             >
               Home
-            </Link>
-            <Link
-              href="/dashboard/messages"
-              className="text-gray-800 hover:text-red-600 font-medium"
-            >
-              Messages
             </Link>
             <Link
               href="/dashboard/activity"
@@ -73,6 +112,7 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {/* Favourites Dropdown */}
             <div className="relative group mt-2">
+              <a href="/dashboard/favourites">
               <button className="text-gray-700 hover:text-red-600 focus:outline-none">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -89,55 +129,67 @@ export default function Header() {
                   />
                 </svg>
               </button>
+              </a>
 
               {/* Favourites Dropdown Menu */}
-              <div className="absolute right-0 mt-0 w-64 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+              {/* <div className="absolute right-0 mt-0 w-64 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
                 <div className="px-4 py-2 border-b">
                   <h3 className="font-semibold text-gray-700">Favourites</h3>
                 </div>
                 <div className="max-h-60 overflow-y-auto">
-                  <div className="p-2 hover:bg-gray-50">
-                    <Link href="/favourites" className="flex items-center">
-                      <Image
-                        src="/profiles/komal.jpg"
-                        alt="Komal"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div className="ml-2">
-                        <p className="text-sm font-medium">Komal Yadav</p>
-                        <p className="text-xs text-gray-500">27 yrs, Delhi</p>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="p-2 hover:bg-gray-50">
-                    <Link href="/favourites" className="flex items-center">
-                      <Image
-                        src="/profiles/manisha.jpg"
-                        alt="Manisha"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div className="ml-2">
-                        <p className="text-sm font-medium">Manisha Bharti</p>
-                        <p className="text-xs text-gray-500">26 yrs, Delhi</p>
-                      </div>
-                    </Link>
-                  </div>
+                  {isFavouritesLoading ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Loading favourites...
+                    </div>
+                  ) : isFavouritesError ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Failed to load favourites
+                    </div>
+                  ) : recentFavourites.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      No favourites found
+                    </div>
+                  ) : (
+                    recentFavourites.map((favourite) => {
+                      // Only show favourites with valid userLikedTo data
+                      if (!favourite.userLikedTo) return null;
+                      
+                      return (
+                        <div key={favourite._id} className="p-2 hover:bg-gray-50">
+                          <Link href={`/dashboard/profile/${favourite.userLikedTo._id}`} className="flex items-center">
+                            <Image
+                              src={
+                                favourite.userLikedTo.profile_image?.length > 0 
+                                ? `${baseUrl}${favourite.userLikedTo.profile_image[0]}` 
+                                : "/images/default-user.jpg"
+                              }
+                              alt={favourite.userLikedTo.fullName || "User"}
+                              width={40}
+                              height={40}
+                              className="rounded-full object-cover aspect-square"
+                            />
+                            <div className="ml-2">
+                              <p className="text-sm font-medium">{favourite.userLikedTo.fullName || "User"}</p>
+                              <p className="text-xs text-gray-500">{getTimeAgo(favourite.createdAt)}</p>
+                            </div>
+                          </Link>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
-                <Link
-                  href="/favourites"
+                <a
+                  href="/dashboard/favourites"
                   className="block text-center text-sm text-red-600 font-medium p-2 border-t hover:bg-red-50"
                 >
                   View All Favourites
-                </Link>
-              </div>
+                </a>
+              </div> */}
             </div>
 
             {/* Notifications Dropdown */}
             <div className="relative group mt-2">
+            <a href="/dashboard/notifications">
               <button className="text-gray-700 hover:text-red-600 focus:outline-none">
                 <div className="relative">
                   <svg
@@ -154,133 +206,104 @@ export default function Header() {
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                     />
                   </svg>
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                    3
-                  </span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </div>
               </button>
+            </a>
 
               {/* Notifications Dropdown Menu */}
-              <div className="absolute right-0 mt-0 w-80 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+              {/* <div className="absolute right-0 mt-0 w-80 bg-white rounded-md shadow-lg py-2 z-10 hidden group-hover:block">
                 <div className="px-4 py-2 border-b flex justify-between items-center">
                   <h3 className="font-semibold text-gray-700">Notifications</h3>
                   <Link
-                    href="/notifications"
+                    href="/dashboard/notifications"
                     className="text-xs text-red-600 hover:text-red-800"
                   >
                     Mark All as Read
                   </Link>
                 </div>
                 <div className="max-h-72 overflow-y-auto">
-                  <div className="p-3 hover:bg-gray-50 border-b">
-                    <Link href="/notifications" className="flex items-start">
-                      <Image
-                        src="/profiles/komal.jpg"
-                        alt="Komal"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div className="ml-3 flex-grow">
-                        <p className="text-sm">
-                          <span className="font-medium">Komal Yadav</span> liked
-                          your profile
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          10 minutes ago
-                        </p>
+                  {isNotificationLoading ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Loading notifications...
+                    </div>
+                  ) : isNotificationError ? (
+                    <div className="p-4 text-center text-gray-500">
+                      Failed to load notifications
+                    </div>
+                  ) : recentNotifications.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">
+                      No notifications found
+                    </div>
+                  ) : (
+                    recentNotifications.map((notification) => (
+                      <div key={notification._id} className="p-3 hover:bg-gray-50 border-b">
+                        <Link href="/dashboard/notifications" className="flex items-center">
+                          {notification.pic && notification.pic.length > 0 ? (
+                            <Image
+                              src={`${baseUrl}${notification.pic[0]}`}
+                              alt="Profile"
+                              width={50}
+                              height={50}
+                              className="aspect-square rounded-full object-cover object-top"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-red-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                          )}
+                          <div className="ml-3 flex-grow">
+                            <p className="text-sm">
+                              {notification.title && (
+                                <span className="font-medium">{notification.title}: </span>
+                              )}
+                              {notification.message}
+                            </p>
+                            <div className="text-xs text-gray-500 mt-1 flex justify-between">
+                              {getTimeAgo(notification.createdAt)}
+                              {!notification.isRead && (
+                                <div className="h-2 w-2 rounded-full bg-red-600 mt-1 self-end"></div>
+                              )}
+                            </div>
+                          
+                          </div>
+                        </Link>
                       </div>
-                      <div className="h-2 w-2 rounded-full bg-red-600 mt-1"></div>
-                    </Link>
-                  </div>
-                  <div className="p-3 hover:bg-gray-50 border-b">
-                    <Link href="/notifications" className="flex items-start">
-                      <Image
-                        src="/profiles/manisha.jpg"
-                        alt="Manisha"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div className="ml-3 flex-grow">
-                        <p className="text-sm">
-                          <span className="font-medium">Manisha Bharti</span>{" "}
-                          viewed your profile
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          2 hours ago
-                        </p>
-                      </div>
-                      <div className="h-2 w-2 rounded-full bg-red-600 mt-1"></div>
-                    </Link>
-                  </div>
-                  <div className="p-3 hover:bg-gray-50">
-                    <Link href="/notifications" className="flex items-start">
-                      <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 text-red-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M13 10V3L4 14h7v7l9-11h-7z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm">
-                          Upgrade to Premium and get 50% off for the first
-                          month!
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">5 days ago</p>
-                      </div>
-                    </Link>
-                  </div>
+                    ))
+                  )}
                 </div>
                 <Link
-                  href="/notifications"
+                  href="/dashboard/notifications"
                   className="block text-center text-sm text-red-600 font-medium p-2 border-t hover:bg-red-50"
                 >
                   View All Notifications
                 </Link>
-              </div>
+              </div> */}
             </div>
-
-            {/* Settings */}
-            {/* <Link href="/settings" className="text-gray-700 hover:text-red-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </Link> */}
 
             {/* User Menu */}
             <div className="relative group">
               <button className="flex items-center focus:outline-none">
                 <Image
                   src={
-                    userProfile.data.user.profile_image.length > 0 ?
+                    userProfile.data.user.profile_image?.length > 0 ?
                     baseUrl + userProfile.data.user.profile_image[0] :
                     "/images/default-user.jpg"
                   }
@@ -311,26 +334,6 @@ export default function Header() {
                   </svg>
                   My Profile
                 </Link>
-                {/* <Link
-                  href="/profile/edit"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 inline mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  Edit Profile
-                </Link> */}
                 <Link
                   href="/settings"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600"
@@ -411,12 +414,6 @@ export default function Header() {
               className="block font-medium text-gray-700 hover:text-red-600"
             >
               Home
-            </Link>
-            <Link
-              href="/dashboard/messages"
-              className="block font-medium text-gray-700 hover:text-red-600"
-            >
-              Messages
             </Link>
             <Link
               href="/dashboard/activity"

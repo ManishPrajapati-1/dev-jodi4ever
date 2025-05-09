@@ -5,117 +5,36 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useGetNotificationsQuery } from "@/lib/services/api"
 
 export default function NotificationsPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [notifications, setNotifications] = useState([])
   const [activeTab, setActiveTab] = useState('all')
+  const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
+  
+  // Use RTK Query hook to fetch notifications
+  const { 
+    data: notificationData, 
+    isLoading: isNotificationLoading, 
+    isError: isNotificationError 
+  } = useGetNotificationsQuery();
+  
+  // Extract notifications from the response if available
+  const notifications = notificationData?.data || []
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
       router.replace('/create-profile')
-    } else {
-      // Fetch notifications from your API
-      // This is mock data, replace with actual API call
-      setTimeout(() => {
-        setNotifications([
-          {
-            id: 1,
-            type: 'like',
-            user: {
-              id: 101,
-              name: 'Komal Yadav',
-              image: '/profiles/komal.jpg'
-            },
-            message: 'liked your profile',
-            time: '10 minutes ago',
-            isRead: false
-          },
-          {
-            id: 2,
-            type: 'visit',
-            user: {
-              id: 102,
-              name: 'Manisha Bharti',
-              image: '/profiles/manisha.jpg'
-            },
-            message: 'viewed your profile',
-            time: '2 hours ago',
-            isRead: false
-          },
-          {
-            id: 3,
-            type: 'message',
-            user: {
-              id: 103,
-              name: 'Shipra Rohilla',
-              image: '/profiles/shipra.jpg'
-            },
-            message: 'sent you a message',
-            time: '1 day ago',
-            isRead: true
-          },
-          {
-            id: 4,
-            type: 'match',
-            user: {
-              id: 104,
-              name: 'Deepak Singh',
-              image: '/profiles/user1.jpg'
-            },
-            message: 'is a new match for you',
-            time: '2 days ago',
-            isRead: true
-          },
-          {
-            id: 5,
-            type: 'system',
-            message: 'Your profile has been successfully verified!',
-            time: '3 days ago',
-            isRead: true
-          },
-          {
-            id: 5,
-            type: 'system',
-            message: 'Your profile has been successfully verified!',
-            time: '3 days ago',
-            isRead: true
-          },
-          {
-            id: 6,
-            type: 'premium',
-            message: 'Upgrade to Premium and get 50% off for the first month!',
-            time: '5 days ago',
-            isRead: true
-          },
-          {
-            id: 7,
-            type: 'request',
-            user: {
-              id: 105,
-              name: 'Ravi Kumar',
-              image: '/profiles/user2.jpg'
-            },
-            message: 'sent you a connection request',
-            time: '1 week ago',
-            isRead: true
-          }
-        ])
-        setLoading(false)
-      }, 1000)
     }
   }, [router])
 
   const markAllAsRead = () => {
     // In a real app, you would call your API to mark all notifications as read
-    // This is just for demo purposes
-    const updatedNotifications = notifications.map(notification => ({
-      ...notification,
-      isRead: true
-    }))
-    setNotifications(updatedNotifications)
+    // For now, we'll just implement client-side UI update
+    // You can add an API mutation for this functionality using RTK Query later
+    console.log('Mark all as read functionality needs to be implemented with RTK Query')
   }
 
   const getFilteredNotifications = () => {
@@ -123,17 +42,73 @@ export default function NotificationsPage() {
       return notifications
     } else if (activeTab === 'unread') {
       return notifications.filter(notification => !notification.isRead)
-    } else {
-      return notifications.filter(notification => notification.type === activeTab)
+    } else if (activeTab === 'like') {
+      return notifications.filter(notification => notification.title?.includes('Liked'))
+    } else if (activeTab === 'visit') {
+      return notifications.filter(notification => notification.title?.includes('Profile View'))
+    } else if (activeTab === 'message') {
+      return notifications.filter(notification => notification.title?.includes('Message'))
+    } else if (activeTab === 'match') {
+      return notifications.filter(notification => 
+        notification.title?.includes('Connection Request Accepted') || 
+        notification.title?.includes('Friend Request Accepted')
+      )
+    } else if (activeTab === 'request') {
+      return notifications.filter(notification => 
+        notification.title?.includes('Friend Request Received') || 
+        notification.title?.includes('Connection Request')
+      )
     }
+    return notifications
   }
 
-  if (loading) {
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInSeconds = Math.floor((now - date) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`
+    }
+    
+    const diffInMinutes = Math.floor(diffInSeconds / 60)
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`
+    }
+    
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`
+    }
+    
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays < 7) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`
+    }
+    
+    const diffInWeeks = Math.floor(diffInDays / 7)
+    return `${diffInWeeks} week${diffInWeeks > 1 ? 's' : ''} ago`
+  }
+
+  if (isNotificationLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading notifications...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (isNotificationError) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-600 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="mt-4 text-gray-600">Failed to load notifications. Please try again later.</p>
         </div>
       </div>
     )
@@ -194,6 +169,12 @@ export default function NotificationsPage() {
             >
               Matches
             </button>
+            <button 
+              className={`px-6 py-4 font-medium ${activeTab === 'request' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
+              onClick={() => setActiveTab('request')}
+            >
+              Requests
+            </button>
           </div>
         </div>
         
@@ -210,63 +191,55 @@ export default function NotificationsPage() {
           ) : (
             filteredNotifications.map(notification => (
               <div 
-                key={notification.id} 
+                key={notification._id} 
                 className={`p-4 hover:bg-gray-50 transition ${!notification.isRead ? 'bg-red-50' : ''}`}
               >
                 <div className="flex items-start">
-                  {notification.type !== 'system' && notification.type !== 'premium' ? (
+                  {/* Profile Image */}
+                  {notification.pic && notification.pic.length > 0 ? (
                     <div className="flex-shrink-0">
                       <Image
-                        src={notification.user.image}
-                        alt={notification.user.name}
+                        src={`${baseUrl}${notification.pic[0]}`}
+                        alt="Profile"
                         width={50}
                         height={50}
-                        className="rounded-full"
+                        className="rounded-full object-cover w-12 h-12"
                       />
                     </div>
                   ) : (
                     <div className="flex-shrink-0 w-[50px] h-[50px] rounded-full flex items-center justify-center bg-red-100">
-                      {notification.type === 'system' ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a4 4 0 118 0v7a4 4 0 01-8 0V6a4 4 0 118 0v7a4 4 0 01-8 0V6a4 4 0 118 0v7a4 4 0 01-8 0V6a4 4 0 014-4h.01" />
-                        </svg>
-                      )}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
                   )}
                   
                   <div className="ml-3 flex-grow">
                     <div className="flex justify-between">
                       <div>
-                        {notification.type !== 'system' && notification.type !== 'premium' ? (
-                          <p className="font-medium">
-                            <Link href={`/profile/${notification.user.id}`} className="hover:text-red-600">
-                              {notification.user.name}
-                            </Link>{' '}
-                            {notification.message}
-                          </p>
-                        ) : (
-                          <p className="font-medium">{notification.message}</p>
-                        )}
+                        <p className="font-medium">
+                          {notification.title && <span className="font-semibold">{notification.title}: </span>}
+                          {notification.message}
+                        </p>
                       </div>
-                      <span className="text-sm text-gray-500">{notification.time}</span>
+                      <span className="text-sm text-gray-500">{getTimeAgo(notification.createdAt)}</span>
                     </div>
                     
-                    {notification.type === 'like' && (
+                    {/* Action Buttons based on notification type */}
+                    {notification.title?.includes('Liked') && (
                       <div className="mt-2">
-                        <button className="text-red-600 text-sm font-medium hover:text-red-700 mr-4">
+                        <Link href={`/dashboard/profile/${notification.user}`}>
+                        <button className="text-red-600 text-sm font-medium hover:text-red-700 mr-4 cursor-pointer">
                           View Profile
                         </button>
+                        </Link>
                         <button className="text-gray-600 text-sm font-medium hover:text-gray-800">
                           Like Back
                         </button>
                       </div>
                     )}
                     
-                    {notification.type === 'visit' && (
+                    {notification.title?.includes('Profile View') && (
                       <div className="mt-2">
                         <button className="text-red-600 text-sm font-medium hover:text-red-700 mr-4">
                           View Profile
@@ -274,7 +247,7 @@ export default function NotificationsPage() {
                       </div>
                     )}
                     
-                    {notification.type === 'message' && (
+                    {notification.title?.includes('Message') && (
                       <div className="mt-2">
                         <button className="text-red-600 text-sm font-medium hover:text-red-700">
                           Reply to Message
@@ -282,7 +255,7 @@ export default function NotificationsPage() {
                       </div>
                     )}
                     
-                    {notification.type === 'match' && (
+                    {(notification.title?.includes('Connection Request Accepted') || notification.title?.includes('Friend Request Accepted')) && (
                       <div className="mt-2">
                         <button className="text-red-600 text-sm font-medium hover:text-red-700 mr-4">
                           View Profile
@@ -293,7 +266,7 @@ export default function NotificationsPage() {
                       </div>
                     )}
                     
-                    {notification.type === 'premium' && (
+                    {notification.title?.includes('Premium') && (
                       <div className="mt-2">
                         <button className="text-yellow-600 text-sm font-medium hover:text-yellow-700">
                           View Offer
@@ -301,7 +274,7 @@ export default function NotificationsPage() {
                       </div>
                     )}
                     
-                    {notification.type === 'request' && (
+                    {(notification.title?.includes('Friend Request Received') || notification.title?.includes('Connection Request')) && (
                       <div className="mt-2">
                         <button className="text-green-600 text-sm font-medium hover:text-green-700 mr-4">
                           Accept
@@ -313,6 +286,7 @@ export default function NotificationsPage() {
                     )}
                   </div>
                   
+                  {/* Unread Indicator */}
                   {!notification.isRead && (
                     <div className="ml-2 flex-shrink-0">
                       <div className="h-2 w-2 rounded-full bg-red-600"></div>

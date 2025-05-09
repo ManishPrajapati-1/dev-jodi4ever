@@ -4,54 +4,131 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
+import { 
+  useGetConnectionsQuery, 
+  useSendRequestQuery, 
+  useGetRequestsQuery,
+  useCancelRequestMutation,
+  useConnectProfileMutation
+} from "@/lib/services/api"
 
 export default function ActivityPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('followers')
-  const [activityData, setActivityData] = useState({
-    followers: [],
-    following: [],
-    requestedTo: [],
-    requestedFrom: []
-  })
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/"
+  const [activeTab, setActiveTab] = useState('connections')
+  const [processingId, setProcessingId] = useState(null)
+  const [processingAction, setProcessingAction] = useState(null) // 'cancel', 'accept', or 'decline'
+  
+  // Fetch connections and requests data from API
+  const { 
+    data: connectionsData, 
+    isLoading: isConnectionsLoading, 
+    isError: isConnectionsError,
+    refetch: refetchConnections
+  } = useGetConnectionsQuery()
+  
+  const { 
+    data: sentRequestsData, 
+    isLoading: isSentRequestsLoading, 
+    isError: isSentRequestsError,
+    refetch: refetchSentRequests
+  } = useSendRequestQuery()
+  
+  const { 
+    data: receivedRequestsData, 
+    isLoading: isReceivedRequestsLoading, 
+    isError: isReceivedRequestsError,
+    refetch: refetchReceivedRequests
+  } = useGetRequestsQuery()
+  
+  // API mutations
+  const [cancelRequest] = useCancelRequestMutation()
+  const [connectProfile] = useConnectProfileMutation()
+
+  // Extract data from API responses
+  const connections = connectionsData?.data || []
+  const sentRequests = sentRequestsData?.data?.filter(req => req.receiver !== null) || []
+  const receivedRequests = receivedRequestsData?.data || []
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
       router.replace('/create-profile')
-    } else {
-      // Fetch activity data from your API
-      // This is mock data, replace with actual API call
-      setTimeout(() => {
-        setActivityData({
-          followers: [
-            { id: 1, name: 'Komal Yadav', image: '/profiles/komal.jpg', location: 'Delhi', age: 27 },
-            { id: 2, name: 'Manisha Bharti', image: '/profiles/manisha.jpg', location: 'Delhi', age: 26 },
-            { id: 3, name: 'Riya Sharma', image: '/profiles/user1.jpg', location: 'Mumbai', age: 28 },
-          ],
-          following: [
-            { id: 2, name: 'Manisha Bharti', image: '/profiles/manisha.jpg', location: 'Delhi', age: 26 },
-            { id: 3, name: 'Shipra Rohilla', image: '/profiles/shipra.jpg', location: 'Delhi', age: 25 },
-            { id: 4, name: 'Amit Kumar', image: '/profiles/user2.jpg', location: 'Bangalore', age: 30 },
-            { id: 5, name: 'Priya Patel', image: '/profiles/user3.jpg', location: 'Ahmedabad', age: 27 },
-          ],
-          requestedTo: [
-            { id: 6, name: 'Neha Gupta', image: '/profiles/user4.jpg', location: 'Chennai', age: 29 },
-            { id: 7, name: 'Rahul Verma', image: '/profiles/user5.jpg', location: 'Kolkata', age: 31 },
-          ],
-          requestedFrom: [
-            { id: 8, name: 'Ankit Singh', image: '/profiles/user6.jpg', location: 'Jaipur', age: 28 },
-            { id: 9, name: 'Pooja Sharma', image: '/profiles/user7.jpg', location: 'Pune', age: 26 },
-            { id: 10, name: 'Vijay Malhotra', image: '/profiles/user8.jpg', location: 'Hyderabad', age: 32 },
-          ]
-        })
-        setLoading(false)
-      }, 1000)
     }
   }, [router])
 
-  if (loading) {
+  // Handle removing a connection
+  const handleRemoveConnection = async (connectionId) => {
+    if (!connectionId) return
+    
+    try {
+      setProcessingId(connectionId)
+      setProcessingAction('remove')
+      await cancelRequest(connectionId).unwrap()
+      // Refetch connections after removal
+      refetchConnections()
+    } catch (error) {
+      console.error('Failed to remove connection:', error)
+    } finally {
+      setProcessingId(null)
+      setProcessingAction(null)
+    }
+  }
+
+  // Handle cancelling a sent request
+  const handleCancelRequest = async (connectionId) => {
+    if (!connectionId) return
+    
+    try {
+      setProcessingId(connectionId)
+      setProcessingAction('cancel')
+      await cancelRequest(connectionId).unwrap()
+      // Refetch sent requests after cancellation
+      refetchSentRequests()
+    } catch (error) {
+      console.error('Failed to cancel request:', error)
+    } finally {
+      setProcessingId(null)
+      setProcessingAction(null)
+    }
+  }
+
+  // Handle accepting or declining a received request
+  const handleRequestResponse = async (profileId, connectionId, status) => {
+    if (!profileId || !connectionId) return
+    
+    try {
+      setProcessingId(connectionId)
+      setProcessingAction(status.toLowerCase())
+      
+      if (status === 'Accepted') {
+        // For accepting, use connectProfile with status 'Accepted'
+        await connectProfile({ 
+          profileId, 
+          status: 'Accepted'
+        }).unwrap()
+        
+        // Refresh connections list as a new connection is added
+        refetchConnections()
+      } else if (status === 'Declined') {
+        // For declining, use cancelRequest
+        await cancelRequest(connectionId).unwrap()
+      }
+      
+      // Refresh received requests list in both cases
+      refetchReceivedRequests()
+    } catch (error) {
+      console.error(`Failed to ${status.toLowerCase()} request:`, error)
+    } finally {
+      setProcessingId(null)
+      setProcessingAction(null)
+    }
+  }
+
+  const isLoading = isConnectionsLoading || isSentRequestsLoading || isReceivedRequestsLoading
+  
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -62,101 +139,165 @@ export default function ActivityPage() {
     )
   }
 
+  // Get current data based on active tab
+  const activeData = 
+    activeTab === 'connections' ? connections :
+    activeTab === 'sent' ? sentRequests :
+    receivedRequests
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex border-b overflow-x-auto">
           <button
-            className={`px-6 py-4 font-medium ${activeTab === 'followers' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
-            onClick={() => setActiveTab('followers')}
+            className={`px-6 py-4 font-medium whitespace-nowrap ${activeTab === 'connections' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
+            onClick={() => setActiveTab('connections')}
           >
-            Followers ({activityData.followers.length})
+            Connections ({connections.length})
           </button>
           <button
-            className={`px-6 py-4 font-medium ${activeTab === 'following' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
-            onClick={() => setActiveTab('following')}
+            className={`px-6 py-4 font-medium whitespace-nowrap ${activeTab === 'sent' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
+            onClick={() => setActiveTab('sent')}
           >
-            Following ({activityData.following.length})
+            Sent Requests ({sentRequests.length})
           </button>
           <button
-            className={`px-6 py-4 font-medium ${activeTab === 'requestedTo' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
-            onClick={() => setActiveTab('requestedTo')}
+            className={`px-6 py-4 font-medium whitespace-nowrap ${activeTab === 'received' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
+            onClick={() => setActiveTab('received')}
           >
-            Requested ({activityData.requestedTo.length})
-          </button>
-          <button
-            className={`px-6 py-4 font-medium ${activeTab === 'requestedFrom' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-600 hover:text-red-600'}`}
-            onClick={() => setActiveTab('requestedFrom')}
-          >
-            Pending ({activityData.requestedFrom.length})
+            Received Requests ({receivedRequests.length})
           </button>
         </div>
         
         {/* Content Area */}
         <div className="p-6">
-          {activityData[activeTab].length === 0 ? (
+          {activeData.length === 0 ? (
             <div className="text-center py-8">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-              <h3 className="mt-4 text-lg font-medium text-gray-600">No {activeTab} yet</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-600">No {activeTab === 'connections' ? 'connections' : activeTab === 'sent' ? 'sent requests' : 'received requests'} found</h3>
               <p className="mt-2 text-gray-500">
-                {activeTab === 'followers' && "You don't have any followers yet."}
-                {activeTab === 'following' && "You're not following anyone yet."}
-                {activeTab === 'requestedTo' && "You haven't sent any connection requests."}
-                {activeTab === 'requestedFrom' && "You don't have any pending connection requests."}
+                {activeTab === 'connections' && "You don't have any connections yet."}
+                {activeTab === 'sent' && "You haven't sent any connection requests."}
+                {activeTab === 'received' && "You don't have any pending connection requests."}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activityData[activeTab].map(profile => (
-                <div key={profile.id} className="border rounded-lg overflow-hidden hover:shadow-md transition">
-                  <div className="flex items-center p-4">
-                    <Image
-                      src={profile.image}
-                      alt={profile.name}
-                      width={60}
-                      height={60}
-                      className="rounded-full object-cover"
-                    />
-                    <div className="ml-4">
-                      <h3 className="font-semibold">{profile.name}</h3>
-                      <p className="text-sm text-gray-600">{profile.age} yrs, {profile.location}</p>
+            <div className="divide-y">
+              {activeData.map(item => {
+                // Determine profile data based on tab
+                let profile, connectionId;
+                
+                if (activeTab === 'connections') {
+                  profile = item.user;
+                  connectionId = item.connectionId;
+                } else if (activeTab === 'sent') {
+                  profile = item.receiver;
+                  connectionId = item._id;
+                } else { // received
+                  profile = item.sender;
+                  connectionId = item._id;
+                }
+                
+                if (!profile) return null;
+                
+                return (
+                  <div key={connectionId} className="py-4 hover:bg-gray-50 transition">
+                    <div className="flex items-center">
+                      {/* Profile Image */}
+                      <div className="flex-shrink-0">
+                        <Image
+                          src={
+                            profile.profile_image?.length > 0
+                              ? `${baseUrl}${profile.profile_image[0]}`
+                              : "/images/default-user.jpg"
+                          }
+                          alt={profile.fullName || "User"}
+                          width={60}
+                          height={60}
+                          className="rounded-full object-cover object-top"
+                        />
+                      </div>
+                      
+                      {/* User Info */}
+                      <div className="ml-4 flex-grow">
+                        <h3 className="font-semibold">{profile.fullName || "User"}</h3>
+                        <div className="flex space-x-2 text-sm text-gray-600">
+                          {profile.height && <span>{profile.height}</span>}
+                          {profile.city && <span>• {profile.city}</span>}
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/dashboard/profile/${profile._id}`}
+                          className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition"
+                        >
+                          View
+                        </Link>
+                        
+                        {activeTab === 'connections' && (
+                          <button 
+                            className={`px-3 py-2 text-sm rounded-md transition ${
+                              processingId === connectionId && processingAction === 'remove'
+                                ? 'bg-gray-100 text-gray-500'
+                                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                            }`}
+                            onClick={() => handleRemoveConnection(connectionId)}
+                            disabled={processingId === connectionId}
+                          >
+                            {processingId === connectionId && processingAction === 'remove' ? 'Removing...' : 'Remove'}
+                          </button>
+                        )}
+                        
+                        {activeTab === 'sent' && (
+                          <button 
+                            className={`px-3 py-2 text-sm rounded-md transition ${
+                              processingId === connectionId && processingAction === 'cancel'
+                                ? 'bg-gray-100 text-gray-500'
+                                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                            }`}
+                            onClick={() => handleCancelRequest(connectionId)}
+                            disabled={processingId === connectionId}
+                          >
+                            {processingId === connectionId && processingAction === 'cancel' ? 'Cancelling...' : 'Cancel'}
+                          </button>
+                        )}
+                        
+                        {activeTab === 'received' && (
+                          <>
+                            <button 
+                              className={`px-3 py-2 text-sm rounded-md transition ${
+                                processingId === connectionId && processingAction === 'accepted'
+                                  ? 'bg-gray-100 text-gray-500'
+                                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+                              }`}
+                              onClick={() => handleRequestResponse(profile._id, connectionId, 'Accepted')}
+                              disabled={processingId === connectionId}
+                            >
+                              {processingId === connectionId && processingAction === 'accepted' ? 'Accepting...' : 'Accept'}
+                            </button>
+                            <button 
+                              className={`px-3 py-2 text-sm rounded-md transition ${
+                                processingId === connectionId && processingAction === 'declined'
+                                  ? 'bg-gray-100 text-gray-500'
+                                  : 'bg-red-100 text-red-700 hover:bg-red-200'
+                              }`}
+                              onClick={() => handleRequestResponse(profile._id, connectionId, 'Declined')}
+                              disabled={processingId === connectionId}
+                            >
+                              {processingId === connectionId && processingAction === 'declined' ? 'Declining...' : 'Decline'}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="border-t p-3 flex justify-between">
-                    {activeTab === 'followers' && (
-                      <>
-                        <button className="text-sm font-medium text-gray-600 hover:text-red-600">View Profile</button>
-                        <button className="text-sm font-medium text-red-600 hover:text-red-700">Remove</button>
-                      </>
-                    )}
-                    
-                    {activeTab === 'following' && (
-                      <>
-                        <button className="text-sm font-medium text-gray-600 hover:text-red-600">View Profile</button>
-                        <button className="text-sm font-medium text-red-600 hover:text-red-700">Unfollow</button>
-                      </>
-                    )}
-                    
-                    {activeTab === 'requestedTo' && (
-                      <>
-                        <button className="text-sm font-medium text-gray-600 hover:text-red-600">View Profile</button>
-                        <button className="text-sm font-medium text-red-600 hover:text-red-700">Cancel Request</button>
-                      </>
-                    )}
-                    
-                    {activeTab === 'requestedFrom' && (
-                      <>
-                        <button className="text-sm font-medium text-green-600 hover:text-green-700">Accept</button>
-                        <button className="text-sm font-medium text-red-600 hover:text-red-700">Decline</button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
