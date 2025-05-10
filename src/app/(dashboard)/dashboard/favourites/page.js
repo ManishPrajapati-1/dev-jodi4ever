@@ -89,7 +89,7 @@ export default function LikedUsersPage() {
       <div className="flex items-center justify-center min-h-[70vh] bg-gray-50">
         <div className="text-center p-8 bg-white rounded-xl shadow-sm max-w-md">
           <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-red-600 mx-auto"></div>
-          <p className="mt-6 text-gray-600 font-medium">Loading your favorites...</p>
+          <p className="mt-6 text-gray-600 font-medium">Loading your favourites...</p>
           <p className="text-gray-500 text-sm mt-2">Please wait while we fetch the profiles you&apos;ve liked</p>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function LikedUsersPage() {
           <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
             <AlertCircle size={32} className="text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Unable to Load Favorites</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">Unable to Load favourites</h3>
           <p className="text-gray-600 mb-6">We&apos;re having trouble loading your favorite profiles. Please try again later.</p>
           <button 
             onClick={() => window.location.reload()}
@@ -133,15 +133,15 @@ export default function LikedUsersPage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-red-600 to-red-500 text-white">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center">
               <div className="flex items-center">
                 <Heart size={24} className="mr-3" />
-                <h1 className="text-2xl font-bold">Favorites</h1>
-                {filteredUsers.length > 0 && (
+                <h1 className="text-2xl font-bold">Favourites</h1>
+                {/* {filteredUsers.length > 0 && (
                   <span className="ml-3 bg-white text-red-600 text-sm font-bold px-2.5 py-1 rounded-full">
                     {filteredUsers.length} profiles
                   </span>
-                )}
+                )} */}
               </div>
               
               {filteredUsers.length > 0 && (
@@ -194,7 +194,7 @@ export default function LikedUsersPage() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search favorites by name, location, or occupation..."
+                  placeholder="Search favourites by name, location, or occupation..."
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -218,7 +218,7 @@ export default function LikedUsersPage() {
                 <div className="w-20 h-20 bg-red-50 rounded-full mx-auto flex items-center justify-center mb-4">
                   <Heart size={36} className="text-red-300" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">No favorites yet</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">No favourites yet</h3>
                 <p className="text-gray-600 max-w-md mx-auto mb-6">
                   {searchQuery 
                     ? "No profiles match your search. Try different keywords or clear your search."
@@ -411,7 +411,7 @@ export default function LikedUsersPage() {
         {filteredUsers.length > 0 && (
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              Showing {filteredUsers.length} of {likedByMe.length} favorites
+              Showing {filteredUsers.length} of {likedByMe.length} favourites
             </div>
             <Link
               href="/dashboard/activity"

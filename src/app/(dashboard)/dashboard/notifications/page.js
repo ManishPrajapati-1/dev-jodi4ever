@@ -199,36 +199,36 @@ export default function NotificationsPage() {
     <div className="min-h-screen bg-gray-50 py-6 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Page Header - Back to Dashboard Link */}
-        <div className="mb-6">
           <Link 
             href="/dashboard" 
             className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
           >
-            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
-            <span className="font-medium">Back to Dashboard</span>
+          <div className="mb-6">
+              <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+              <span className="font-medium">Back to Dashboard</span>
+          </div>
           </Link>
-        </div>
         
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-red-600 to-red-500 text-white">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col justify-between items-center">
               <div className="flex items-center">
                 <Bell size={24} className="mr-3" />
-                <h1 className="text-2xl font-bold">Notifications</h1>
-                {unreadCount > 0 && (
+                <h1 className="text-xl md:text-2xl font-bold">Notifications</h1>
+                {/* {unreadCount > 0 && (
                   <span className="ml-3 bg-white text-red-600 text-sm font-bold px-2.5 py-1 rounded-full">
                     {unreadCount} new
                   </span>
-                )}
+                )} */}
               </div>
-              <button 
+              {/* <button 
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200 flex items-center backdrop-blur-sm"
                 onClick={markAllAsRead}
               >
                 <CheckCircle size={18} className="mr-2" />
                 Mark All as Read
-              </button>
+              </button> */}
             </div>
           </div>
           

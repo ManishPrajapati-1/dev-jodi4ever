@@ -220,7 +220,7 @@ export default function ProfilePage() {
   // Create Tab Button component
   const TabButton = ({ id, label, isActive, onClick }) => (
     <button 
-      className={`py-3 px-4 font-medium transition-colors relative ${
+      className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${
         isActive 
           ? 'text-red-600' 
           : 'text-gray-600 hover:text-red-600'
@@ -334,14 +334,14 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Cover Photo */}
           <div className="h-60 bg-gradient-to-r from-red-600 to-red-400 relative">
-            <div className="absolute top-4 right-4">
+            {/* <div className="absolute top-4 right-4">
               <button className="bg-white/20 backdrop-blur-sm text-white rounded-lg px-3 py-2 hover:bg-white/30 transition-colors flex items-center">
                 <Camera size={18} className="mr-2" />
                 <span className="font-medium">Change Cover</span>
               </button>
-            </div>
+            </div> */}
             
-            <div className="absolute bottom-0 left-0 w-full p-6 flex flex-col sm:flex-row items-end">
+            <div className=" bottom-0 left-0 w-full p-6 flex flex-col md:flex-col justify-center items-center">
               <div className="relative h-32 w-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white group">
                 <Image
                   src={profileImage}
@@ -357,9 +357,9 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-              <div className="ml-0 sm:ml-6 mt-4 sm:mt-0 sm:pb-2">
-                <h1 className="text-2xl font-bold text-white">{formData.fullName}</h1>
-                <p className="text-white/90 font-medium flex flex-wrap items-center gap-2 mt-1">
+              <div className="flex flex-col gap-4">
+                <h1 className="text-2xl text-center font-bold text-white">{formData.fullName}</h1>
+                <p className="text-white/90 text-xs md:text-base font-medium flex flex-wrap items-center gap-2 ">
                   {formData.dob && (
                     <span className="flex items-center">
                       <Cake size={14} className="mr-1.5" /> 
@@ -464,7 +464,7 @@ export default function ProfilePage() {
                   </h3>
                   <button 
                     onClick={handleUploadPhoto}
-                    className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center px-4 py-2 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center px-2 py-1 md:px-4 md:py-2 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
                     disabled={isUploading}
                   >
                     {isUploading ? (
@@ -475,7 +475,7 @@ export default function ProfilePage() {
                     ) : (
                       <>
                         <Upload size={18} className="mr-2" />
-                        Upload New Photos
+                        Upload
                       </>
                     )}
                   </button>

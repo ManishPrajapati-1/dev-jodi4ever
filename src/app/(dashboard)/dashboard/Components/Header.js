@@ -49,13 +49,18 @@ export default function Header() {
   }, [profileMenuRef]);
 
   if (isLoading) return <div className="w-full h-16 bg-white animate-pulse"></div>;
-  if (isError) return <div className="w-full h-16 bg-white flex items-center justify-center text-red-500">Could not load header</div>;
+  if (isError) return <div className="w-full h-16 bg-white flex items-center justify-center text-red-500"></div>;
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
     // Close profile menu when opening mobile menu
     if (!isMobileMenuOpen) setProfileMenuOpen(false);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.replace('/');
+  }
 
   const toggleProfileMenu = () => {
     setProfileMenuOpen(!isProfileMenuOpen);
@@ -171,7 +176,7 @@ export default function Header() {
                   />
                 </svg>
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
@@ -218,6 +223,16 @@ export default function Header() {
                     </p>
                   </div>
                   {profileMenuItems.map((item) => (
+                   (item.label === "Logout") ? (
+                    <button
+                      key={item.href}
+                      onClick={handleLogout}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                    >
+                      <span className="mr-3 text-gray-500">{item.icon}</span>
+                      {item.label}
+                    </button>
+                   ) :
                     <Link
                       key={item.href}
                       href={item.href}
@@ -346,6 +361,18 @@ export default function Header() {
               
               <div className="bg-gray-50">
                 {profileMenuItems.map((item) => (
+                  (item.label === "Logout") ? (
+                    <button
+                      key={item.href}
+                      onClick={handleLogout}
+                      className="block px-4 py-3 font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
+                    >
+                      <div className="flex items-center">
+                      <span className="mr-3 text-gray-500">{item.icon}</span>
+                      {item.label}
+                    </div>
+                    </button>
+                   ) :
                   <Link
                     key={item.href}
                     href={item.href}

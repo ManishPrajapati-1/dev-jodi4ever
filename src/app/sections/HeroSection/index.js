@@ -7,13 +7,24 @@ import { Icons } from "@/app/icons";
 import Modal from "./Components/Modal";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
-import qs from "query-string";
-import { updatePreferences } from "@/lib/features/profile/profileSlice";
+import { useGetUserProfileQuery } from "@/lib/services/api";
 
 export default function Home() {
   const [image, setImage] = useState("/images/banner1.jpg");
   const [showModal, setShowModal] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+  
+  // Check if token exists when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem('token'); // Or however you store your token
+    setHasToken(!!token);
+  }, []);
 
+  // Only fetch user profile if we have a token
+  const { data: userProfile, isLoading } = useGetUserProfileQuery(undefined, {
+    skip: !hasToken, // Skip the query if we don't have a token
+  });
+  // console.log(userProfile.data.user.fullName);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -42,19 +53,29 @@ export default function Home() {
     router.push(`/create-profile?${queryString}`);
   };
 
+  // Handle login or continue with profile
+  const handleAuthAction = () => {
+    if (hasToken && userProfile) {
+      // User is logged in, navigate to their profile or dashboard
+      router.push('/dashboard'); // Or wherever you want to direct them
+    } else {
+      // User is not logged in, show login modal
+      setShowModal(true);
+    }
+  };
+
   return (
     <>
       <div className="relative overflow-hidden">
         {/* Background Images */}
         <div
-          className={`image-zoom absolute inset-0 -z-10 transform transition-all  duration-1000`}
+          className={`image-zoom absolute inset-0 -z-10 transform transition-all duration-1000`}
         >
           <Image
             src={image}
             width={1920}
             height={1280}
             alt="Banner"
-            // priority={true}
             className="w-full h-full object-cover object-center"
           />
         </div>
@@ -63,19 +84,24 @@ export default function Home() {
         <div className="w-screen bg-black/80 p-8">
           <div className="flex justify-between items-center">
             <Image src="/images/jodi4ever_logo_named.png" width={100} height={100} className="w-14 md:w-18" alt="Logo" />
-            {/* <span className="font-bold text-3xl text-white">J4E</span> */}
-            {/* <span
-              className="flex items-center gap-2 font-semibold text-2xl text-white hover:underline underline-offset-2 cursor-pointer"
-              onClick={() => setShowModal(true)}
+            
+            {/* Conditional Login/Continue Button */}
+            <span
+              className="flex items-center gap-2 font-semibold text-xl text-white hover:underline underline-offset-2 cursor-pointer"
+              onClick={handleAuthAction}
             >
-              Login <Icons.ArrowDown />
-            </span> */}
+              {hasToken && userProfile ? (
+                <>Continue with {userProfile.data.user.fullName} <Icons.ArrowDown /></>
+              ) : (
+                <>Login <Icons.ArrowDown /></>
+              )}
+            </span>
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-7xl mx-auto gap-8 mt-12">
             {/* Text Section */}
             <div className="text-center md:text-left text-white flex flex-col gap-4">
-              <h3 className="text-3xl" onClick={() => setShowModal(true)}>
+              <h3 className="text-3xl">
                 <span className="font-bold text-4xl">#</span>1 Matrimony
               </h3>
               <div>
