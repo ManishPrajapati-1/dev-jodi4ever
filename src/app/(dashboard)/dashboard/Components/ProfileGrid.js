@@ -3,21 +3,45 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, UserPlus, MessageCircle, GraduationCap, Briefcase, MapPin, Crown, MessageSquareWarning } from 'lucide-react';
+import { 
+  Heart, 
+  UserPlus, 
+  MessageCircle, 
+  GraduationCap, 
+  Briefcase, 
+  MapPin, 
+  Crown, 
+  MessageSquareWarning,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  Check,
+  X,
+  Cake,
+  Ruler,
+  Phone,
+  Mail,
+  User,
+  Loader2
+} from 'lucide-react';
 import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation, useViewSingleProfileQuery } from '@/lib/services/api';
-import toast, { Toaster } from 'react-hot-toast'
-import { Loader2 } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 import ProfileModal from './ProfileModal';
+
+// Base URL for profile images
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://65.1.117.252:5002/';
 
 const ProfileCard = ({ profile, onProfileClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [connectProfile, { isLoadingConnect, isErrorConnect }] = useConnectProfileMutation();
-  const [likeProfile, { isLoadingLike, isErrorLike }] = useLikeProfileMutation();
-  const [dislikeProfile, { isLoadingDislike, isErrorDislike }] = useDislikeProfileMutation();
+  const [connectProfile, { isLoadingConnect }] = useConnectProfileMutation();
+  const [likeProfile, { isLoadingLike }] = useLikeProfileMutation();
+  const [dislikeProfile, { isLoadingDislike }] = useDislikeProfileMutation();
   const [isLiked, setIsLiked] = useState(profile.isLiked);
+  const [isHovered, setIsHovered] = useState(false);
 
   const hasMultipleImages = profile.profile_image && profile.profile_image.length > 1;
 
+  // Handle like/unlike
   const toggleLike = async (e) => {
     e.stopPropagation();
     try {
@@ -37,22 +61,23 @@ const ProfileCard = ({ profile, onProfileClick }) => {
     }
   }
 
-
-  const handleConnect = async () => {
+  // Handle connect button click
+  const handleConnect = async (e) => {
+    e.stopPropagation();
     try {
       const res = await connectProfile({profileId: profile._id, status: "Accepted"}).unwrap();
       if(res.message.includes('already')) {
-        toast.error(res.message, {icon: <MessageSquareWarning className='stroke-yellow-600'/>},);
+        toast.error(res.message, {icon: <MessageSquareWarning className='stroke-yellow-600'/>});
       } else {
         toast.success(res.message);
       }
     } catch (error) {
-      // Handle error (e.g., show an error message)
       console.log('Connection failed:', error);
       toast.error('Failed to send connection request. Please try again.');
     }
   }
 
+  // Image navigation
   const goToNextImage = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,58 +104,68 @@ const ProfileCard = ({ profile, onProfileClick }) => {
   };
   
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden transition transform hover:shadow-md hover:translate-y-[-4px]">
+    <div 
+      className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Profile Image with Slider */}
-      <div className="relative aspect-[1/1] cursor-pointer" onClick={() => {onProfileClick(profile._id)}}>
+      <div 
+        className={`relative aspect-[4/5] cursor-pointer group ${isHovered ? 'transform scale-[1.02] transition-transform duration-500' : 'transition-transform duration-500'}`} 
+        onClick={() => onProfileClick(profile._id)}
+      >
         {profile.profile_image && profile.profile_image.length > 0 ? (
           <div className="relative w-full h-full">
             {/* Current image display */}
             <div className="w-full h-full">
               <Image
-                src={`http://65.1.117.252:5002/${profile.profile_image[currentImageIndex]}`}
-                alt={`${profile.fullName}`}
+                src={`${baseUrl}${profile.profile_image[currentImageIndex]}`}
+                alt={`${profile.fullName || 'Profile'}`}
                 width={500}
-                height={500}
+                height={600}
                 priority={true}
                 className="object-cover w-full h-full"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             
             {/* Image navigation - only show if multiple images */}
             {hasMultipleImages && (
               <>
                 {/* Left/Right arrows */}
-                <div className="absolute flex justify-between transform -translate-y-1/2 left-2 right-2 top-1/2 z-10">
+                <div className="absolute flex justify-between transform -translate-y-1/2 left-3 right-3 top-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button 
-                    className="bg-black/30 hover:bg-black/50 text-white rounded-full p-1.5 backdrop-blur-sm"
+                    className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToPrevImage}
+                    aria-label="Previous image"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <ChevronLeft size={20} />
                   </button>
                   <button 
-                    className="bg-black/30 hover:bg-black/50 text-white rounded-full p-1.5 backdrop-blur-sm"
+                    className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToNextImage}
+                    aria-label="Next image"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ChevronRight size={20} />
                   </button>
                 </div>
                 
                 {/* Image counter */}
-                <div className="absolute top-2 right-12 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm">
+                <div className="absolute top-3 right-14 bg-black/40 text-white text-xs font-medium px-2.5 py-1.5 rounded-full backdrop-blur-sm">
                   {currentImageIndex + 1}/{profile.profile_image.length}
                 </div>
                 
                 {/* Dots indicator */}
-                <div className="absolute bottom-2 left-0 right-0">
-                  <div className="flex justify-center gap-1">
+                <div className="absolute bottom-3 left-0 right-0">
+                  <div className="flex justify-center gap-1.5">
                     {profile.profile_image.map((_, index) => (
                       <button 
                         key={index} 
-                        className={`w-2 h-2 rounded-full ${index === currentImageIndex ? 'bg-white' : 'bg-white/70 hover:bg-white'} transition-colors`}
+                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                          index === currentImageIndex 
+                            ? 'bg-white w-3 h-3' 
+                            : 'bg-white/60 hover:bg-white/80'
+                        }`}
                         onClick={(e) => goToImage(e, index)}
                         aria-label={`View image ${index + 1}`}
                       ></button>
@@ -142,47 +177,73 @@ const ProfileCard = ({ profile, onProfileClick }) => {
           </div>
         ) : (
           <div className="h-full w-full bg-gray-100 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+            <User size={64} className="text-gray-300" />
           </div>
         )}
         
-        {/* Favorite Button */}
-        <button onClick={toggleLike} className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm hover:bg-white rounded-full p-2 transition shadow-sm z-20 cursor-pointer">
-          <Heart size={20} className="text-primary" fill={isLiked ? "#ff3366" : "none"} />
+        {/* Like Button */}
+        <button 
+          onClick={toggleLike} 
+          className={`absolute top-3 right-3 p-2.5 rounded-full shadow-sm z-20 transition-all duration-300 ${
+            isLiked
+              ? 'bg-red-50 text-red-600'
+              : 'bg-white/90 backdrop-blur-sm hover:bg-white text-gray-600 hover:text-red-600'
+          }`}
+          disabled={isLoadingLike || isLoadingDislike}
+          aria-label={isLiked ? 'Unlike profile' : 'Like profile'}
+        >
+          {isLoadingLike || isLoadingDislike ? (
+            <Loader2 size={22} className="animate-spin" />
+          ) : (
+            <Heart size={22} fill={isLiked ? "#dc2626" : "none"} strokeWidth={isLiked ? 0 : 2} />
+          )}
         </button>
         
         {/* Premium Badge */}
         {profile.isPremium && (
-          <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center shadow-sm z-20">
-            <Crown size={12} className="mr-1" />
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-amber-400 text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center shadow-sm z-20">
+            <Crown size={14} className="mr-1.5" strokeWidth={2.5} />
             PREMIUM
           </div>
         )}
+        
+        {/* Name & Age overlay on hover */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+          <h3 className="text-xl font-bold drop-shadow-md">{profile.fullName || 'Name not available'}</h3>
+          <p className="text-white/90 drop-shadow-md flex items-center">
+            <Cake size={14} className="mr-1.5" /> {profile.age || '??'} years
+          </p>
+        </div>
       </div>
       
       {/* Profile Info */}
       <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start mb-3">
           <div>
-            <Link href={`/dashboard/profile/${profile._id}`}>
-              <h3 className="text-lg font-bold text-gray-800">{profile.fullName}</h3>
+            <Link 
+              href={`/dashboard/profile/${profile._id}`}
+              className="text-lg font-bold text-gray-800 hover:text-red-600 transition-colors duration-200"
+            >
+              {profile.fullName || 'Name not available'}
             </Link>
-            <p className="text-sm text-gray-500 flex items-center">
-              <MapPin size={14} className="mr-1" />
+            <p className="text-sm text-gray-500 flex items-center mt-0.5">
+              <MapPin size={14} className="mr-1.5 text-red-500" />
               {profile.city || profile.state || 'Location not specified'}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-sm font-medium text-gray-700">
+            <div className="flex items-center text-sm font-medium text-gray-700 mb-0.5">
+              <Cake size={14} className="mr-1.5 text-gray-500" />
               {profile.age || '??'} yrs
             </div>
-            <div className="text-xs text-gray-500">{profile.height || 'Height not specified'}</div>
+            <div className="flex items-center text-xs text-gray-500">
+              <Ruler size={12} className="mr-1.5 text-gray-400" />
+              {profile.height || 'Height not specified'}
+            </div>
           </div>
         </div>
         
-        <div className="space-y-2 mt-3">
+        <div className="space-y-2.5 mt-3">
           <div className="flex items-center text-sm text-gray-600">
             <Briefcase size={14} className="mr-2 text-gray-500 flex-shrink-0" />
             <span className="truncate">{profile.occupation || 'Occupation not specified'}</span>
@@ -193,19 +254,19 @@ const ProfileCard = ({ profile, onProfileClick }) => {
             <span className="truncate">{profile.highest_education || 'Education not specified'}</span>
           </div>
           
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-wrap gap-1.5 mt-3">
             {profile.religion && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+              <span className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
                 {profile.religion}
               </span>
             )}
             {profile.marital_status && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+              <span className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
                 {profile.marital_status}
               </span>
             )}
             {profile.diet && (
-              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+              <span className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">
                 {profile.diet}
               </span>
             )}
@@ -215,17 +276,30 @@ const ProfileCard = ({ profile, onProfileClick }) => {
       
       {/* Action Buttons */}
       <div className="flex border-t border-gray-100">
-        <button onClick={handleConnect} className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer">
-          <UserPlus size={18} className="mr-2 text-primary" />
+        <button 
+          onClick={handleConnect} 
+          className="flex-1 py-3.5 text-center font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors flex items-center justify-center"
+          disabled={isLoadingConnect}
+        >
+          {isLoadingConnect ? (
+            <Loader2 size={18} className="animate-spin mr-2 text-red-600" />
+          ) : (
+            <UserPlus size={18} className="mr-2 text-red-600" />
+          )}
           Connect
         </button>
         <div className="w-px bg-gray-100"></div>
-        <button className="flex-1 py-3 text-center font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center cursor-pointer">
-          <MessageCircle size={18} className="mr-2 text-primary" />
+        <button 
+          className="flex-1 py-3.5 text-center font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors flex items-center justify-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            toast.error("Messaging is only available for premium members");
+          }}
+        >
+          <MessageCircle size={18} className="mr-2 text-red-600" />
           Message
         </button>
       </div>
-
     </div>
   );
 };
@@ -241,6 +315,7 @@ const ProfileGrid = ({ profiles }) => {
     skip: !selectedProfileId,
   });
 
+  // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -254,63 +329,129 @@ const ProfileGrid = ({ profiles }) => {
     };
   }, [isModalOpen]);
 
+  // Handle profile click
   const handleProfileClick = (profileId) => {
-    setSelectedProfileId(null);
     setSelectedProfileId(profileId);
     setIsModalOpen(true);
-    window.target
-    // Make sure query is triggered
-    // The actual data fetching is handled by the RTK Query hook
   };
 
   // Close modal and reset selected profile
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    // We can choose to keep the profile data cached or reset it
-    setSelectedProfileId(null); // Uncomment to reset on close
+    // Optional: Reset selected profile ID
+    // setSelectedProfileId(null);
   };
 
+  // Handle like status change
   const handleLikeChange = (profileId, isLiked) => {
-    // Update the profiles state with the new like status
-    setProfiles(prevProfiles => 
-      prevProfiles.map(profile => 
-        profile._id === profileId 
-          ? { ...profile, isLiked } 
-          : profile
-      )
-    );
+    // This function would update the like status in the parent component
+    // if you're managing the profiles state there
   };
+
+  // Loading skeleton for profiles
+  const ProfileSkeleton = () => (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+      <div className="aspect-[4/5] bg-gray-200"></div>
+      <div className="p-4">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-3"></div>
+        <div className="flex gap-1 mt-3">
+          <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+        </div>
+      </div>
+      <div className="h-12 border-t border-gray-100 flex">
+        <div className="flex-1 bg-gray-50"></div>
+        <div className="w-px bg-gray-100"></div>
+        <div className="flex-1 bg-gray-50"></div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className='relative'>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Toaster position="right-bottom"/>
+    <div className="relative">
+      {/* Profile Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {profiles.map((profile) => (
-          <ProfileCard key={profile._id} profile={profile} onProfileClick={handleProfileClick}/>
+          <ProfileCard 
+            key={profile._id} 
+            profile={profile} 
+            onProfileClick={handleProfileClick}
+          />
         ))}
       </div>
 
+      {/* Toaster for notifications */}
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          success: {
+            style: {
+              background: '#f0fdf4',
+              border: '1px solid #d1fae5',
+              padding: '16px',
+              color: '#065f46',
+            },
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#ffffff',
+            },
+          },
+          error: {
+            style: {
+              background: '#fef2f2',
+              border: '1px solid #fee2e2',
+              padding: '16px',
+              color: '#991b1b',
+            },
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#ffffff',
+            },
+          },
+          loading: {
+            style: {
+              background: '#eff6ff',
+              border: '1px solid #dbeafe',
+              padding: '16px',
+              color: '#1e40af',
+            }
+          }
+        }}
+      />
+      
+      {/* Loading overlay */}
       {isLoadingProfile && selectedProfileId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl flex items-center">
-            <Loader2 className="animate-spin mr-2 text-primary" size={24} />
-            <span className="text-gray-700 font-medium">Loading profile...</span>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl flex items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-red-600 mr-3"></div>
+            <span className="text-gray-700 font-medium">Loading profile details...</span>
           </div>
         </div>
       )}
       
       {/* Error handling for profile fetch */}
       {profileError && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setIsModalOpen(false)}>
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md">
-            <h3 className="text-red-600 font-bold text-lg mb-2">Error Loading Profile</h3>
-            <p className="text-gray-700">
-              There was a problem loading this profile. Please try again later.
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50" 
+          onClick={handleCloseModal}
+        >
+          <div 
+            className="bg-white p-8 rounded-xl shadow-xl max-w-md"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <X size={32} className="text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">Error Loading Profile</h3>
+            <p className="text-gray-600 text-center mb-6">
+              We&apos;re having trouble loading this profile information. Please try again later.
             </p>
             <button 
-              className="mt-4 w-full py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
-              onClick={() => setIsModalOpen(false)}
+              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium"
+              onClick={handleCloseModal}
             >
               Close
             </button>
@@ -327,9 +468,7 @@ const ProfileGrid = ({ profiles }) => {
           onLikeChange={handleLikeChange}
         />
       )}
-
     </div>
-    
   );
 };
 

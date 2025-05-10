@@ -44,14 +44,14 @@ export default function DashboardPage() {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     // Scroll to top when changing pages
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
   }
 
   // Handle previous page
   const handlePreviousPage = () => {
     if (pagination && currentPage > 1) {
       setCurrentPage(currentPage - 1);
-      window.scrollTo(0, 0);
+      // window.scrollTo(0, 0);
     }
   }
 
@@ -59,7 +59,7 @@ export default function DashboardPage() {
   const handleNextPage = () => {
     if (pagination && pagination.hasNextPages) {
       setCurrentPage(currentPage + 1);
-      window.scrollTo(0, 0);
+      // window.scrollTo(0, 0);
     }
   }
 
