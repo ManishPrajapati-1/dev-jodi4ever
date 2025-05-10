@@ -16,6 +16,15 @@
   --color-btn-hover: var(--appButton2);
 }
 
+* {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For IE/Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* For Webkit browsers like Chrome, Safari */
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;

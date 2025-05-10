@@ -121,13 +121,13 @@ export default function Header() {
           {/* Desktop Navigation Menu */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
                 className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200 py-1 border-b-2 border-transparent hover:border-red-600"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
           </nav>
 

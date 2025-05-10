@@ -133,7 +133,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
             {hasMultipleImages && (
               <>
                 {/* Left/Right arrows */}
-                <div className="absolute flex justify-between transform -translate-y-1/2 left-3 right-3 top-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute flex justify-between transform -translate-y-1/2 left-3 right-3 top-1/2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button 
                     className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToPrevImage}
