@@ -112,7 +112,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
       {/* Profile Image with Slider */}
       <div 
         className={`relative aspect-[4/5] cursor-pointer group ${isHovered ? 'transform scale-[1.02] transition-transform duration-500' : 'transition-transform duration-500'}`} 
-        onClick={() => onProfileClick(profile._id)}
+        // onClick={() => onProfileClick(profile._id)}
       >
         {profile.profile_image && profile.profile_image.length > 0 ? (
           <div className="relative w-full h-full">
@@ -378,7 +378,7 @@ const ProfileGrid = ({ profiles }) => {
           <ProfileCard 
             key={profile._id} 
             profile={profile} 
-            onProfileClick={handleProfileClick}
+            // onProfileClick={handleProfileClick}
           />
         ))}
       </div>

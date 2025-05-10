@@ -6,7 +6,7 @@ import Header from "./Components/Header";
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Jodi Banao - Find Your Perfect Match",
+  title: "Jodi4Ever - Find Your Perfect Match",
   description:
     "A matrimonial platform to help you find your perfect life partner",
 };
@@ -16,7 +16,7 @@ const LoadingUI = () => (
   <div className="flex items-center justify-center min-h-screen bg-gray-50">
     <div className="text-center">
       <div className="inline-block h-12 w-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
-      <p className="mt-3 text-gray-600">Loading Jodi Banao...</p>
+      <p className="mt-3 text-gray-600">Loading Jodi4Ever...</p>
     </div>
   </div>
 );
@@ -148,13 +148,13 @@ export default function RootLayout({ children }) {
                     <div className="flex items-center mb-4">
                       <Image
                         src="/images/wedding.png"
-                        alt="Jodi Banao Logo"
+                        alt="Jodi4Ever Logo"
                         width={50}
                         height={50}
                         className="mr-3"
                       />
                       <h3 className="text-2xl font-bold text-white">
-                        Jodi Banao
+                        Jodi4Ever
                       </h3>
                     </div>
                     <p className="text-gray-300 mb-6 max-w-md">
@@ -373,7 +373,7 @@ export default function RootLayout({ children }) {
                 <div className="mt-12 border-t border-gray-700 pt-6">
                   <div className="flex flex-col md:flex-row justify-between items-center">
                     <p className="text-gray-400 text-sm">
-                      © {currentYear} Jodi Banao. All rights reserved.
+                      © {currentYear} Jodi4Ever. All rights reserved.
                     </p>
                     <div className="mt-4 md:mt-0">
                       <ul className="flex space-x-6 text-sm">
