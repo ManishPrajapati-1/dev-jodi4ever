@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import StoreProvider from "@/app/store/StoreProvider";
 import Image from "next/image";
+import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer/footer";
 
 import "@/app/globals.css";
@@ -64,12 +65,12 @@ export const metadata = {
 // console.log("metadata", metadata);
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
         {/* <Header /> */}
         <StoreProvider>
+          {/* <Header /> */}
           <>
             <Image
               src={"/images/leafl.png"}

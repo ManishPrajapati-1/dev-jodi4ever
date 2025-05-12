@@ -115,7 +115,7 @@ export default function NotificationsPage() {
     } else if (notification.title?.includes('Message')) {
       return <MessageCircle size={20} className="text-green-600" />
     } else if (notification.title?.includes('Connection Request Accepted') || notification.title?.includes('Friend Request Accepted')) {
-      return <UserCheck size={20} className="text-purple-600" />
+      return <UserCheck size={20} className="text-primary" />
     } else if (notification.title?.includes('Friend Request Received') || notification.title?.includes('Connection Request')) {
       return <UserPlus size={20} className="text-amber-600" />
     } else if (notification.title?.includes('Premium')) {
@@ -199,20 +199,18 @@ export default function NotificationsPage() {
     <div className="min-h-screen bg-gray-50 py-6 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Page Header - Back to Dashboard Link */}
-          <Link 
+          <Link
             href="/dashboard" 
-            className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
+            className="mb-6 text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
           >
-          <div className="mb-6">
               <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
               <span className="font-medium">Back to Dashboard</span>
-          </div>
           </Link>
         
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-red-600 to-red-500 text-white">
-            <div className="flex flex-col justify-between items-center">
+            <div className="flex flex-col justify-between items-center md:items-start">
               <div className="flex items-center">
                 <Bell size={24} className="mr-3" />
                 <h1 className="text-xl md:text-2xl font-bold">Notifications</h1>
@@ -341,7 +339,7 @@ export default function NotificationsPage() {
                       </div>
                       
                       {/* Action Buttons based on notification type */}
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      {/* <div className="mt-3 flex flex-wrap gap-2">
                         {notification.title?.includes('Liked') && (
                           <>
                             <Link
@@ -379,7 +377,7 @@ export default function NotificationsPage() {
                           <>
                             <Link
                               href={`/dashboard/profile/${notification.user}`}
-                              className="inline-flex items-center px-3 py-1.5 bg-purple-50 text-purple-600 text-sm rounded-lg hover:bg-purple-100 transition-colors duration-200"
+                              className="inline-flex items-center px-3 py-1.5 bg-purple-50 text-primary text-sm rounded-lg hover:bg-purple-100 transition-colors duration-200"
                             >
                               <Eye size={16} className="mr-1.5" />
                               View Profile
@@ -410,7 +408,7 @@ export default function NotificationsPage() {
                             </button>
                           </>
                         )}
-                      </div>
+                      </div> */}
                     </div>
                     
                     {/* Unread Indicator */}

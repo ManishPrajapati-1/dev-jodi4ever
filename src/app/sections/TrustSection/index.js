@@ -76,7 +76,7 @@ export default function TrustSection() {
   };
 
   return (
-    <section className="w-full mt-12 md:mt-16 text-center flex flex-col gap-8">
+    <section className="w-full mt-12 md:mt-16 text-center flex flex-col gap-8" id="testimonials">
       <h3 className="text-xl font-medium text-secondary uppercase tracking-wider mb-2">Trusted brand</h3>
       <h2 className="text-4xl sm:text-5xl font-bold text-tertiary mb-10">Trusted by 1500+ Couples</h2>
 

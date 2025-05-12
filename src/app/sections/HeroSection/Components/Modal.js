@@ -378,7 +378,7 @@ export default function LoginModal({ isVisible, setIsVisible }) {
             </div>
 
             {/* Bottom decoration bar */}
-            <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-primary"></div>
+            <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-primary to-primary"></div>
           </div>
         </div>
       )}

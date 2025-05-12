@@ -57,7 +57,7 @@ export default function TestimonialsSection() {
   const current = testimonials[currentIndex];
 
   return (
-    <div className="py-8 px-4 ">
+    <div className="py-8 px-4" id="success-stories">
       {/* Section Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-tertiary">

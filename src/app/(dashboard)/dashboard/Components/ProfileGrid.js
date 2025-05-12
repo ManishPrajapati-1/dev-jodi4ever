@@ -217,15 +217,15 @@ const ProfileCard = ({ profile, onProfileClick }) => {
       </div>
       
       {/* Profile Info */}
-      <div className="p-4">
+      <Link href={`/dashboard/profile/${profile._id}`} className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <Link 
-              href={`/dashboard/profile/${profile._id}`}
+            <p 
+              // href={`/dashboard/profile/${profile._id}`}
               className="text-lg font-bold text-gray-800 hover:text-red-600 transition-colors duration-200"
             >
               {profile.fullName || 'Name not available'}
-            </Link>
+            </p>
             <p className="text-sm text-gray-500 flex items-center mt-0.5">
               <MapPin size={14} className="mr-1.5 text-red-500" />
               {profile.city || profile.state || 'Location not specified'}
@@ -272,7 +272,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
             )}
           </div>
         </div>
-      </div>
+      </Link>
       
       {/* Action Buttons */}
       <div className="flex border-t border-gray-100">
@@ -293,7 +293,8 @@ const ProfileCard = ({ profile, onProfileClick }) => {
           className="flex-1 py-3.5 text-center font-medium text-gray-700 hover:bg-gray-50 hover:text-red-600 transition-colors flex items-center justify-center"
           onClick={(e) => {
             e.stopPropagation();
-            toast.error("Messaging is only available for premium members");
+            // toast.error("Messaging is only available for premium members");
+            toast.error("This feature is only available in app.")
           }}
         >
           <MessageCircle size={18} className="mr-2 text-red-600" />

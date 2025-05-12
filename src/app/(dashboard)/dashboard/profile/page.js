@@ -1,14 +1,15 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useSelector, useDispatch } from 'react-redux'
-import toast, { Toaster } from 'react-hot-toast'
-import { 
-  Upload, 
-  Edit2, 
+import React, { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { useSelector, useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast";
+import {
+  Upload,
+  Edit2,
   Save,
   X,
   Camera,
@@ -30,91 +31,225 @@ import {
   Cake,
   Ruler,
   Globe,
-  Loader2
-} from 'lucide-react';
+  Loader2,
+} from "lucide-react";
 
 // Import your RTK query mutation
-import { useUpdateProfileMutation } from '@/lib/services/api';
+import {
+  useUpdateProfileMutation,
+  useDeleteProfileImageMutation,
+} from "@/lib/services/api";
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const dispatch = useDispatch()
-  const [loading, setLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
-  const [activeTab, setActiveTab] = useState('photos')
-  const [isUploading, setIsUploading] = useState(false)
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/"
-  
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("photos");
+  const [isUploading, setIsUploading] = useState(false);
+  const [previews, setPreviews] = useState([]);
+  const [viewImageIndex, setViewImageIndex] = useState(null);
+
+  // File input ref to programmatically trigger file selection
+  const fileInputRef = useRef(null);
+
+  // State for image viewing modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentModalImage, setCurrentModalImage] = useState("");
+
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
+
   // Assuming this is how your redux state is structured
-  const userProfile = useSelector((state) => state.user.data?.user)
-  
+  const userProfile = useSelector((state) => state.user.data?.user);
+
+  const MAX_IMAGES = 5;
+
+  const {
+    register,
+    handleSubmit: updateImage,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm();
+
+  const images = watch("images", []);
+
   // RTK Query mutation hook for saving profile updates
-  const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation()
-  
+  const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
+  const [deleteImage, { isLoading: isDeleting }] =
+    useDeleteProfileImageMutation();
+
+  const handleFiles = (files) => {
+    // Filter for image files only
+    const imageFiles = Array.from(files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+
+    // Check if total images exceed the maximum
+    if (imageFiles.length > MAX_IMAGES) {
+      toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+      return;
+    }
+
+    // Generate previews for the files
+    const newPreviews = imageFiles.map((file) => ({
+      url: URL.createObjectURL(file),
+      file: file,
+    }));
+
+    setPreviews(newPreviews);
+
+    setValue("images", imageFiles, { shouldValidate: true });
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    handleFiles(files);
+  };
+
+  // Handle deleting a specific image
+  const handleDeleteImage = async (imageIndex) => {
+    try {
+      // Show a confirmation dialog before deleting
+      if (!window.confirm("Are you sure you want to delete this image?")) {
+        return;
+      }
+
+      // Update the loading state for the specific image
+      setIsDeleting(true);
+
+      // Call the deleteImage mutation with the image index
+      const response = await deleteImage({ imageIndex }).unwrap();
+      
+      toast.success(response.message || "Image deleted successfully!");
+      
+      // You might want to refresh the user profile here to get updated images
+      // This depends on how your Redux store is updated after the API call
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error(error?.data?.message || "Failed to delete image. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Handle updating a specific image
+  const handleUpdateSpecificImage = async (imageIndex, file) => {
+    try {
+      setIsUploading(true);
+      
+      const formDataToSend = new FormData();
+      formDataToSend.append('profile_image', file);
+      formDataToSend.append('imageIndex', imageIndex);
+      
+      const response = await updateProfile(formDataToSend).unwrap();
+      
+      toast.success(response.message || "Image updated successfully!");
+      
+      // Clear the preview after successful upload
+      setPreviews([]);
+      setValue("images", []);
+      
+    } catch (error) {
+      console.error("Error updating image:", error);
+      toast.error(error?.data?.message || "Failed to update image. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Function to handle triggering file selection for a specific image index
+  const handleReplaceImage = (index) => {
+    setViewImageIndex(index); // Store the index of the image being replaced
+    fileInputRef.current.click();
+  };
+
+  // Function to handle the file selected for replacement
+  const handleReplaceFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Only proceed if viewImageIndex is set
+    if (viewImageIndex !== null && file) {
+      handleUpdateSpecificImage(viewImageIndex, file);
+      setViewImageIndex(null); // Reset the view image index
+      e.target.value = null; // Reset the file input
+    }
+  };
+
+  // Function to open modal with a specific image
+  const openImageModal = (imageUrl) => {
+    setCurrentModalImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
   // Form state
   const [formData, setFormData] = useState({
-    fullName: '',
-    dob: '',
-    height: '',
-    country: '',
-    state: '',
-    city: '',
-    annual_income: '',
-    employed_in: '',
-    highest_education: '',
-    course: '',
-    occupation: '',
-    mother_tongue: '',
-    religion: '',
-    caste: '',
-    marital_status: '',
-    diet: '',
-    living_with_family: '',
-    description: '',
+    fullName: "",
+    dob: "",
+    height: "",
+    country: "",
+    state: "",
+    city: "",
+    annual_income: "",
+    employed_in: "",
+    highest_education: "",
+    course: "",
+    occupation: "",
+    mother_tongue: "",
+    religion: "",
+    caste: "",
+    marital_status: "",
+    diet: "",
+    living_with_family: "",
+    description: "",
     heightInCm: 23,
-  })
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-  
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      router.replace('/create-profile')
-      return
+      router.replace("/create-profile");
+      return;
     }
-    
+
     if (userProfile) {
       // Initialize form data from userProfile
       setFormData({
-        fullName: userProfile.fullName || '',
-        dob: userProfile.dob ? new Date(userProfile.dob).toISOString().split('T')[0] : '',
-        height: userProfile.height || '',
-        country: userProfile.country || '',
-        state: userProfile.state || '',
-        city: userProfile.city || '',
-        annual_income: userProfile.annual_income || '',
-        employed_in: userProfile.employed_in || '',
-        highest_education: userProfile.highest_education || '',
-        course: userProfile.course || '',
-        occupation: userProfile.occupation || '',
-        mother_tongue: userProfile.mother_tongue || '',
-        religion: userProfile.religion || '',
-        caste: userProfile.caste || '',
-        marital_status: userProfile.marital_status || '',
-        diet: userProfile.diet || '',
-        living_with_family: userProfile.living_with_family || '',
-        description: userProfile.description || '',
+        fullName: userProfile.fullName || "",
+        dob: userProfile.dob
+          ? new Date(userProfile.dob).toISOString().split("T")[0]
+          : "",
+        height: userProfile.height || "",
+        country: userProfile.country || "",
+        state: userProfile.state || "",
+        city: userProfile.city || "",
+        annual_income: userProfile.annual_income || "",
+        employed_in: userProfile.employed_in || "",
+        highest_education: userProfile.highest_education || "",
+        course: userProfile.course || "",
+        occupation: userProfile.occupation || "",
+        mother_tongue: userProfile.mother_tongue || "",
+        religion: userProfile.religion || "",
+        caste: userProfile.caste || "",
+        marital_status: userProfile.marital_status || "",
+        diet: userProfile.diet || "",
+        living_with_family: userProfile.living_with_family || "",
+        description: userProfile.description || "",
         heightInCm: userProfile.heightInCm || 23,
-      })
-      setLoading(false)
+      });
+      setLoading(false);
     }
-  }, [router, userProfile])
-  
+  }, [router, userProfile]);
+
   const profileImage = userProfile?.profile_image?.[0]
-    ? userProfile.profile_image[0].startsWith('http')
+    ? userProfile.profile_image[0].startsWith("http")
       ? userProfile.profile_image[0]
       : baseUrl + userProfile.profile_image[0]
-    : "/images/default-user.jpg"
-  
+    : "/images/default-user.jpg";
+
   // Calculate age from date of birth
   const calculateAge = (dob) => {
     if (!dob) return null;
@@ -122,67 +257,72 @@ export default function ProfilePage() {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
-    
+
     return age;
-  }
+  };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
-      ...(name === "height" && { heightInCm: getSelectedCm(value) })
-    }))
-  }
-  
+      ...(name === "height" && { heightInCm: getSelectedCm(value) }),
+    }));
+  };
+
   const toggleEditMode = () => {
     if (isEditing) {
       // If currently editing, cancel and reset form data
       setFormData({
-        fullName: userProfile.fullName || '',
-        dob: userProfile.dob ? new Date(userProfile.dob).toISOString().split('T')[0] : '',
-        height: userProfile.height || '',
-        country: userProfile.country || '',
-        state: userProfile.state || '',
-        city: userProfile.city || '',
-        annual_income: userProfile.annual_income || '',
-        employed_in: userProfile.employed_in || '',
-        highest_education: userProfile.highest_education || '',
-        course: userProfile.course || '',
-        occupation: userProfile.occupation || '',
-        mother_tongue: userProfile.mother_tongue || '',
-        religion: userProfile.religion || '',
-        caste: userProfile.caste || '',
-        marital_status: userProfile.marital_status || '',
-        diet: userProfile.diet || '',
-        living_with_family: userProfile.living_with_family || '',
-        description: userProfile.description || '',
+        fullName: userProfile.fullName || "",
+        dob: userProfile.dob
+          ? new Date(userProfile.dob).toISOString().split("T")[0]
+          : "",
+        height: userProfile.height || "",
+        country: userProfile.country || "",
+        state: userProfile.state || "",
+        city: userProfile.city || "",
+        annual_income: userProfile.annual_income || "",
+        employed_in: userProfile.employed_in || "",
+        highest_education: userProfile.highest_education || "",
+        course: userProfile.course || "",
+        occupation: userProfile.occupation || "",
+        mother_tongue: userProfile.mother_tongue || "",
+        religion: userProfile.religion || "",
+        caste: userProfile.caste || "",
+        marital_status: userProfile.marital_status || "",
+        diet: userProfile.diet || "",
+        living_with_family: userProfile.living_with_family || "",
+        description: userProfile.description || "",
         heightInCm: userProfile.heightInCm || 23,
-      })
+      });
     }
-    setIsEditing(!isEditing)
-  }
-  
+    setIsEditing(!isEditing);
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
       // Call API to update profile
-      const response = await updateProfile(formData).unwrap()
-      toast.success('Profile updated successfully!', {
+      const response = await updateProfile(formData).unwrap();
+      toast.success("Profile updated successfully!", {
         icon: <Check className="text-green-500" />,
-        duration: 3000
-      })
-      setIsEditing(false)
+        duration: 3000,
+      });
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error)
-      toast.error('Failed to update profile. Please try again.')
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile. Please try again.");
     }
-  }
+  };
 
   const getSelectedCm = (heightString) => {
     const match = heightString.match(/(\d+)'(\d+)"/);
@@ -194,14 +334,58 @@ export default function ProfilePage() {
     return "0.0";
   };
 
-  // Mock upload photo function (to be implemented)
-  const handleUploadPhoto = () => {
+  // Upload all photos
+  const handleUploadPhoto = async (e) => {
+    e.preventDefault();
     setIsUploading(true);
-    // Simulate API call
-    setTimeout(() => {
-      toast.success('Photo uploaded successfully!');
+
+    try {
+      const formDataToSend = new FormData();
+      
+      if (previews && previews.length > 0) {
+        for (let i = 0; i < previews.length; i++) {
+          formDataToSend.append('profile_image', previews[i].file);
+        }
+      }
+
+      const response = await updateProfile(formDataToSend).unwrap();
+      toast.success(response.message || "Photos uploaded successfully!");
+      
+      // Clear the preview after successful upload
+      setPreviews([]);
+      setValue("images", []);
+    } catch (error) {
+      console.error("Error uploading photos:", error);
+      toast.error(error?.data?.message || "Failed to upload photos. Please try again.");
+    } finally {
       setIsUploading(false);
-    }, 1500);
+    }
+  };
+
+  // Modal for viewing full-size image
+  const ImageViewModal = ({ isOpen, imageUrl, onClose }) => {
+    if (!isOpen) return null;
+    
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div className="relative max-w-5xl max-h-screen">
+          <button 
+            onClick={onClose} 
+            className="absolute -top-10 right-0 bg-white p-2 rounded-full"
+          >
+            <X size={24} className="text-gray-800" />
+          </button>
+          <div className="relative h-[80vh] w-[90vw] md:w-[80vw]">
+            <Image 
+              src={imageUrl} 
+              alt="Full size preview" 
+              fill 
+              className="object-contain" 
+            />
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Loading state
@@ -210,20 +394,22 @@ export default function ProfilePage() {
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center p-8 bg-white rounded-xl shadow-sm max-w-md">
           <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-200 border-t-red-600 mx-auto"></div>
-          <p className="mt-6 text-gray-600 font-medium">Loading your profile...</p>
-          <p className="text-gray-500 text-sm mt-2">This will just take a moment</p>
+          <p className="mt-6 text-gray-600 font-medium">
+            Loading your profile...
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            This will just take a moment
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   // Create Tab Button component
   const TabButton = ({ id, label, isActive, onClick }) => (
-    <button 
+    <button
       className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${
-        isActive 
-          ? 'text-red-600' 
-          : 'text-gray-600 hover:text-red-600'
+        isActive ? "text-red-600" : "text-gray-600 hover:text-red-600"
       }`}
       onClick={() => onClick(id)}
     >
@@ -235,9 +421,24 @@ export default function ProfilePage() {
   );
 
   // Create FormField component for consistent styling
-  const FormField = ({ label, id, type = "text", name, value, onChange, options, placeholder, className = "" }) => (
+  const FormField = ({
+    label,
+    id,
+    type = "text",
+    name,
+    value,
+    onChange,
+    options,
+    placeholder,
+    className = "",
+  }) => (
     <div className={className}>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-gray-700 mb-2"
+      >
+        {label}
+      </label>
       {type === "select" ? (
         <select
           id={id}
@@ -248,7 +449,9 @@ export default function ProfilePage() {
         >
           <option value="">{placeholder || `Select ${label}`}</option>
           {options.map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
           ))}
         </select>
       ) : type === "textarea" ? (
@@ -282,65 +485,81 @@ export default function ProfilePage() {
         {icon}
         <p className="text-sm text-gray-500 ml-2">{label}</p>
       </div>
-      <p className="text-gray-800 font-medium pl-7">{value || "Not specified"}</p>
+      <p className="text-gray-800 font-medium pl-7">
+        {value || "Not specified"}
+      </p>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4">
       <div className="container mx-auto max-w-5xl">
-        <Toaster 
+        <Toaster
           position="bottom-right"
           toastOptions={{
             success: {
               style: {
-                background: '#f0fdf4',
-                border: '1px solid #d1fae5',
-                padding: '16px',
-                color: '#065f46',
+                background: "#f0fdf4",
+                border: "1px solid #d1fae5",
+                padding: "16px",
+                color: "#065f46",
               },
             },
             error: {
               style: {
-                background: '#fef2f2',
-                border: '1px solid #fee2e2',
-                padding: '16px',
-                color: '#991b1b',
+                background: "#fef2f2",
+                border: "1px solid #fee2e2",
+                padding: "16px",
+                color: "#991b1b",
               },
             },
           }}
         />
 
+        {/* Image View Modal */}
+        <ImageViewModal 
+          isOpen={isModalOpen} 
+          imageUrl={currentModalImage} 
+          onClose={() => setIsModalOpen(false)}
+        />
+
+        {/* Hidden file input for replacing specific images */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept="image/*"
+          onChange={handleReplaceFileChange}
+        />
+
         {/* Page Header - Back to Dashboard Link */}
         <div className="mb-6">
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span className="font-medium">Back to Dashboard</span>
           </Link>
         </div>
-        
+
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Cover Photo */}
           <div className="h-60 bg-gradient-to-r from-red-600 to-red-400 relative">
-            {/* <div className="absolute top-4 right-4">
-              <button className="bg-white/20 backdrop-blur-sm text-white rounded-lg px-3 py-2 hover:bg-white/30 transition-colors flex items-center">
-                <Camera size={18} className="mr-2" />
-                <span className="font-medium">Change Cover</span>
-              </button>
-            </div> */}
-            
             <div className=" bottom-0 left-0 w-full p-6 flex flex-col md:flex-col justify-center items-center">
               <div className="relative h-32 w-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white group">
                 <Image
@@ -358,38 +577,42 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="flex flex-col gap-4">
-                <h1 className="text-2xl text-center font-bold text-white">{formData.fullName}</h1>
+                <h1 className="text-2xl text-center font-bold text-white">
+                  {formData.fullName}
+                </h1>
                 <p className="text-white/90 text-xs md:text-base font-medium flex flex-wrap items-center gap-2 ">
                   {formData.dob && (
                     <span className="flex items-center">
-                      <Cake size={14} className="mr-1.5" /> 
+                      <Cake size={14} className="mr-1.5" />
                       {calculateAge(formData.dob)} years
                     </span>
                   )}
                   {formData.height && (
                     <span className="flex items-center">
-                      <Ruler size={14} className="mr-1.5" /> 
+                      <Ruler size={14} className="mr-1.5" />
                       {formData.height}
                     </span>
                   )}
                   {formData.city && (
                     <span className="flex items-center">
-                      <MapPin size={14} className="mr-1.5" /> 
-                      {[formData.city, formData.country].filter(Boolean).join(', ')}
+                      <MapPin size={14} className="mr-1.5" />
+                      {[formData.city, formData.country]
+                        .filter(Boolean)
+                        .join(", ")}
                     </span>
                   )}
                 </p>
               </div>
             </div>
           </div>
-          
+
           {/* Action Buttons */}
           <div className="flex justify-end px-6 py-4 border-b">
-            <button 
+            <button
               onClick={toggleEditMode}
               className={`px-5 py-2.5 rounded-lg transition flex items-center shadow-sm mr-2 ${
-                isEditing 
-                  ? "bg-gray-200 hover:bg-gray-300 text-gray-800" 
+                isEditing
+                  ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }`}
               disabled={isSaving}
@@ -406,9 +629,9 @@ export default function ProfilePage() {
                 </>
               )}
             </button>
-            
+
             {isEditing && (
-              <button 
+              <button
                 onClick={handleSubmit}
                 className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg transition flex items-center shadow-sm"
                 disabled={isSaving}
@@ -427,45 +650,80 @@ export default function ProfilePage() {
               </button>
             )}
           </div>
-          
+
           {/* Tabs */}
           <div className="px-6 py-0 border-b">
             <div className="flex overflow-x-auto scrollbar-hide">
-              <TabButton 
-                id="photos" 
-                label="Photos" 
-                isActive={activeTab === 'photos'} 
-                onClick={setActiveTab} 
+              <TabButton
+                id="photos"
+                label="Photos"
+                isActive={activeTab === "photos"}
+                onClick={setActiveTab}
               />
-              <TabButton 
-                id="about" 
-                label="About Me" 
-                isActive={activeTab === 'about'} 
-                onClick={setActiveTab} 
+              <TabButton
+                id="about"
+                label="About Me"
+                isActive={activeTab === "about"}
+                onClick={setActiveTab}
               />
-              <TabButton 
-                id="details" 
-                label="Personal Details" 
-                isActive={activeTab === 'details'} 
-                onClick={setActiveTab} 
+              <TabButton
+                id="details"
+                label="Personal Details"
+                isActive={activeTab === "details"}
+                onClick={setActiveTab}
               />
             </div>
           </div>
-          
+
           {/* Tab Content */}
           <div className="p-6">
             {/* Photos Tab */}
-            {activeTab === 'photos' && (
+            {activeTab === "photos" && (
               <>
-                <div className="flex justify-between items-center mb-6">
+                <form
+                  onSubmit={updateImage(handleUploadPhoto)}
+                  className="flex justify-between items-center mb-6"
+                >
                   <h3 className="text-lg font-semibold text-gray-800 flex items-center">
                     <Camera size={20} className="mr-2 text-red-600" />
                     My Photos
+                    <span className="text-sm text-gray-500 ml-2">
+                      ({userProfile.profile_image?.length || 0}/{MAX_IMAGES})
+                    </span>
                   </h3>
-                  <button 
+                  <input
+                    type="file"
+                    {...register("images", {
+                      validate: {
+                        required: (value) => {
+                          if (!value || value.length === 0) {
+                            return (
+                              images.length > 0 ||
+                              "Please upload at least one photo"
+                            );
+                          }
+                          return true;
+                        },
+                        maxCount: (value) => {
+                          return (
+                            !value ||
+                            value.length <= MAX_IMAGES ||
+                            `You can only upload a maximum of ${MAX_IMAGES} images`
+                          );
+                        },
+                      },
+                    })}
+                    onChange={handleImageChange}
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <button
+                    type="submit"
                     onClick={handleUploadPhoto}
                     className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center px-2 py-1 md:px-4 md:py-2 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                    disabled={isUploading}
+                    disabled={isUploading || previews.length === 0}
                   >
                     {isUploading ? (
                       <>
@@ -479,13 +737,54 @@ export default function ProfilePage() {
                       </>
                     )}
                   </button>
-                </div>
+                </form>
+                
+                {/* Preview section */}
+                {previews.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Selected Photos:</h4>
+                    <div className="flex gap-3 overflow-x-auto pb-3">
+                      {previews.map((preview, index) => (
+                        <div key={index} className="relative h-24 w-24 flex-shrink-0">
+                          <Image
+                            src={preview.url}
+                            alt={`Preview ${index + 1}`}
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                          <button
+                            type="button"
+                            className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow"
+                            onClick={() => {
+                              const newPreviews = [...previews];
+                              newPreviews.splice(index, 1);
+                              setPreviews(newPreviews);
+                              
+                              const newFiles = [...images];
+                              newFiles.splice(index, 1);
+                              setValue("images", newFiles);
+                            }}
+                          >
+                            <X size={14} className="text-red-600" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {userProfile.profile_image && userProfile.profile_image.length > 0 ? (
+                  {userProfile.profile_image &&
+                  userProfile.profile_image.length > 0 ? (
                     userProfile.profile_image.map((photo, index) => {
-                      const photoUrl = photo.startsWith('http') ? photo : baseUrl + photo
+                      const photoUrl = photo.startsWith("http")
+                        ? photo
+                        : baseUrl + photo;
                       return (
-                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden shadow-sm border border-gray-100 group">
+                        <div
+                          key={index}
+                          className="relative aspect-square rounded-lg overflow-hidden shadow-sm border border-gray-100 group"
+                        >
                           <Image
                             src={photoUrl}
                             alt={`Photo ${index + 1}`}
@@ -493,44 +792,80 @@ export default function ProfilePage() {
                             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-transparent bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button className="bg-white p-2 rounded-full shadow-md" title="View photo">
+                              <button
+                                type="button"
+                                className="bg-white p-2 rounded-full shadow-md"
+                                title="View photo"
+                                onClick={() => openImageModal(photoUrl)}
+                              >
                                 <Eye size={18} className="text-gray-700" />
                               </button>
-                              <button className="bg-white p-2 rounded-full shadow-md" title="Delete photo">
-                                <Trash2 size={18} className="text-red-600" />
+                              <button
+                                type="button"
+                                className="bg-white p-2 rounded-full shadow-md"
+                                title="Replace photo"
+                                onClick={() => handleReplaceImage(index)}
+                              >
+                                <Edit2 size={18} className="text-blue-600" />
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-white p-2 rounded-full shadow-md"
+                                title="Delete photo"
+                                onClick={() => handleDeleteImage(index)}
+                                disabled={isDeleting}
+                              >
+                                {isDeleting ? (
+                                  <Loader2 size={18} className="text-red-600 animate-spin" />
+                                ) : (
+                                  <Trash2 size={18} className="text-red-600" />
+                                )}
                               </button>
                             </div>
                           </div>
                         </div>
-                      )
+                      );
                     })
                   ) : (
                     <div className="col-span-full text-center py-10 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
-                      <Camera size={48} className="text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-500 mb-3">No photos yet. Add some to make your profile stand out!</p>
-                      <button 
-                        onClick={handleUploadPhoto}
-                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center shadow-sm"
+                      <Camera
+                        size={48}
+                        className="text-gray-400 mx-auto mb-3"
+                      />
+                      <p className="text-gray-500 mb-3">
+                        No photos yet. Add some to make your profile stand out!
+                      </p>
+                      <label
+                        htmlFor="image-upload"
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center shadow-sm cursor-pointer"
                       >
                         <Upload size={16} className="mr-2" />
                         Upload Your First Photo
-                      </button>
+                      </label>
                     </div>
                   )}
-                  <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <button className="flex flex-col items-center justify-center p-4">
-                      <Plus size={28} className="text-gray-500 mb-2" />
-                      <span className="text-sm text-gray-600 font-medium">Add Photo</span>
-                    </button>
-                  </div>
+                  {userProfile.profile_image &&
+                  userProfile.profile_image.length < MAX_IMAGES && (
+                    <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                      <label
+                        htmlFor="image-upload"
+                        className="flex flex-col items-center justify-center p-4 cursor-pointer w-full h-full"
+                      >
+                        <Plus size={28} className="text-gray-500 mb-2" />
+                        <span className="text-sm text-gray-600 font-medium">
+                          Add Photo
+                        </span>
+                      </label>
+                    </div>
+                  )}
                 </div>
               </>
             )}
-            
+
             {/* About Me Tab */}
-            {activeTab === 'about' && (
+            {activeTab === "about" && (
               <div>
                 {isEditing ? (
                   <form>
@@ -545,7 +880,7 @@ export default function ProfilePage() {
                         placeholder="Tell us about yourself, your interests, and what you're looking for in a partner..."
                       />
                     </div>
-                    
+
                     <h3 className="text-lg font-semibold mb-4 text-gray-800 pt-6 border-t flex items-center">
                       <Briefcase size={20} className="mr-2 text-red-600" />
                       Professional Information
@@ -570,7 +905,7 @@ export default function ProfilePage() {
                           { value: "High School", label: "High School" },
                           { value: "Bachelor's", label: "Bachelor's" },
                           { value: "Master's", label: "Master's" },
-                          { value: "Doctorate", label: "Doctorate" }
+                          { value: "Doctorate", label: "Doctorate" },
                         ]}
                       />
                       <FormField
@@ -593,14 +928,38 @@ export default function ProfilePage() {
                           { value: "Rs. 1 - 2 Lakh", label: "Rs. 1 - 2 Lakh" },
                           { value: "Rs. 2 - 3 Lakh", label: "Rs. 2 - 3 Lakh" },
                           { value: "Rs. 3 - 5 Lakh", label: "Rs. 3 - 5 Lakh" },
-                          { value: "Rs. 5 - 7.5 Lakh", label: "Rs. 5 - 7.5 Lakh" },
-                          { value: "Rs. 7.5 - 10 Lakh", label: "Rs. 7.5 - 10 Lakh" },
-                          { value: "Rs. 10 - 15 Lakh", label: "Rs. 10 - 15 Lakh" },
-                          { value: "Rs. 15 - 20 Lakh", label: "Rs. 15 - 20 Lakh" },
-                          { value: "Rs. 20 - 30 Lakh", label: "Rs. 20 - 30 Lakh" },
-                          { value: "Rs. 30 - 50 Lakh", label: "Rs. 30 - 50 Lakh" },
-                          { value: "Rs. 50 Lakh - 1 Crore", label: "Rs. 50 Lakh - 1 Crore" },
-                          { value: "Rs. 1 Crore & above", label: "Rs. 1 Crore & above" }
+                          {
+                            value: "Rs. 5 - 7.5 Lakh",
+                            label: "Rs. 5 - 7.5 Lakh",
+                          },
+                          {
+                            value: "Rs. 7.5 - 10 Lakh",
+                            label: "Rs. 7.5 - 10 Lakh",
+                          },
+                          {
+                            value: "Rs. 10 - 15 Lakh",
+                            label: "Rs. 10 - 15 Lakh",
+                          },
+                          {
+                            value: "Rs. 15 - 20 Lakh",
+                            label: "Rs. 15 - 20 Lakh",
+                          },
+                          {
+                            value: "Rs. 20 - 30 Lakh",
+                            label: "Rs. 20 - 30 Lakh",
+                          },
+                          {
+                            value: "Rs. 30 - 50 Lakh",
+                            label: "Rs. 30 - 50 Lakh",
+                          },
+                          {
+                            value: "Rs. 50 Lakh - 1 Crore",
+                            label: "Rs. 50 Lakh - 1 Crore",
+                          },
+                          {
+                            value: "Rs. 1 Crore & above",
+                            label: "Rs. 1 Crore & above",
+                          },
                         ]}
                       />
                       <FormField
@@ -612,10 +971,16 @@ export default function ProfilePage() {
                         onChange={handleInputChange}
                         options={[
                           { value: "Private Sector", label: "Private Sector" },
-                          { value: "Government/Public Sector", label: "Government/Public Sector" },
+                          {
+                            value: "Government/Public Sector",
+                            label: "Government/Public Sector",
+                          },
                           { value: "Self Employed", label: "Self Employed" },
-                          { value: "Business/Entrepreneur", label: "Business/Entrepreneur" },
-                          { value: "Not Working", label: "Not Working" }
+                          {
+                            value: "Business/Entrepreneur",
+                            label: "Business/Entrepreneur",
+                          },
+                          { value: "Not Working", label: "Not Working" },
                         ]}
                       />
                     </div>
@@ -636,33 +1001,45 @@ export default function ProfilePage() {
                       ) : (
                         <div className="bg-gray-50 p-5 rounded-lg border border-gray-200 border-dashed text-center">
                           <p className="text-gray-500">
-                            You haven&apos;t added any description yet. Click the &quot;Edit Profile&quot; button to add information about yourself.
+                            You haven&apos;t added any description yet. Click
+                            the &quot;Edit Profile&quot; button to add
+                            information about yourself.
                           </p>
                         </div>
                       )}
                     </div>
-                    
+
                     <h3 className="text-lg font-semibold mb-5 text-gray-800 pt-4 border-t flex items-center">
                       <Briefcase size={20} className="mr-2 text-red-600" />
                       Professional Information
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <InfoItem 
+                      <InfoItem
                         icon={<Briefcase size={18} className="text-gray-500" />}
                         label="Profession"
                         value={formData.occupation}
                       />
-                      <InfoItem 
-                        icon={<GraduationCap size={18} className="text-gray-500" />}
+                      <InfoItem
+                        icon={
+                          <GraduationCap size={18} className="text-gray-500" />
+                        }
                         label="Education"
-                        value={formData.highest_education ? `${formData.highest_education}${formData.course ? ` in ${formData.course}` : ""}` : null}
+                        value={
+                          formData.highest_education
+                            ? `${formData.highest_education}${
+                                formData.course ? ` in ${formData.course}` : ""
+                              }`
+                            : null
+                        }
                       />
-                      <InfoItem 
-                        icon={<DollarSign size={18} className="text-gray-500" />}
+                      <InfoItem
+                        icon={
+                          <DollarSign size={18} className="text-gray-500" />
+                        }
                         label="Annual Income"
                         value={formData.annual_income}
                       />
-                      <InfoItem 
+                      <InfoItem
                         icon={<Building size={18} className="text-gray-500" />}
                         label="Employed In"
                         value={formData.employed_in}
@@ -672,9 +1049,9 @@ export default function ProfilePage() {
                 )}
               </div>
             )}
-            
+
             {/* Personal Details Tab */}
-            {activeTab === 'details' && (
+            {activeTab === "details" && (
               <div>
                 {isEditing ? (
                   <form>
@@ -711,7 +1088,7 @@ export default function ProfilePage() {
                           const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
                           return {
                             value: `${feet}'${inches}" (${cm} cm)`,
-                            label: `${feet}'${inches}" (${cm} cm)`
+                            label: `${feet}'${inches}" (${cm} cm)`,
                           };
                         })}
                       />
@@ -726,7 +1103,7 @@ export default function ProfilePage() {
                           { value: "Single", label: "Single" },
                           { value: "Divorced", label: "Divorced" },
                           { value: "Widowed", label: "Widowed" },
-                          { value: "Separated", label: "Separated" }
+                          { value: "Separated", label: "Separated" },
                         ]}
                       />
                       <FormField
@@ -743,7 +1120,7 @@ export default function ProfilePage() {
                           { value: "Sikh", label: "Sikh" },
                           { value: "Buddhist", label: "Buddhist" },
                           { value: "Jain", label: "Jain" },
-                          { value: "Other", label: "Other" }
+                          { value: "Other", label: "Other" },
                         ]}
                       />
                       <FormField
@@ -772,7 +1149,7 @@ export default function ProfilePage() {
                           { value: "Non-Veg", label: "Non-Vegetarian" },
                           { value: "Eggetarian", label: "Eggetarian" },
                           { value: "Jain", label: "Jain" },
-                          { value: "Vegan", label: "Vegan" }
+                          { value: "Vegan", label: "Vegan" },
                         ]}
                       />
                       <FormField
@@ -784,7 +1161,7 @@ export default function ProfilePage() {
                         onChange={handleInputChange}
                         options={[
                           { value: "Yes", label: "Yes" },
-                          { value: "No", label: "No" }
+                          { value: "No", label: "No" },
                         ]}
                       />
                     </div>
@@ -825,76 +1202,95 @@ export default function ProfilePage() {
                         Personal Information
                       </h3>
                       <div className="space-y-4">
-                        <InfoItem 
+                        <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Religion"
                           value={formData.religion}
                         />
-                        <InfoItem 
+                        <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Caste"
                           value={formData.caste}
                         />
-                        <InfoItem 
+                        <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Marital Status"
                           value={formData.marital_status}
                         />
-                        <InfoItem 
-                          icon={<Utensils size={18} className="text-gray-500" />}
+                        <InfoItem
+                          icon={
+                            <Utensils size={18} className="text-gray-500" />
+                          }
                           label="Diet Preference"
                           value={
-                            formData.diet === "Veg" ? "Vegetarian" : 
-                            formData.diet === "Non-Veg" ? "Non-Vegetarian" : 
-                            formData.diet
+                            formData.diet === "Veg"
+                              ? "Vegetarian"
+                              : formData.diet === "Non-Veg"
+                              ? "Non-Vegetarian"
+                              : formData.diet
                           }
                         />
-                        <InfoItem 
+                        <InfoItem
                           icon={<Home size={18} className="text-gray-500" />}
                           label="Living With Family"
                           value={formData.living_with_family}
                         />
                       </div>
                     </div>
-                    
+
                     <div>
                       <h3 className="text-lg font-semibold mb-5 text-gray-800 flex items-center">
                         <Globe size={20} className="mr-2 text-red-600" />
                         Location & Languages
                       </h3>
                       <div className="space-y-4">
-                        <InfoItem 
+                        <InfoItem
                           icon={<MapPin size={18} className="text-gray-500" />}
                           label="Location"
-                          value={[formData.city, formData.state, formData.country].filter(Boolean).join(', ')}
+                          value={[
+                            formData.city,
+                            formData.state,
+                            formData.country,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")}
                         />
-                        <InfoItem 
-                          icon={<Languages size={18} className="text-gray-500" />}
+                        <InfoItem
+                          icon={
+                            <Languages size={18} className="text-gray-500" />
+                          }
                           label="Mother Tongue"
                           value={formData.mother_tongue}
                         />
                       </div>
-                      
+
                       <h3 className="text-lg font-semibold mb-4 mt-8 text-gray-800 pt-5 border-t flex items-center">
                         <User size={20} className="mr-2 text-red-600" />
                         Basic Details
                       </h3>
                       <div className="space-y-4">
-                        <InfoItem 
+                        <InfoItem
                           icon={<User size={18} className="text-gray-500" />}
                           label="Full Name"
                           value={formData.fullName}
                         />
-                        <InfoItem 
+                        <InfoItem
                           icon={<Cake size={18} className="text-gray-500" />}
                           label="Date of Birth"
                           value={
-                            formData.dob 
-                              ? `${new Date(formData.dob).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})} (${calculateAge(formData.dob)} years)`
+                            formData.dob
+                              ? `${new Date(formData.dob).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )} (${calculateAge(formData.dob)} years)`
                               : null
                           }
                         />
-                        <InfoItem 
+                        <InfoItem
                           icon={<Ruler size={18} className="text-gray-500" />}
                           label="Height"
                           value={formData.height}
@@ -907,38 +1303,87 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
-        
+
         {/* Tips Panel */}
         <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-amber-500">
           <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2 text-amber-500"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                clipRule="evenodd"
+              />
             </svg>
             Profile Completion Tips
           </h3>
-          <p className="text-gray-600 mb-4">Complete your profile to increase your chances of finding a perfect match. Here are some tips:</p>
+          <p className="text-gray-600 mb-4">
+            Complete your profile to increase your chances of finding a perfect
+            match. Here are some tips:
+          </p>
           <ul className="space-y-2 text-gray-600">
             <li className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
               Upload at least 3-4 clear photos to showcase yourself better
             </li>
             <li className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
-              Write a detailed description about yourself and what you&apos;re looking for
+              Write a detailed description about yourself and what you&apos;re
+              looking for
             </li>
             <li className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
               Complete all personal details for better matching
             </li>
             <li className="flex items-start">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-green-500 flex-shrink-0 mt-0.5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
               Regularly update your profile to appear in recent matches
             </li>
@@ -946,5 +1391,5 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -89,7 +89,7 @@ const Step1PersonalDetails = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-1 rounded-2xl shadow-lg">
+      <div className="bg-gradient-to-r from-pink-500 via-primary to-indigo-500 p-1 rounded-2xl shadow-lg">
         <div className="bg-white p-6 sm:p-8 rounded-2xl">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-800">Personal Details</h2>

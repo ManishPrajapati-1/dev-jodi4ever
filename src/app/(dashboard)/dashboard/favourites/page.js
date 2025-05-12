@@ -133,7 +133,7 @@ export default function LikedUsersPage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Header */}
           <div className="p-6 bg-gradient-to-r from-red-600 to-red-500 text-white">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center md:justify-between">
               <div className="flex items-center">
                 <Heart size={24} className="mr-3" />
                 <h1 className="text-2xl font-bold">Favourites</h1>
@@ -391,10 +391,10 @@ export default function LikedUsersPage() {
                                   </>
                                 )}
                               </button>
-                              <button className="inline-flex items-center justify-center px-3 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 transition-colors duration-200">
+                              {/* <button className="inline-flex items-center justify-center px-3 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 transition-colors duration-200">
                                 <MessageCircle size={16} className="mr-1.5" />
                                 Message
-                              </button>
+                              </button> */}
                             </div>
                           </div>
                         </div>

@@ -18,6 +18,15 @@ export const api = createApi({
   baseQuery: baseQuery,
   tagTypes: ["State", "City"],
   endpoints: (builder) => ({
+
+    // Links (T&C, FAQs)
+    getTermsPrivacyAbout: builder.query({
+      query: () => ({
+        url: "user/get_terms_privacy_about",
+        method: "GET"
+      }),
+    }),
+
     // Auth
     loginUser: builder.mutation({
       query: (data) => ({
@@ -57,13 +66,21 @@ export const api = createApi({
         method: "GET",
       }),
     }),
-
+    // To update image use imageIndex, profile_image, by default imageIndex [auto_increment]
     updateProfile: builder.mutation({
       query: (data) => ({
         url: "user/profile",
         method: "PUT",
         body: data,
       }),
+    }),
+
+    deleteProfileImage: builder.mutation({
+      query: (data) => ({
+        url: "user/deleteProfileImage",
+        method: "POST",
+        body: data,
+      })
     }),
 
     // Matching/Profiles
@@ -191,12 +208,14 @@ export const api = createApi({
 });
 
 export const {
+  useGetTermsPrivacyAboutQuery,
   useLoginUserMutation,
   useVerifyLoginOtpMutation,
   useSignUpUserMutation,
   useVerifyOtpSignUpMutation,
   useGetUserProfileQuery,
   useUpdateProfileMutation,
+  useDeleteProfileImageMutation,
   useGetMatchingProfilesQuery,
   useLikeProfileMutation,
   useDislikeProfileMutation,

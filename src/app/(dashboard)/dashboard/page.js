@@ -133,7 +133,7 @@ export default function DashboardPage() {
             >
               All Matches
             </button>
-            <button 
+            {/* <button 
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
                 activeFilter === 'new' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
@@ -156,7 +156,7 @@ export default function DashboardPage() {
               onClick={() => setActiveFilter('favorites')}
             >
               Favorites
-            </button>
+            </button> */}
           </div>
           
           {/* <div className="relative">
