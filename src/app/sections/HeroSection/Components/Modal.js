@@ -164,7 +164,7 @@ export default function LoginModal({ isVisible, setIsVisible }) {
         // Wait for animation to complete before redirecting
         setTimeout(() => {
           setIsVisible(false);
-          router.push("/dashboard/profile");
+          router.push("/dashboard");
         }, 1500);
       }
     } catch (err) {

@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
+import fieldsData from "../fieldsData.json";
 import {
   Upload,
   Edit2,
@@ -39,6 +40,7 @@ import {
   useUpdateProfileMutation,
   useDeleteProfileImageMutation,
 } from "@/lib/services/api";
+import { updateUserProfile } from "@/lib/features/user/userSlice";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -49,6 +51,9 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [previews, setPreviews] = useState([]);
   const [viewImageIndex, setViewImageIndex] = useState(null);
+  const [isDel, setIsDeleting] = useState(false);
+  const [isCourseVisible, setIsCourseVisible] = useState(false);
+  const [courses, setCourses] = useState([]);
 
   // File input ref to programmatically trigger file selection
   const fileInputRef = useRef(null);
@@ -65,15 +70,87 @@ export default function ProfilePage() {
 
   const MAX_IMAGES = 5;
 
+  // Main form for profile data
   const {
     register,
-    handleSubmit: updateImage,
+    handleSubmit,
+    control,
     watch,
     setValue,
-    formState: { errors },
-  } = useForm();
+    reset,
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      dob: "",
+      height: "",
+      country: "",
+      state: "",
+      city: "",
+      annual_income: "",
+      employed_in: "",
+      highest_education: "",
+      course: "",
+      occupation: "",
+      mother_tongue: "",
+      religion: "",
+      caste: "",
+      marital_status: "",
+      diet: "",
+      living_with_family: "",
+      description: "",
+      heightInCm: 23,
+      profile_image: [],
+      images: [],
+      sect: "",
+      jammat: "",
+    },
+  });
 
+  // Watch for education changes to update course options
+  const highestEducation = watch("highest_education");
   const images = watch("images", []);
+  // Add these watch and effect hooks near the top of your component:
+  const religion = watch("religion", "");
+  const sect = watch("sect", "");
+
+  // Reset dependent fields when religion changes
+  useEffect(() => {
+    if (religion !== "Muslim") {
+      setValue("sect", "");
+      setValue("jammat", "");
+    }
+
+    // Reset caste when religion changes
+    // setValue("caste", "");
+  }, [religion, setValue]);
+
+  // Reset jammat when sect changes
+  useEffect(() => {
+    if (sect !== "Sunni") {
+      setValue("jammat", "");
+    }
+  }, [sect, setValue]);
+
+  // Add this function to determine which caste field to show
+  const getCasteFieldName = () => {
+    switch (religion) {
+      case "Hindu":
+        return "hinduCaste";
+      case "Muslim":
+        return "muslimCaste";
+      case "Sikh":
+        return "sikhCaste";
+      case "Jain":
+        return "jainCaste";
+      case "Christian":
+        return "christianCaste";
+      default:
+        return null;
+    }
+  };
+
+  const casteFieldName = getCasteFieldName();
 
   // RTK Query mutation hook for saving profile updates
   const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
@@ -87,7 +164,7 @@ export default function ProfilePage() {
     );
 
     // Check if total images exceed the maximum
-    if (imageFiles.length > MAX_IMAGES) {
+    if (imageFiles.length > MAX_IMAGES - userProfile.profile_image?.length) {
       toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
       return;
     }
@@ -121,14 +198,27 @@ export default function ProfilePage() {
 
       // Call the deleteImage mutation with the image index
       const response = await deleteImage({ imageIndex }).unwrap();
-      
+
       toast.success(response.message || "Image deleted successfully!");
-      
-      // You might want to refresh the user profile here to get updated images
-      // This depends on how your Redux store is updated after the API call
+      const updatedImages =
+        response.profile_image ||
+        userProfile.profile_image.filter((_, idx) => idx !== imageIndex);
+
+      // Update Redux store with the full user profile
+      dispatch(
+        updateUserProfile({
+          ...userProfile,
+          profile_image: updatedImages,
+        })
+      );
+
+      // Also update local formData state to ensure UI consistency
+      setValue("profile_image", updatedImages);
     } catch (error) {
       console.error("Error deleting image:", error);
-      toast.error(error?.data?.message || "Failed to delete image. Please try again.");
+      toast.error(
+        error?.data?.message || "Failed to delete image. Please try again."
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -138,22 +228,37 @@ export default function ProfilePage() {
   const handleUpdateSpecificImage = async (imageIndex, file) => {
     try {
       setIsUploading(true);
-      
+
       const formDataToSend = new FormData();
-      formDataToSend.append('profile_image', file);
-      formDataToSend.append('imageIndex', imageIndex);
-      
+      formDataToSend.append("profile_image", file);
+      formDataToSend.append("imageIndex", imageIndex);
+
       const response = await updateProfile(formDataToSend).unwrap();
-      
+      console.log(response);
       toast.success(response.message || "Image updated successfully!");
-      
+      const updatedImages = response?.data?.user?.profile_image || [
+        ...userProfile.profile_image,
+      ];
+
+      // Update Redux
+      dispatch(
+        updateUserProfile({
+          ...userProfile,
+          profile_image: updatedImages,
+        })
+      );
+
+      // Update local state
+      setValue("profile_image", updatedImages);
+
       // Clear the preview after successful upload
       setPreviews([]);
       setValue("images", []);
-      
     } catch (error) {
       console.error("Error updating image:", error);
-      toast.error(error?.data?.message || "Failed to update image. Please try again.");
+      toast.error(
+        error?.data?.message || "Failed to update image. Please try again."
+      );
     } finally {
       setIsUploading(false);
     }
@@ -169,7 +274,7 @@ export default function ProfilePage() {
   const handleReplaceFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     // Only proceed if viewImageIndex is set
     if (viewImageIndex !== null && file) {
       handleUpdateSpecificImage(viewImageIndex, file);
@@ -184,29 +289,6 @@ export default function ProfilePage() {
     setIsModalOpen(true);
   };
 
-  // Form state
-  const [formData, setFormData] = useState({
-    fullName: "",
-    dob: "",
-    height: "",
-    country: "",
-    state: "",
-    city: "",
-    annual_income: "",
-    employed_in: "",
-    highest_education: "",
-    course: "",
-    occupation: "",
-    mother_tongue: "",
-    religion: "",
-    caste: "",
-    marital_status: "",
-    diet: "",
-    living_with_family: "",
-    description: "",
-    heightInCm: 23,
-  });
-
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -214,10 +296,9 @@ export default function ProfilePage() {
       router.replace("/create-profile");
       return;
     }
-
     if (userProfile) {
       // Initialize form data from userProfile
-      setFormData({
+      reset({
         fullName: userProfile.fullName || "",
         dob: userProfile.dob
           ? new Date(userProfile.dob).toISOString().split("T")[0]
@@ -239,15 +320,50 @@ export default function ProfilePage() {
         living_with_family: userProfile.living_with_family || "",
         description: userProfile.description || "",
         heightInCm: userProfile.heightInCm || 23,
+        profile_image: userProfile.profile_image || [],
+        images: [],
+        sect: userProfile.sect || "",
+        jammat: userProfile.jammat || "",
       });
       setLoading(false);
     }
-  }, [router, userProfile]);
+  }, [userProfile, reset, router, isDel, isUploading]);
 
-  const profileImage = userProfile?.profile_image?.[0]
-    ? userProfile.profile_image[0].startsWith("http")
-      ? userProfile.profile_image[0]
-      : baseUrl + userProfile.profile_image[0]
+  useEffect(() => {
+    setIsCourseVisible(
+      highestEducation === "Below High School" ||
+        highestEducation === "High School (12th)" ||
+        highestEducation === ""
+    );
+
+    let availableCourses = [];
+
+    switch (highestEducation) {
+      case "Bachelor's":
+        availableCourses = fieldsData.bachelor_courses;
+        break;
+      case "Master's":
+        availableCourses = fieldsData.master_courses;
+        break;
+      case "Doctorate":
+        availableCourses = fieldsData.doctorate_courses;
+        break;
+      case "Diploma":
+        availableCourses = fieldsData.diploma_courses;
+        break;
+      default:
+        availableCourses = {}; // No courses if not selected
+        break;
+    }
+
+    setCourses(availableCourses);
+  }, [highestEducation]);
+
+  const profileData = watch();
+  const profileImage = profileData?.profile_image?.[0]
+    ? profileData.profile_image[0].startsWith("http")
+      ? profileData.profile_image[0]
+      : baseUrl + profileData.profile_image[0]
     : "/images/default-user.jpg";
 
   // Calculate age from date of birth
@@ -268,19 +384,10 @@ export default function ProfilePage() {
     return age;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "height" && { heightInCm: getSelectedCm(value) }),
-    }));
-  };
-
   const toggleEditMode = () => {
     if (isEditing) {
-      // If currently editing, cancel and reset form data
-      setFormData({
+      // If currently editing, cancel and reset form data to original values
+      reset({
         fullName: userProfile.fullName || "",
         dob: userProfile.dob
           ? new Date(userProfile.dob).toISOString().split("T")[0]
@@ -302,21 +409,24 @@ export default function ProfilePage() {
         living_with_family: userProfile.living_with_family || "",
         description: userProfile.description || "",
         heightInCm: userProfile.heightInCm || 23,
+        profile_image: userProfile.profile_image || [],
+        images: [],
+        sect: userProfile.sect || "",
+        jammat: userProfile.jammat || "",
       });
     }
     setIsEditing(!isEditing);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
       // Call API to update profile
-      const response = await updateProfile(formData).unwrap();
+      const response = await updateProfile(data).unwrap();
       toast.success("Profile updated successfully!", {
         icon: <Check className="text-green-500" />,
         duration: 3000,
       });
+      dispatch(updateUserProfile(data));
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -325,7 +435,7 @@ export default function ProfilePage() {
   };
 
   const getSelectedCm = (heightString) => {
-    const match = heightString.match(/(\d+)'(\d+)"/);
+    const match = heightString?.match(/(\d+)'(\d+)"/);
     if (match) {
       const feet = parseInt(match[1]);
       const inches = parseInt(match[2]);
@@ -341,22 +451,39 @@ export default function ProfilePage() {
 
     try {
       const formDataToSend = new FormData();
-      
+
       if (previews && previews.length > 0) {
         for (let i = 0; i < previews.length; i++) {
-          formDataToSend.append('profile_image', previews[i].file);
+          formDataToSend.append("profile_image", previews[i].file);
         }
       }
 
       const response = await updateProfile(formDataToSend).unwrap();
       toast.success(response.message || "Photos uploaded successfully!");
-      
+      const updatedImages = response?.data?.user?.profile_image || [
+        ...(userProfile.profile_image || []),
+        ...previews.map((p) => URL.createObjectURL(p.file)),
+      ];
+
+      // Update Redux with complete user data
+      dispatch(
+        updateUserProfile({
+          ...userProfile,
+          profile_image: updatedImages,
+        })
+      );
+
+      // Update local state
+      setValue("profile_image", updatedImages);
+
       // Clear the preview after successful upload
       setPreviews([]);
       setValue("images", []);
     } catch (error) {
       console.error("Error uploading photos:", error);
-      toast.error(error?.data?.message || "Failed to upload photos. Please try again.");
+      toast.error(
+        error?.data?.message || "Failed to upload photos. Please try again."
+      );
     } finally {
       setIsUploading(false);
     }
@@ -365,22 +492,22 @@ export default function ProfilePage() {
   // Modal for viewing full-size image
   const ImageViewModal = ({ isOpen, imageUrl, onClose }) => {
     if (!isOpen) return null;
-    
+
     return (
       <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
         <div className="relative max-w-5xl max-h-screen">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="absolute -top-10 right-0 bg-white p-2 rounded-full"
           >
             <X size={24} className="text-gray-800" />
           </button>
           <div className="relative h-[80vh] w-[90vw] md:w-[80vw]">
-            <Image 
-              src={imageUrl} 
-              alt="Full size preview" 
-              fill 
-              className="object-contain" 
+            <Image
+              src={imageUrl}
+              alt="Full size preview"
+              fill
+              className="object-contain"
             />
           </div>
         </div>
@@ -426,11 +553,9 @@ export default function ProfilePage() {
     id,
     type = "text",
     name,
-    value,
-    onChange,
-    options,
     placeholder,
     className = "",
+    options = [],
   }) => (
     <div className={className}>
       <label
@@ -440,40 +565,61 @@ export default function ProfilePage() {
         {label}
       </label>
       {type === "select" ? (
-        <select
-          id={id}
+        <Controller
           name={name}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
-          value={value}
-          onChange={onChange}
-        >
-          <option value="">{placeholder || `Select ${label}`}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          control={control}
+          render={({ field }) => (
+            <select
+              id={id}
+              {...field}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
+            >
+              <option value="">{placeholder || `Select ${label}`}</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+        />
       ) : type === "textarea" ? (
-        <textarea
-          id={id}
+        <Controller
           name={name}
-          rows="4"
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
+          control={control}
+          render={({ field }) => (
+            <textarea
+              id={id}
+              rows="4"
+              placeholder={placeholder}
+              {...field}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+            />
+          )}
         />
       ) : (
-        <input
-          type={type}
-          id={id}
+        <Controller
           name={name}
-          className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
+          control={control}
+          render={({ field }) => (
+            <input
+              type={type}
+              id={id}
+              placeholder={placeholder}
+              {...field}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+            />
+          )}
         />
+      )}
+      {errors[name] && (
+        <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
       )}
     </div>
   );
@@ -517,9 +663,9 @@ export default function ProfilePage() {
         />
 
         {/* Image View Modal */}
-        <ImageViewModal 
-          isOpen={isModalOpen} 
-          imageUrl={currentModalImage} 
+        <ImageViewModal
+          isOpen={isModalOpen}
+          imageUrl={currentModalImage}
           onClose={() => setIsModalOpen(false)}
         />
 
@@ -560,11 +706,11 @@ export default function ProfilePage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Cover Photo */}
           <div className="h-60 bg-gradient-to-r from-red-600 to-red-400 relative">
-            <div className=" bottom-0 left-0 w-full p-6 flex flex-col md:flex-col justify-center items-center">
+            <div className="bottom-0 left-0 w-full p-6 flex flex-col md:flex-col justify-center items-center">
               <div className="relative h-32 w-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white group">
                 <Image
                   src={profileImage}
-                  alt={`${formData.fullName}'s profile`}
+                  alt={`${profileData.fullName}'s profile`}
                   fill
                   sizes="128px"
                   className="object-cover"
@@ -578,25 +724,25 @@ export default function ProfilePage() {
               </div>
               <div className="flex flex-col gap-4">
                 <h1 className="text-2xl text-center font-bold text-white">
-                  {formData.fullName}
+                  {profileData.fullName}
                 </h1>
                 <p className="text-white/90 text-xs md:text-base font-medium flex flex-wrap items-center gap-2 ">
-                  {formData.dob && (
+                  {profileData.dob && (
                     <span className="flex items-center">
                       <Cake size={14} className="mr-1.5" />
-                      {calculateAge(formData.dob)} years
+                      {calculateAge(profileData.dob)} years
                     </span>
                   )}
-                  {formData.height && (
+                  {profileData.height && (
                     <span className="flex items-center">
                       <Ruler size={14} className="mr-1.5" />
-                      {formData.height}
+                      {profileData.height}
                     </span>
                   )}
-                  {formData.city && (
+                  {profileData.city && (
                     <span className="flex items-center">
                       <MapPin size={14} className="mr-1.5" />
-                      {[formData.city, formData.country]
+                      {[profileData.city, profileData.country]
                         .filter(Boolean)
                         .join(", ")}
                     </span>
@@ -632,11 +778,11 @@ export default function ProfilePage() {
 
             {isEditing && (
               <button
-                onClick={handleSubmit}
+                onClick={handleSubmit(onSubmit)}
                 className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg transition flex items-center shadow-sm"
-                disabled={isSaving}
+                disabled={isSubmitting}
               >
-                {isSaving ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 size={18} className="mr-2 animate-spin" />
                     Saving...
@@ -681,7 +827,7 @@ export default function ProfilePage() {
             {activeTab === "photos" && (
               <>
                 <form
-                  onSubmit={updateImage(handleUploadPhoto)}
+                  onSubmit={handleSubmit(handleUploadPhoto)}
                   className="flex justify-between items-center mb-6"
                 >
                   <h3 className="text-lg font-semibold text-gray-800 flex items-center">
@@ -695,15 +841,6 @@ export default function ProfilePage() {
                     type="file"
                     {...register("images", {
                       validate: {
-                        required: (value) => {
-                          if (!value || value.length === 0) {
-                            return (
-                              images.length > 0 ||
-                              "Please upload at least one photo"
-                            );
-                          }
-                          return true;
-                        },
                         maxCount: (value) => {
                           return (
                             !value ||
@@ -721,7 +858,6 @@ export default function ProfilePage() {
                   />
                   <button
                     type="submit"
-                    onClick={handleUploadPhoto}
                     className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center px-2 py-1 md:px-4 md:py-2 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
                     disabled={isUploading || previews.length === 0}
                   >
@@ -738,14 +874,19 @@ export default function ProfilePage() {
                     )}
                   </button>
                 </form>
-                
+
                 {/* Preview section */}
                 {previews.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Selected Photos:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      Selected Photos:
+                    </h4>
                     <div className="flex gap-3 overflow-x-auto pb-3">
                       {previews.map((preview, index) => (
-                        <div key={index} className="relative h-24 w-24 flex-shrink-0">
+                        <div
+                          key={index}
+                          className="relative h-24 w-24 flex-shrink-0"
+                        >
                           <Image
                             src={preview.url}
                             alt={`Preview ${index + 1}`}
@@ -759,7 +900,7 @@ export default function ProfilePage() {
                               const newPreviews = [...previews];
                               newPreviews.splice(index, 1);
                               setPreviews(newPreviews);
-                              
+
                               const newFiles = [...images];
                               newFiles.splice(index, 1);
                               setValue("images", newFiles);
@@ -772,7 +913,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {userProfile.profile_image &&
                   userProfile.profile_image.length > 0 ? (
@@ -792,8 +933,8 @@ export default function ProfilePage() {
                             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-end justify-center bottom-1">
+                            <div className="flex gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 type="button"
                                 className="bg-white p-2 rounded-full shadow-md"
@@ -818,7 +959,10 @@ export default function ProfilePage() {
                                 disabled={isDeleting}
                               >
                                 {isDeleting ? (
-                                  <Loader2 size={18} className="text-red-600 animate-spin" />
+                                  <Loader2
+                                    size={18}
+                                    className="text-red-600 animate-spin"
+                                  />
                                 ) : (
                                   <Trash2 size={18} className="text-red-600" />
                                 )}
@@ -847,19 +991,19 @@ export default function ProfilePage() {
                     </div>
                   )}
                   {userProfile.profile_image &&
-                  userProfile.profile_image.length < MAX_IMAGES && (
-                    <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
-                      <label
-                        htmlFor="image-upload"
-                        className="flex flex-col items-center justify-center p-4 cursor-pointer w-full h-full"
-                      >
-                        <Plus size={28} className="text-gray-500 mb-2" />
-                        <span className="text-sm text-gray-600 font-medium">
-                          Add Photo
-                        </span>
-                      </label>
-                    </div>
-                  )}
+                    userProfile.profile_image.length < MAX_IMAGES && (
+                      <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <label
+                          htmlFor="image-upload"
+                          className="flex flex-col items-center justify-center p-4 cursor-pointer w-full h-full"
+                        >
+                          <Plus size={28} className="text-gray-500 mb-2" />
+                          <span className="text-sm text-gray-600 font-medium">
+                            Add Photo
+                          </span>
+                        </label>
+                      </div>
+                    )}
                 </div>
               </>
             )}
@@ -875,8 +1019,6 @@ export default function ProfilePage() {
                         id="description"
                         type="textarea"
                         name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
                         placeholder="Tell us about yourself, your interests, and what you're looking for in a partner..."
                       />
                     </div>
@@ -889,99 +1031,75 @@ export default function ProfilePage() {
                       <FormField
                         label="Profession"
                         id="occupation"
+                        type="select"
                         name="occupation"
-                        value={formData.occupation}
-                        onChange={handleInputChange}
-                        placeholder="Your current profession"
+                        options={fieldsData.occupationOptions.map(
+                          (profession) => ({
+                            value: profession,
+                            label: profession,
+                          })
+                        )}
                       />
                       <FormField
                         label="Highest Education"
                         id="highest_education"
                         type="select"
                         name="highest_education"
-                        value={formData.highest_education}
-                        onChange={handleInputChange}
                         options={[
-                          { value: "High School", label: "High School" },
+                          {
+                            value: "Below High School",
+                            label: "Below High School",
+                          },
+                          {
+                            value: "High School (12th)",
+                            label: "High School (12th)",
+                          },
+                          { value: "Diploma", label: "Diploma" },
                           { value: "Bachelor's", label: "Bachelor's" },
                           { value: "Master's", label: "Master's" },
-                          { value: "Doctorate", label: "Doctorate" },
+                          { value: "Doctorate", label: "Doctorate/PhD" },
                         ]}
                       />
-                      <FormField
-                        label="Course/Degree"
-                        id="course"
-                        name="course"
-                        value={formData.course}
-                        onChange={handleInputChange}
-                        placeholder="Your field of study"
-                      />
+
+                      {!isCourseVisible && (
+                        <FormField
+                          label="Course"
+                          id="course"
+                          type="select"
+                          name="course"
+                          options={Object.entries(courses)
+                            .map(([category, courseList]) =>
+                              courseList.map((course) => ({
+                                value: course,
+                                label: course,
+                              }))
+                            )
+                            .flat()}
+                        />
+                      )}
                       <FormField
                         label="Annual Income"
                         id="annual_income"
                         type="select"
                         name="annual_income"
-                        value={formData.annual_income}
-                        onChange={handleInputChange}
-                        options={[
-                          { value: "Rs. 0 - 1 Lakh", label: "Rs. 0 - 1 Lakh" },
-                          { value: "Rs. 1 - 2 Lakh", label: "Rs. 1 - 2 Lakh" },
-                          { value: "Rs. 2 - 3 Lakh", label: "Rs. 2 - 3 Lakh" },
-                          { value: "Rs. 3 - 5 Lakh", label: "Rs. 3 - 5 Lakh" },
-                          {
-                            value: "Rs. 5 - 7.5 Lakh",
-                            label: "Rs. 5 - 7.5 Lakh",
-                          },
-                          {
-                            value: "Rs. 7.5 - 10 Lakh",
-                            label: "Rs. 7.5 - 10 Lakh",
-                          },
-                          {
-                            value: "Rs. 10 - 15 Lakh",
-                            label: "Rs. 10 - 15 Lakh",
-                          },
-                          {
-                            value: "Rs. 15 - 20 Lakh",
-                            label: "Rs. 15 - 20 Lakh",
-                          },
-                          {
-                            value: "Rs. 20 - 30 Lakh",
-                            label: "Rs. 20 - 30 Lakh",
-                          },
-                          {
-                            value: "Rs. 30 - 50 Lakh",
-                            label: "Rs. 30 - 50 Lakh",
-                          },
-                          {
-                            value: "Rs. 50 Lakh - 1 Crore",
-                            label: "Rs. 50 Lakh - 1 Crore",
-                          },
-                          {
-                            value: "Rs. 1 Crore & above",
-                            label: "Rs. 1 Crore & above",
-                          },
-                        ]}
+                        options={fieldsData.annualIncomeOptions.map(
+                          (annual_income) => ({
+                            value: annual_income,
+                            label: annual_income,
+                          })
+                        )}
                       />
                       <FormField
                         label="Employed In"
                         id="employed_in"
                         type="select"
                         name="employed_in"
-                        value={formData.employed_in}
-                        onChange={handleInputChange}
-                        options={[
-                          { value: "Private Sector", label: "Private Sector" },
-                          {
-                            value: "Government/Public Sector",
-                            label: "Government/Public Sector",
-                          },
-                          { value: "Self Employed", label: "Self Employed" },
-                          {
-                            value: "Business/Entrepreneur",
-                            label: "Business/Entrepreneur",
-                          },
-                          { value: "Not Working", label: "Not Working" },
-                        ]}
+                        options={fieldsData.employeeInOptions.map(
+                          (employed_in) => ({
+                            value: employed_in,
+                            label: employed_in,
+                          })
+                        )}
                       />
                     </div>
                   </form>
@@ -992,10 +1110,10 @@ export default function ProfilePage() {
                         <User size={20} className="mr-2 text-red-600" />
                         About Me
                       </h3>
-                      {formData.description ? (
+                      {profileData.description ? (
                         <div className="bg-gray-50 p-5 rounded-lg">
                           <p className="text-gray-700 whitespace-pre-line leading-relaxed">
-                            {formData.description}
+                            {profileData.description}
                           </p>
                         </div>
                       ) : (
@@ -1017,7 +1135,7 @@ export default function ProfilePage() {
                       <InfoItem
                         icon={<Briefcase size={18} className="text-gray-500" />}
                         label="Profession"
-                        value={formData.occupation}
+                        value={profileData.occupation}
                       />
                       <InfoItem
                         icon={
@@ -1025,9 +1143,11 @@ export default function ProfilePage() {
                         }
                         label="Education"
                         value={
-                          formData.highest_education
-                            ? `${formData.highest_education}${
-                                formData.course ? ` in ${formData.course}` : ""
+                          profileData.highest_education
+                            ? `${profileData.highest_education}${
+                                profileData.course
+                                  ? ` in ${profileData.course}`
+                                  : ""
                               }`
                             : null
                         }
@@ -1037,12 +1157,12 @@ export default function ProfilePage() {
                           <DollarSign size={18} className="text-gray-500" />
                         }
                         label="Annual Income"
-                        value={formData.annual_income}
+                        value={profileData.annual_income}
                       />
                       <InfoItem
                         icon={<Building size={18} className="text-gray-500" />}
                         label="Employed In"
-                        value={formData.employed_in}
+                        value={profileData.employed_in}
                       />
                     </div>
                   </>
@@ -1064,24 +1184,18 @@ export default function ProfilePage() {
                         label="Full Name"
                         id="fullName"
                         name="fullName"
-                        value={formData.fullName}
-                        onChange={handleInputChange}
                       />
                       <FormField
                         label="Date of Birth"
                         id="dob"
                         type="date"
                         name="dob"
-                        value={formData.dob}
-                        onChange={handleInputChange}
                       />
                       <FormField
                         label="Height"
                         id="height"
                         type="select"
                         name="height"
-                        value={formData.height}
-                        onChange={handleInputChange}
                         options={Array.from({ length: 37 }, (_, i) => {
                           const feet = Math.floor(i / 12) + 4; // Start at 4 feet
                           const inches = i % 12;
@@ -1097,13 +1211,11 @@ export default function ProfilePage() {
                         id="marital_status"
                         type="select"
                         name="marital_status"
-                        value={formData.marital_status}
-                        onChange={handleInputChange}
                         options={[
                           { value: "Single", label: "Single" },
+                          { value: "Married", label: "Married" },
                           { value: "Divorced", label: "Divorced" },
                           { value: "Widowed", label: "Widowed" },
-                          { value: "Separated", label: "Separated" },
                         ]}
                       />
                       <FormField
@@ -1111,8 +1223,6 @@ export default function ProfilePage() {
                         id="religion"
                         type="select"
                         name="religion"
-                        value={formData.religion}
-                        onChange={handleInputChange}
                         options={[
                           { value: "Hindu", label: "Hindu" },
                           { value: "Muslim", label: "Muslim" },
@@ -1120,45 +1230,81 @@ export default function ProfilePage() {
                           { value: "Sikh", label: "Sikh" },
                           { value: "Buddhist", label: "Buddhist" },
                           { value: "Jain", label: "Jain" },
+                          { value: "Parsi", label: "Parsi" },
+                          { value: "Jewish", label: "Jewish" },
+                          { value: "Bahai", label: "Bahai" },
                           { value: "Other", label: "Other" },
                         ]}
                       />
-                      <FormField
-                        label="Caste"
-                        id="caste"
-                        name="caste"
-                        value={formData.caste}
-                        onChange={handleInputChange}
-                      />
+                      {/* Replace your existing caste field with this dynamic one */}
+                      {casteFieldName && fieldsData[casteFieldName] && (
+                        <FormField
+                          label="Caste"
+                          id="caste"
+                          type="select"
+                          name="caste"
+                          options={fieldsData[casteFieldName].map((caste) => ({
+                            value: caste,
+                            label: caste,
+                          }))}
+                        />
+                      )}
+
+                      {/* Muslim Sect - Show only if religion is Muslim */}
+                      {religion === "Muslim" && (
+                        <FormField
+                          label="Sect"
+                          id="sect"
+                          type="select"
+                          name="sect"
+                          options={[
+                            { value: "Sunni", label: "Sunni" },
+                            { value: "Shia", label: "Shia" },
+                            { value: "Other", label: "Other" },
+                          ]}
+                        />
+                      )}
+
+                      {/* Muslim jammat - Show only if religion is Muslim and sect is Sunni */}
+                      {religion === "Muslim" && sect === "Sunni" && (
+                        <FormField
+                          label="jammat"
+                          id="jammat"
+                          type="select"
+                          name="jammat"
+                          options={fieldsData.muslimJamaat.map((jammat) => ({
+                            value: jammat,
+                            label: jammat,
+                          }))}
+                        />
+                      )}
                       <FormField
                         label="Mother Tongue"
                         id="mother_tongue"
+                        type="select"
                         name="mother_tongue"
-                        value={formData.mother_tongue}
-                        onChange={handleInputChange}
+                        options={fieldsData.motherTongue.map(
+                          (motherTongue) => ({
+                            value: motherTongue,
+                            label: motherTongue,
+                          })
+                        )}
                       />
                       <FormField
                         label="Diet Preference"
                         id="diet"
                         type="select"
                         name="diet"
-                        value={formData.diet}
-                        onChange={handleInputChange}
-                        options={[
-                          { value: "Veg", label: "Vegetarian" },
-                          { value: "Non-Veg", label: "Non-Vegetarian" },
-                          { value: "Eggetarian", label: "Eggetarian" },
-                          { value: "Jain", label: "Jain" },
-                          { value: "Vegan", label: "Vegan" },
-                        ]}
+                        options={fieldsData.dietOptions.map((diet) => ({
+                          value: diet,
+                          label: diet,
+                        }))}
                       />
                       <FormField
                         label="Living With Family"
                         id="living_with_family"
                         type="select"
                         name="living_with_family"
-                        value={formData.living_with_family}
-                        onChange={handleInputChange}
                         options={[
                           { value: "Yes", label: "Yes" },
                           { value: "No", label: "No" },
@@ -1171,27 +1317,9 @@ export default function ProfilePage() {
                       Location
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                      <FormField
-                        label="Country"
-                        id="country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleInputChange}
-                      />
-                      <FormField
-                        label="State"
-                        id="state"
-                        name="state"
-                        value={formData.state}
-                        onChange={handleInputChange}
-                      />
-                      <FormField
-                        label="City"
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                      />
+                      <FormField label="Country" id="country" name="country" />
+                      <FormField label="State" id="state" name="state" />
+                      <FormField label="City" id="city" name="city" />
                     </div>
                   </form>
                 ) : (
@@ -1205,17 +1333,35 @@ export default function ProfilePage() {
                         <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Religion"
-                          value={formData.religion}
+                          value={profileData.religion}
                         />
+                        {/* In your display mode (when !isEditing) */}
                         <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Caste"
-                          value={formData.caste}
+                          value={profileData.caste}
                         />
+                        {profileData.religion === "Muslim" && (
+                          <InfoItem
+                            icon={<Users size={18} className="text-gray-500" />}
+                            label="Sect"
+                            value={profileData.sect}
+                          />
+                        )}
+                        {profileData.religion === "Muslim" &&
+                          profileData.sect === "Sunni" && (
+                            <InfoItem
+                              icon={
+                                <Users size={18} className="text-gray-500" />
+                              }
+                              label="jammat"
+                              value={profileData.jammat}
+                            />
+                          )}
                         <InfoItem
                           icon={<Users size={18} className="text-gray-500" />}
                           label="Marital Status"
-                          value={formData.marital_status}
+                          value={profileData.marital_status}
                         />
                         <InfoItem
                           icon={
@@ -1223,17 +1369,17 @@ export default function ProfilePage() {
                           }
                           label="Diet Preference"
                           value={
-                            formData.diet === "Veg"
+                            profileData.diet === "Veg"
                               ? "Vegetarian"
-                              : formData.diet === "Non-Veg"
+                              : profileData.diet === "Non-Veg"
                               ? "Non-Vegetarian"
-                              : formData.diet
+                              : profileData.diet
                           }
                         />
                         <InfoItem
                           icon={<Home size={18} className="text-gray-500" />}
                           label="Living With Family"
-                          value={formData.living_with_family}
+                          value={profileData.living_with_family}
                         />
                       </div>
                     </div>
@@ -1248,9 +1394,9 @@ export default function ProfilePage() {
                           icon={<MapPin size={18} className="text-gray-500" />}
                           label="Location"
                           value={[
-                            formData.city,
-                            formData.state,
-                            formData.country,
+                            profileData.city,
+                            profileData.state,
+                            profileData.country,
                           ]
                             .filter(Boolean)
                             .join(", ")}
@@ -1260,7 +1406,7 @@ export default function ProfilePage() {
                             <Languages size={18} className="text-gray-500" />
                           }
                           label="Mother Tongue"
-                          value={formData.mother_tongue}
+                          value={profileData.mother_tongue}
                         />
                       </div>
 
@@ -1272,28 +1418,28 @@ export default function ProfilePage() {
                         <InfoItem
                           icon={<User size={18} className="text-gray-500" />}
                           label="Full Name"
-                          value={formData.fullName}
+                          value={profileData.fullName}
                         />
                         <InfoItem
                           icon={<Cake size={18} className="text-gray-500" />}
                           label="Date of Birth"
                           value={
-                            formData.dob
-                              ? `${new Date(formData.dob).toLocaleDateString(
+                            profileData.dob
+                              ? `${new Date(profileData.dob).toLocaleDateString(
                                   "en-US",
                                   {
                                     year: "numeric",
                                     month: "long",
                                     day: "numeric",
                                   }
-                                )} (${calculateAge(formData.dob)} years)`
+                                )} (${calculateAge(profileData.dob)} years)`
                               : null
                           }
                         />
                         <InfoItem
                           icon={<Ruler size={18} className="text-gray-500" />}
                           label="Height"
-                          value={formData.height}
+                          value={profileData.height}
                         />
                       </div>
                     </div>
