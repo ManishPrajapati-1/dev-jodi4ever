@@ -57,6 +57,7 @@ export default function ProfilePage() {
 
   // File input ref to programmatically trigger file selection
   const fileInputRef = useRef(null);
+  const inputRefs = useRef({});
 
   // State for image viewing modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,7 +111,6 @@ export default function ProfilePage() {
   // Watch for education changes to update course options
   const highestEducation = watch("highest_education");
   const images = watch("images", []);
-  // Add these watch and effect hooks near the top of your component:
   const religion = watch("religion", "");
   const sect = watch("sect", "");
 
@@ -360,6 +360,7 @@ export default function ProfilePage() {
   }, [highestEducation]);
 
   const profileData = watch();
+  console.log(profileData);
   const profileImage = profileData?.profile_image?.[0]
     ? profileData.profile_image[0].startsWith("http")
       ? profileData.profile_image[0]
@@ -420,6 +421,7 @@ export default function ProfilePage() {
 
   const onSubmit = async (data) => {
     try {
+      data.heightInCm = getSelectedCm(data.height);
       // Call API to update profile
       const response = await updateProfile(data).unwrap();
       toast.success("Profile updated successfully!", {
@@ -548,81 +550,135 @@ export default function ProfilePage() {
   );
 
   // Create FormField component for consistent styling
-  const FormField = ({
-    label,
-    id,
-    type = "text",
-    name,
-    placeholder,
-    className = "",
-    options = [],
-  }) => (
-    <div className={className}>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-2"
-      >
-        {label}
-      </label>
-      {type === "select" ? (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <select
-              id={id}
-              {...field}
-              className={`w-full px-3 py-2.5 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
-            >
-              <option value="">{placeholder || `Select ${label}`}</option>
-              {options.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          )}
-        />
-      ) : type === "textarea" ? (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <textarea
-              id={id}
-              rows="4"
-              placeholder={placeholder}
-              {...field}
-              className={`w-full px-3 py-2.5 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
-            />
-          )}
-        />
-      ) : (
-        <Controller
-          name={name}
-          control={control}
-          render={({ field }) => (
-            <input
-              type={type}
-              id={id}
-              placeholder={placeholder}
-              {...field}
-              className={`w-full px-3 py-2.5 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
-            />
-          )}
-        />
-      )}
-      {errors[name] && (
-        <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
-      )}
-    </div>
-  );
+// Add this at the component level
+
+
+// Modify your FormField component to use this approach
+const FormField = ({
+  label,
+  id,
+  type = "text",
+  name,
+  placeholder,
+  className = "",
+  options = [],
+}) => (
+  <div className={className}>
+    <label
+      htmlFor={id}
+      className="block text-sm font-medium text-gray-700 mb-2"
+    >
+      {label}
+    </label>
+    {type === "select" ? (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <select
+            id={id}
+            {...field}
+            ref={(el) => {
+              inputRefs.current[name] = el;
+              field.ref(el);
+            }}
+            className={`w-full px-3 py-2.5 border ${
+              errors[name] ? "border-red-500" : "border-gray-300"
+            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
+          >
+            <option value="">{placeholder || `Select ${label}`}</option>
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        )}
+      />
+    ) : type === "textarea" ? (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <textarea
+            id={id}
+            rows="4"
+            placeholder={placeholder}
+            {...field}
+            ref={(el) => {
+              inputRefs.current[name] = el;
+              field.ref(el);
+            }}
+            onChange={(e) => {
+              const selectionStart = e.target.selectionStart;
+              const selectionEnd = e.target.selectionEnd;
+              field.onChange(e);
+              
+              // Use setTimeout to restore focus after render
+              setTimeout(() => {
+                const input = inputRefs.current[name];
+                if (input) {
+                  input.focus();
+                  if (input.setSelectionRange) {
+                    input.setSelectionRange(selectionStart, selectionEnd);
+                  }
+                }
+              }, 0);
+            }}
+            className={`w-full px-3 py-2.5 border ${
+              errors[name] ? "border-red-500" : "border-gray-300"
+            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+          />
+        )}
+      />
+    ) : (
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <input
+            type={type}
+            id={id}
+            placeholder={placeholder}
+            {...field}
+            ref={(el) => {
+              inputRefs.current[name] = el;
+              field.ref(el);
+            }}
+            onChange={(e) => {
+              const selectionStart = e.target.selectionStart;
+              const selectionEnd = e.target.selectionEnd;
+              field.onChange(e);
+              
+              // Apply any additional changes needed
+              if (name === "height") {
+                setValue("heightInCm", getSelectedCm(e.target.value));
+              }
+              
+              // Use setTimeout to restore focus after render
+              setTimeout(() => {
+                const input = inputRefs.current[name];
+                if (input) {
+                  input.focus();
+                  if (name === "dob") { return; } // Skip for date inputs
+                  if (input.setSelectionRange) {
+                    input.setSelectionRange(selectionStart, selectionEnd);
+                  }
+                }
+              }, 0);
+            }}
+            className={`w-full px-3 py-2.5 border ${
+              errors[name] ? "border-red-500" : "border-gray-300"
+            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+          />
+        )}
+      />
+    )}
+    {errors[name] && (
+      <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
+    )}
+  </div>
+);
 
   // Create InfoItem component for display mode
   const InfoItem = ({ icon, label, value }) => (
@@ -1201,7 +1257,7 @@ export default function ProfilePage() {
                           const inches = i % 12;
                           const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
                           return {
-                            value: `${feet}'${inches}" (${cm} cm)`,
+                            value: `${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`,
                             label: `${feet}'${inches}" (${cm} cm)`,
                           };
                         })}

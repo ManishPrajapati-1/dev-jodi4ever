@@ -10,6 +10,16 @@ import { CalendarIcon, ChevronRightIcon, MapPinIcon, RulerIcon, UserIcon } from 
 const Step1PersonalDetails = () => {
   const preferencesData = useSelector((state) => state.profile.preferences);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getSelectedCm = (heightString) => {
+    const match = heightString?.match(/(\d+)'(\d+)"/);
+    if (match) {
+      const feet = parseInt(match[1]);
+      const inches = parseInt(match[2]);
+      return (feet * 30.48 + inches * 2.54).toFixed(2);
+    }
+    return "0.0";
+  };
   
   const {
     register,
@@ -62,10 +72,11 @@ const Step1PersonalDetails = () => {
     
     // Simulate API call
     setTimeout(() => {
+      data.heightInCm = getSelectedCm(data.height);
       dispatch(updateFormData(data));
       dispatch(setStep(2));
       setIsSubmitting(false);
-    }, 600);
+    }, 200);
   };
 
   const getAgeFromDOB = (dob) => {
@@ -242,9 +253,9 @@ const Step1PersonalDetails = () => {
                     {Array.from({ length: 37 }, (_, i) => {
                       const feet = Math.floor(i / 12) + 4; // Start at 4 feet
                       const inches = i % 12;
-                      const cm = (feet * 30.48 + inches * 2.54).toFixed(1);
+                      const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
                       return (
-                        <option key={i} value={`${feet}'${inches}"`}>
+                        <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
                           {feet}&apos;{inches}&apos; ({cm} cm)
                         </option>
                       );

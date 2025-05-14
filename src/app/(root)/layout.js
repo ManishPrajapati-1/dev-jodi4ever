@@ -15,11 +15,6 @@ const poppins = Poppins({
   style: ["normal", "italic"],
 });
 
-// export const metadata = {
-//   title: "Jodi4Ever - Home",
-//   description: "Jodi4Ever - find you a soulmate",
-// };
-
 export const metadata = {
   title: "Jodi4Ever – Find Your Perfect Match | Trusted Matrimony Platform",
   description:

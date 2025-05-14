@@ -1,11 +1,11 @@
-"use client";
+// "use client";
 
 import Link from "next/link";
 import Head from "next/head";
 
-// export const metadata = {
-//     title: 'Page Not Found',
-//   };
+export const metadata = {
+    title: 'Page Not Found',
+  };
 
 export default function NotFound() {
       <Head>
