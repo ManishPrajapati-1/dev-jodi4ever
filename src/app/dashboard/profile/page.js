@@ -447,8 +447,8 @@ export default function ProfilePage() {
   };
 
   // Upload all photos
-  const handleUploadPhoto = async (e) => {
-    e.preventDefault();
+  const handleUploadPhoto = async () => {
+    // e.preventDefault();
     setIsUploading(true);
 
     try {

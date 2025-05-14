@@ -287,12 +287,12 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button className="bg-amber-100 text-amber-700 px-5 py-2.5 rounded-lg font-medium hover:bg-amber-200 transition-colors">
+                  <Link href={'/premium'} className="bg-amber-100 text-amber-700 px-5 py-2.5 rounded-lg font-medium hover:bg-amber-200 transition-colors">
                     View Plans
-                  </button>
-                  <button className="bg-amber-500 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-amber-600 transition-colors">
+                  </Link>
+                  <Link href={'/premium'} className="bg-amber-500 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-amber-600 transition-colors">
                     Upgrade Now
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

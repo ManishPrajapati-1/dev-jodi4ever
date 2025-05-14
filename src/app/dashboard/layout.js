@@ -24,13 +24,13 @@ const LoadingUI = () => (
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <meta name="theme-color" content="#ffffff" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </head>
-      <body className="antialiased text-gray-800">
+    // <html lang="en" className="scroll-smooth">
+    //   <head>
+    //     <link rel="icon" href="/favicon.ico" sizes="any" />
+    //     <meta name="theme-color" content="#ffffff" />
+    //     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    //   </head>
+    //   <body className="antialiased text-gray-800">
         <StoreProvider>
           <div className="min-h-screen flex flex-col bg-gray-50">
             {/* Header */}
@@ -42,10 +42,10 @@ export default function RootLayout({ children }) {
             </Suspense>
 
             {/* Footer */}
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </StoreProvider>
-      </body>
-    </html>
+    //   </body>
+    // </html>
   );
 }

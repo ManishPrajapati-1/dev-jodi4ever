@@ -21,9 +21,9 @@ export default function CtaSection() {
           <Link href="/create-profile" className="bg-btn text-white px-6 py-3 rounded-md font-semibold hover:bg-btn-hover transition-all duration-300">
             Create Free Profile
           </Link>
-          <button className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold border border-white hover:bg-gray-300 transition-all duration-300">
+          <Link href="/contact" className="bg-white text-indigo-600 px-6 py-3 rounded-md font-semibold border border-white hover:bg-gray-300 transition-all duration-300">
             Help and Support
-          </button>
+          </Link>
         </div>
       </div>
       

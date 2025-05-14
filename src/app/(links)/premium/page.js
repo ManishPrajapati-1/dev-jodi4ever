@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Header from "@/app/components/Header"
 
 export default function Premium() {
@@ -208,12 +209,12 @@ export default function Premium() {
                         Our premium features can help you find your perfect match faster.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="/register" className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary transition font-medium">
+                        <Link href="/create-profile" className="px-6 py-3 bg-primary text-white rounded-md hover:bg-primary transition font-medium">
                             Get Started Now
-                        </a>
-                        <a href="/contact" className="px-6 py-3 bg-white text-primary border border-primary-300 rounded-md hover:bg-primary-50 transition font-medium">
+                        </Link>
+                        <Link href="/contact" className="px-6 py-3 bg-white text-primary border border-primary-300 rounded-md hover:bg-primary-50 transition font-medium">
                             Contact Sales
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </main>

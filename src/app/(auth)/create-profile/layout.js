@@ -27,8 +27,7 @@ export const metadata = {
 
 export default function CreateProfileLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="bg-gradient-to-b from-tertiary/40 to-tertiary/10 min-h-screen font-sans">
+
         <StoreProvider>
           <div className="min-h-screen flex flex-col">
             {/* Header / Banner */}
@@ -59,7 +58,6 @@ export default function CreateProfileLayout({ children }) {
             <Footer />
           </div>
         </StoreProvider>
-      </body>
-    </html>
+
   );
 }
