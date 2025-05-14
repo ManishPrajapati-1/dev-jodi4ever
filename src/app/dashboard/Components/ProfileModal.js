@@ -166,7 +166,7 @@ const ProfileModal = ({ isOpen, onClose, profileData, onLikeChange }) => {
               <div className="relative w-full h-full">
                 {/* Current image */}
                 <Image
-                  src={`http://65.1.117.252:5002/${profileData.profile_image[currentImageIndex]}`}
+                  src={`https://jodi4ever.com/${profileData.profile_image[currentImageIndex]}`}
                   alt={`${profileData.fullName}`}
                   fill
                   className="object-cover object-center"
@@ -212,7 +212,7 @@ const ProfileModal = ({ isOpen, onClose, profileData, onLikeChange }) => {
                         >
                           <div className="relative w-full h-full">
                             <Image
-                              src={`http://65.1.117.252:5002/${img}`}
+                              src={`https://jodi4ever.com/${img}`}
                               alt={`Thumbnail ${index + 1}`}
                               fill
                               className="object-cover"

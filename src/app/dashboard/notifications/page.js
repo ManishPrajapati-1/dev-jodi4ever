@@ -27,7 +27,7 @@ import {
 export default function NotificationsPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('all')
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
   
   // Use RTK Query hook to fetch notifications
   const { 

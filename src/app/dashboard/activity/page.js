@@ -31,7 +31,7 @@ import {
 
 export default function ActivityPage() {
   const router = useRouter()
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/"
   const [activeTab, setActiveTab] = useState('connections')
   const [processingId, setProcessingId] = useState(null)
   const [processingAction, setProcessingAction] = useState(null) // 'cancel', 'accept', or 'decline'

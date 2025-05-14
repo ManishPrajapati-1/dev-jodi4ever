@@ -64,7 +64,7 @@ export default function ProfilePage() {
   const [currentModalImage, setCurrentModalImage] = useState("");
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/";
+    process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
 
   // Assuming this is how your redux state is structured
   const userProfile = useSelector((state) => state.user.data?.user);
@@ -234,7 +234,6 @@ export default function ProfilePage() {
       formDataToSend.append("imageIndex", imageIndex);
 
       const response = await updateProfile(formDataToSend).unwrap();
-      console.log(response);
       toast.success(response.message || "Image updated successfully!");
       const updatedImages = response?.data?.user?.profile_image || [
         ...userProfile.profile_image,
@@ -360,7 +359,6 @@ export default function ProfilePage() {
   }, [highestEducation]);
 
   const profileData = watch();
-  console.log(profileData);
   const profileImage = profileData?.profile_image?.[0]
     ? profileData.profile_image[0].startsWith("http")
       ? profileData.profile_image[0]

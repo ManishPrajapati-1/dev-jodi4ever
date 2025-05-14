@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://65.1.117.252:5002/api/",
+  baseUrl: "https://jodi4ever.com/api/",
   prepareHeaders: (headers) => {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;

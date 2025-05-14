@@ -29,7 +29,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import ProfileModal from './ProfileModal';
 
 // Base URL for profile images
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://65.1.117.252:5002/';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jodi4ever.com/';
 
 const ProfileCard = ({ profile, onProfileClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

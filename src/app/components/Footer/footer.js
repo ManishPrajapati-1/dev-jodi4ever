@@ -1,4 +1,3 @@
-import { Icons } from "@/app/icons";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,9 +18,6 @@ export default function Footer() {
       ],
       services: [
         { href: "/premium", label: "Premium Membership" },
-        // { href: "/matchmaking", label: "Matchmaking Services" },
-        // { href: "/relationship-advice", label: "Relationship Advice" },
-        // { href: "/horoscope-matching", label: "Horoscope Matching" },
       ],
     };
   
@@ -119,7 +115,7 @@ export default function Footer() {
                             alt="Jodi4Ever Logo"
                             width={70}
                             height={70}
-                            className="mr-3"
+                            className="mr-3 w-auto h-auto"
                           />
                           {/* <h3 className="text-2xl font-bold text-white">
                             Jodi4Ever

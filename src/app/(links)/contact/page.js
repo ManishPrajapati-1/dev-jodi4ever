@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from 'react';
-import Header from "@/app/components/Header"
-import { useGetTermsPrivacyAboutQuery } from "@/lib/services/api";
+import Header from "@/app/components/Header";
+import {
+  FaEnvelope,
+  FaPhoneAlt,
+  FaMapMarkerAlt,
+  FaClock,
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+} from "react-icons/fa";
 
 export default function Contact() {
-    const { data: webData, isLoading, error } = useGetTermsPrivacyAboutQuery();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -21,9 +28,6 @@ export default function Contact() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // This is where you'd usually send the form data to your backend
-        // For now, we'll just simulate a successful submission
-        
         // Form validation
         if (!formData.name || !formData.email || !formData.message) {
             setFormStatus({
@@ -46,191 +50,195 @@ export default function Contact() {
         }, 1000);
     };
 
-    if (isLoading) {
-        return (
-            <>
-                <Header />
-                <div className="container mx-auto px-4 py-10 min-h-screen flex items-center justify-center">
-                    <div className="animate-pulse w-full max-w-4xl">
-                        <div className="h-8 bg-gray-200 rounded-md w-1/3 mb-6"></div>
-                        <div className="h-4 bg-gray-200 rounded-md w-2/3 mb-8"></div>
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div className="h-64 bg-gray-200 rounded-md"></div>
-                            <div>
-                                {[...Array(4)].map((_, i) => (
-                                    <div key={i} className="h-10 bg-gray-200 rounded-md w-full mb-4"></div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </>
-        );
-    }
-
-    if (error) {
-        return (
-            <>
-                <Header />
-                <div className="container mx-auto px-4 py-10 min-h-screen flex items-center justify-center">
-                    <div className="text-center">
-                        <h2 className="text-2xl font-semibold text-red-600 mb-2">Oops! Something went wrong</h2>
-                        <p className="text-gray-600">We couldn&apos;t load the contact information. Please try again later.</p>
-                    </div>
-                </div>
-            </>
-        );
-    }
-
-    const contactInfo = webData?.contactUs ? (
-        <div 
-            className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: webData.contactUs }}
-        />
-    ) : (
-        <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-primary">Contact Us</h2>
-            <p className="text-gray-700">For support or inquiries, contact us via:</p>
-            <ul className="space-y-3">
-                <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Email:</strong> support@jodi4ever.com</span>
-                </li>
-                <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Phone:</strong> +91-9899981720</span>
-                </li>
-                <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Office Address:</strong> Delhi - 110066</span>
-                </li>
-            </ul>
-        </div>
-    );
-
     return (
         <>
             <Header />
-            <main className="container mx-auto px-4 py-8 md:py-16 max-w-6xl">
-                <h1 className="text-3xl font-bold text-center text-primary mb-2">Get in Touch</h1>
-                <p className="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
-                    Have questions about our services? Need help with your account? Or just want to provide feedback? 
-                    We&apos;re here to help you every step of the way.
-                </p>
+            <div className="flex flex-col min-h-screen bg-gradient-to-b">
+                <div className="container mx-auto py-10 px-4 md:px-8 max-w-5xl">
+                    {/* Header Section */}
+                    <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-8">
+                        <div className="bg-gradient-to-r from-primary to-btn-hover px-6 py-8 text-center">
+                            <div className="flex justify-center mb-4">
+                                <FaEnvelope className="text-white w-16 h-16 bg-white/20 p-3 rounded-full" />
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                                Get in Touch
+                            </h1>
+                            <p className="text-white/80 max-w-2xl mx-auto">
+                                Have questions about our services? We&apos;re here to help you every step of the way.
+                            </p>
+                        </div>
 
-                <div className="grid md:grid-cols-2 gap-10">
-                    <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-                        {contactInfo}
-                        
-                        <div className="mt-8">
-                            <h3 className="text-lg font-medium text-primary mb-4">Business Hours</h3>
-                            <div className="space-y-2 text-gray-700">
-                                <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                                <p>Saturday: 10:00 AM - 4:00 PM</p>
-                                <p>Sunday: Closed</p>
+                        <div className="p-6 md:p-10 bg-white">
+                            {/* Introduction */}
+                            <div className="mb-8 max-w-3xl mx-auto">
+                                <p className="text-gray-600 leading-relaxed">
+                                    Need help with your account? Want to provide feedback? Or just have questions about 
+                                    our matchmaking services? We&apos;d love to hear from you. Use any of the contact methods 
+                                    below or fill out our contact form, and our team will get back to you as soon as possible.
+                                </p>
                             </div>
+
+                            {/* Contact Form and Info */}
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {/* Left Column - Contact Information */}
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                    <div className="flex items-center bg-indigo-50 p-4 border-l-4 border-indigo-500">
+                                        <FaPhoneAlt className="text-indigo-600 w-6 h-6 mr-3" />
+                                        <h2 className="text-xl font-semibold text-gray-800">
+                                            Contact Information
+                                        </h2>
+                                    </div>
+                                    <div className="p-6">
+                                        <ul className="space-y-5">
+                                            <li className="flex items-start">
+                                                <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                                                    <FaEnvelope className="text-indigo-600 w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-medium text-gray-800">Email</h3>
+                                                    <p className="text-gray-600 mt-1">support@jodi4ever.com</p>
+                                                </div>
+                                            </li>
+                                            <li className="flex items-start">
+                                                <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                                                    <FaPhoneAlt className="text-indigo-600 w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-medium text-gray-800">Phone</h3>
+                                                    <p className="text-gray-600 mt-1">+91-9899981720</p>
+                                                </div>
+                                            </li>
+                                            <li className="flex items-start">
+                                                <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                                                    <FaMapMarkerAlt className="text-indigo-600 w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-medium text-gray-800">Office Address</h3>
+                                                    <p className="text-gray-600 mt-1">Delhi - 110066</p>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                        <div className="mt-8 pt-6 border-t border-gray-100">
+                                            <div className="flex items-center mb-4">
+                                                <FaClock className="text-indigo-600 w-5 h-5 mr-3" />
+                                                <h3 className="font-medium text-gray-800">Business Hours</h3>
+                                            </div>
+                                            <div className="space-y-2 pl-8 text-gray-600">
+                                                <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                                                <p>Saturday: 10:00 AM - 4:00 PM</p>
+                                                <p>Sunday: Closed</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 pt-6 border-t border-gray-100">
+                                            <div className="flex items-center mb-4">
+                                                <h3 className="font-medium text-gray-800">Connect With Us</h3>
+                                            </div>
+                                            <div className="flex space-x-4">
+                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                    <FaFacebookF />
+                                                </a>
+                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                    <FaInstagram />
+                                                </a>
+                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                    <FaTwitter />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Right Column - Contact Form */}
+                                <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                    <div className="flex items-center bg-purple-50 p-4 border-l-4 border-purple-500">
+                                        <FaEnvelope className="text-purple-600 w-6 h-6 mr-3" />
+                                        <h2 className="text-xl font-semibold text-gray-800">
+                                            Send Us a Message
+                                        </h2>
+                                    </div>
+                                    <div className="p-6">
+                                        {formStatus.submitted && (
+                                            <div className={`mb-6 p-4 rounded-md ${formStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                {formStatus.message}
+                                            </div>
+                                        )}
+                                        
+                                        <form onSubmit={handleSubmit} className="space-y-4">
+                                            <div>
+                                                <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Your Name *</label>
+                                                <input
+                                                    type="text"
+                                                    id="name"
+                                                    name="name"
+                                                    value={formData.name}
+                                                    onChange={handleChange}
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    required
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Your Email *</label>
+                                                <input
+                                                    type="email"
+                                                    id="email"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleChange}
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    required
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label htmlFor="subject" className="block text-gray-700 font-medium mb-2">Subject</label>
+                                                <input
+                                                    type="text"
+                                                    id="subject"
+                                                    name="subject"
+                                                    value={formData.subject}
+                                                    onChange={handleChange}
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label htmlFor="message" className="block text-gray-700 font-medium mb-2">Your Message *</label>
+                                                <textarea
+                                                    id="message"
+                                                    name="message"
+                                                    value={formData.message}
+                                                    onChange={handleChange}
+                                                    rows="5"
+                                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                                    required
+                                                ></textarea>
+                                            </div>
+                                            
+                                            <button
+                                                type="submit"
+                                                className="w-full bg-gradient-to-r from-primary to-btn-hover text-white py-3 rounded-md hover:opacity-90 transition font-medium"
+                                            >
+                                                Send Message
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Bottom Section */}
+                            {/* <div className="mt-10 text-center">
+                                <div className="inline-block px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-500 font-medium">
+                                    We typically respond within 24 hours
+                                </div>
+                            </div> */}
                         </div>
-                        
-                        <div className="mt-8">
-                            <h3 className="text-lg font-medium text-primary mb-4">Connect With Us</h3>
-                            <div className="flex space-x-4">
-                                <a href="#" className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-primary hover:bg-purple-200 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
-                                    </svg>
-                                </a>
-                                <a href="#" className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-primary hover:bg-purple-200 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"/>
-                                    </svg>
-                                </a>
-                                <a href="#" className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-primary hover:bg-purple-200 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="bg-white rounded-lg shadow-md p-6 md:p-8">
-                        <h2 className="text-xl font-semibold text-primary mb-6">Send Us a Message</h2>
-                        
-                        {formStatus.submitted && (
-                            <div className={`mb-6 p-4 rounded-md ${formStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                {formStatus.message}
-                            </div>
-                        )}
-                        
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label htmlFor="name" className="block text-gray-700 font-medium mb-2">Your Name *</label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            
-                            <div className="mb-4">
-                                <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Your Email *</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    required
-                                />
-                            </div>
-                            
-                            <div className="mb-4">
-                                <label htmlFor="subject" className="block text-gray-700 font-medium mb-2">Subject</label>
-                                <input
-                                    type="text"
-                                    id="subject"
-                                    name="subject"
-                                    value={formData.subject}
-                                    onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                />
-                            </div>
-                            
-                            <div className="mb-6">
-                                <label htmlFor="message" className="block text-gray-700 font-medium mb-2">Your Message *</label>
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    value={formData.message}
-                                    onChange={handleChange}
-                                    rows="5"
-                                    className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    required
-                                ></textarea>
-                            </div>
-                            
-                            <button
-                                type="submit"
-                                className="w-full bg-primary text-white py-3 rounded-md hover:bg-primary transition font-medium"
-                            >
-                                Send Message
-                            </button>
-                        </form>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 }

@@ -48,7 +48,7 @@ export default function Home() {
   });
 
   const submitForm = (data) => {
-    console.log("Form submitted with data:", data);
+    // console.log("Form submitted with data:", data);
     const queryString = new URLSearchParams(data).toString();
     router.push(`/create-profile?${queryString}`);
   };
@@ -87,7 +87,7 @@ export default function Home() {
             
             {/* Conditional Login/Continue Button */}
             <span
-              className="flex items-center gap-2 font-semibold text-xl text-white hover:underline underline-offset-2 cursor-pointer"
+              className="flex items-center gap-2 font-semibold text-base md:text-xl text-white hover:underline underline-offset-2 cursor-pointer"
               onClick={handleAuthAction}
             >
               {hasToken && userProfile ? (

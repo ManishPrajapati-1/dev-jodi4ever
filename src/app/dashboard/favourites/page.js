@@ -24,7 +24,7 @@ import { useGetFavouritesQuery, useDislikeProfileMutation } from "@/lib/services
 
 export default function LikedUsersPage() {
   const router = useRouter()
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002/"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/"
   const [dislikingUserId, setDislikingUserId] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterView, setFilterView] = useState('list') // 'grid' or 'list'

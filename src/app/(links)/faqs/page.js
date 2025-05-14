@@ -1,10 +1,17 @@
 "use client";
 
 import { useState } from 'react';
-import Header from "@/app/components/Header"
+import Header from "@/app/components/Header";
+import { 
+  FaQuestion, 
+  FaSearch, 
+  FaEnvelope, 
+  FaPhoneAlt, 
+  FaChevronDown
+} from "react-icons/fa";
 
 export default function FAQs() {
-    // Sample FAQ data - in a real application, this might come from an API
+    // Sample FAQ data
     const faqData = [
         {
             id: 1,
@@ -70,108 +77,158 @@ export default function FAQs() {
         faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Group FAQs by categories for better organization
+    const groupedFAQs = [
+        {
+            category: "General Information",
+            faqs: filteredFAQs.slice(0, 3)
+        },
+        {
+            category: "Account & Security",
+            faqs: filteredFAQs.slice(3, 7)
+        },
+        {
+            category: "Plans & Support",
+            faqs: filteredFAQs.slice(7)
+        }
+    ].filter(group => group.faqs.length > 0);
+
     return (
         <>
             <Header />
-            <main className="container mx-auto px-4 py-8 md:py-16 max-w-4xl">
-                <h1 className="text-3xl font-bold text-center text-primary mb-2">Frequently Asked Questions</h1>
-                <p className="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
-                    Find answers to common questions about Jodi4Ever&apos;s services, policies, and features.
-                </p>
-
-                {/* Search Bar */}
-                <div className="mb-8">
-                    <div className="relative max-w-xl mx-auto">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+            <div className="flex flex-col min-h-screen bg-gradient-to-b">
+                <div className="container mx-auto py-10 px-4 md:px-8 max-w-5xl">
+                    {/* Header Section */}
+                    <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-8">
+                        <div className="bg-gradient-to-r from-primary to-btn-hover px-6 py-8 text-center">
+                            <div className="flex justify-center mb-4">
+                                <FaQuestion className="text-white w-16 h-16 bg-white/20 p-3 rounded-full" />
+                            </div>
+                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                                Frequently Asked Questions
+                            </h1>
+                            <p className="text-white/80 max-w-2xl mx-auto">
+                                Find answers to common questions about Jodi4Ever&apos;s services, policies, and features
+                            </p>
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Search for questions or keywords..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                        />
-                    </div>
-                </div>
 
-                {/* FAQ List */}
-                <div className="space-y-4">
-                    {filteredFAQs.length > 0 ? (
-                        filteredFAQs.map((faq, index) => (
-                            <div key={faq.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <button
-                                    className="w-full text-left px-6 py-4 focus:outline-none"
-                                    onClick={() => toggleFAQ(index)}
-                                >
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="text-lg font-medium text-gray-800">{faq.question}</h3>
-                                        <svg
-                                            className={`w-5 h-5 text-primary transform transition-transform duration-200 ${activeIndex === index ? 'rotate-180' : ''}`}
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
+                        <div className="p-6 md:p-10 bg-white">
+                            {/* Search Bar */}
+                            <div className="mb-10 max-w-2xl mx-auto">
+                                <div className="bg-purple-50 rounded-xl p-6 shadow-sm">
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                            <FaSearch className="h-5 w-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Search for questions or keywords..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full pl-12 pr-4 py-3 border border-purple-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        />
                                     </div>
-                                </button>
-                                <div
-                                    className={`px-6 transition-all duration-300 ease-in-out overflow-hidden ${
-                                        activeIndex === index ? 'max-h-96 pb-6' : 'max-h-0'
-                                    }`}
-                                >
-                                    <p className="text-gray-600">{faq.answer}</p>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="text-center py-8 bg-white rounded-lg shadow-md">
-                            <p className="text-gray-600">No matching FAQs found. Please try a different search term.</p>
-                        </div>
-                    )}
-                </div>
 
-                {/* Additional Help Section */}
-                <div className="mt-12 bg-purple-50 rounded-lg p-6 border border-purple-100">
-                    <h2 className="text-xl font-semibold text-primary mb-4">Still have questions?</h2>
-                    <p className="text-gray-700 mb-6">
-                        If you couldn&apos;t find the answer you were looking for, our support team is ready to help you.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <a 
-                            href="/contact" 
-                            className="flex items-center justify-center bg-white p-4 rounded-md border border-purple-200 hover:bg-purple-50 transition"
-                        >
-                            <div className="mr-4 bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
+                            {/* FAQ Categories */}
+                            <div className="space-y-10">
+                                {filteredFAQs.length > 0 ? (
+                                    groupedFAQs.map((group, groupIndex) => (
+                                        <div key={groupIndex} className="space-y-4">
+                                            {groupedFAQs.length > 1 && (
+                                                <div className="flex items-center bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500 mb-4">
+                                                    <h2 className="text-xl font-semibold text-gray-800">{group.category}</h2>
+                                                </div>
+                                            )}
+                                            {group.faqs.map((faq, index) => (
+                                                <div 
+                                                    key={faq.id} 
+                                                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                                                >
+                                                    <button
+                                                        className="w-full text-left p-5 focus:outline-none"
+                                                        onClick={() => toggleFAQ(faq.id)}
+                                                    >
+                                                        <div className="flex justify-between items-center">
+                                                            <h3 className="text-lg font-medium text-gray-800">{faq.question}</h3>
+                                                            <div className={`bg-purple-100 w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-300 ${activeIndex === faq.id ? 'rotate-180' : ''}`}>
+                                                                <FaChevronDown className="w-4 h-4 text-purple-600" />
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                    <div
+                                                        className={`px-5 transition-all duration-300 ease-in-out overflow-hidden ${
+                                                            activeIndex === faq.id ? 'max-h-96 pb-5 border-t border-gray-100' : 'max-h-0'
+                                                        }`}
+                                                    >
+                                                        <p className="text-gray-600 pt-4">{faq.answer}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-10 bg-white rounded-xl shadow-md">
+                                        <div className="inline-flex justify-center items-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+                                            <FaSearch className="w-6 h-6 text-purple-600" />
+                                        </div>
+                                        <h3 className="text-xl font-medium text-gray-800 mb-2">No matching FAQs found</h3>
+                                        <p className="text-gray-600">Please try a different search term or browse our categories.</p>
+                                        <button 
+                                            onClick={() => setSearchTerm('')}
+                                            className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-btn-hover transition"
+                                        >
+                                            Clear Search
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            <div>
-                                <h3 className="font-medium text-primary">Contact Support</h3>
-                                <p className="text-sm text-gray-600">Get help from our customer support team</p>
+
+                            {/* Additional Help Section */}
+                            <div className="mt-12 bg-indigo-50 rounded-xl p-6 shadow-sm">
+                                <h2 className="text-xl font-semibold text-primary mb-4 text-center">Still have questions?</h2>
+                                <p className="text-gray-700 mb-6 text-center max-w-2xl mx-auto">
+                                    If you couldn&apos;t find the answer you were looking for, our support team is ready to help you.
+                                </p>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <a 
+                                        href="/contact" 
+                                        className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition flex items-center"
+                                    >
+                                        <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
+                                            <FaEnvelope className="text-indigo-600 w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-gray-800">Contact Support</h3>
+                                            <p className="text-sm text-gray-600 mt-1">Get help from our customer support team</p>
+                                        </div>
+                                    </a>
+                                    <a 
+                                        href="mailto:support@jodi4ever.com" 
+                                        className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition flex items-center"
+                                    >
+                                        <div className="flex-shrink-0 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
+                                            <FaPhoneAlt className="text-indigo-600 w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-gray-800">Direct Email</h3>
+                                            <p className="text-sm text-gray-600 mt-1">Email us at support@jodi4ever.com</p>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
-                        </a>
-                        <a 
-                            href="mailto:support@jodi4ever.com" 
-                            className="flex items-center justify-center bg-white p-4 rounded-md border border-purple-200 hover:bg-purple-50 transition"
-                        >
-                            <div className="mr-4 bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
+
+                            {/* Bottom Section */}
+                            <div className="mt-10 text-center">
+                                <div className="inline-block px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-500 font-medium">
+                                    Updated May 2025
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-medium text-primary">Direct Email</h3>
-                                <p className="text-sm text-gray-600">Email us at support@jodi4ever.com</p>
-                            </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 }
