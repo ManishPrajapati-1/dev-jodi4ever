@@ -57,23 +57,30 @@ const Step6ProfileImage = () => {
     // Filter for image files only
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     
-    // Check if total images exceed the maximum
-    if (imageFiles.length > MAX_IMAGES) {
+    // Get current images and check if new total will exceed the maximum
+    const currentFiles = previews.map(preview => preview.file);
+    const totalFiles = [...currentFiles, ...imageFiles];
+    
+    if (totalFiles.length > MAX_IMAGES) {
       setErrorMessage(`You can only upload a maximum of ${MAX_IMAGES} images.`);
       return;
     }
     
-    // Generate previews for the files
+    // Generate previews for the new files
     const newPreviews = imageFiles.map(file => ({
       url: URL.createObjectURL(file),
       file: file
     }));
     
-    setPreviews(newPreviews);
-    setValue('images', imageFiles, { shouldValidate: true });
+    // Combine existing previews with new ones
+    const updatedPreviews = [...previews, ...newPreviews];
+    setPreviews(updatedPreviews);
+    
+    // Update form value with all files
+    setValue('images', totalFiles, { shouldValidate: true });
     
     // Clear any existing validation errors
-    if (imageFiles.length > 0) {
+    if (updatedPreviews.length > 0) {
       setErrorMessage('');
     }
   };

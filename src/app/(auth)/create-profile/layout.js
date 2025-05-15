@@ -4,6 +4,7 @@ import Link from "next/link";
 import "@/app/globals.css";
 import Footer from "@/app/components/Footer/footer";
 import { ArrowLeft, Heart } from "lucide-react";
+import FormStepper from "./Components/FormSteper";
 
 export const metadata = {
   title: "Create Your Profile | Jodi4Ever",
@@ -27,7 +28,6 @@ export const metadata = {
 
 export default function CreateProfileLayout({ children }) {
   return (
-
         <StoreProvider>
           <div className="min-h-screen flex flex-col">
             {/* Header / Banner */}
@@ -35,13 +35,7 @@ export default function CreateProfileLayout({ children }) {
 
             {/* Back to home link */}
             <div className="container mx-auto px-4 pt-4">
-              <Link 
-                href="/"
-                className="inline-flex items-center text-gray-600 hover:text-primary transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                <span className="text-sm">Back to Home</span>
-              </Link>
+              <FormStepper />
             </div>
 
             {/* Main Content Area */}
@@ -55,7 +49,7 @@ export default function CreateProfileLayout({ children }) {
             </main>
 
             {/* Footer */}
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </StoreProvider>
 
