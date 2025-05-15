@@ -3,8 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useLoginUserMutation, useVerifyLoginOtpMutation } from "@/lib/services/api";
+import {
+  useLoginUserMutation,
+  useVerifyLoginOtpMutation,
+} from "@/lib/services/api";
 import { Check, X, Clock, RefreshCw, Phone } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginModal({ isVisible, setIsVisible }) {
   const router = useRouter();
@@ -14,10 +18,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
   const [loginUser, { isLoading: isLoginLoading }] = useLoginUserMutation();
-  const [verifyLoginOtp, { isLoading: isOtpLoading }] = useVerifyLoginOtpMutation();
-  
+  const [verifyLoginOtp, { isLoading: isOtpLoading }] =
+    useVerifyLoginOtpMutation();
+
   const inputRefs = useRef([]);
 
   const {
@@ -47,19 +52,21 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   const sendOTP = async () => {
     setErrorMessage("");
-    
+
     try {
       const response = await loginUser({ phone: phone }).unwrap();
       if (response.success) {
         setStep(2);
         setTimer(60);
         setCanResend(false);
-        
+
         // Focus first OTP input
         setTimeout(() => {
           if (inputRefs.current[0]) {
@@ -68,7 +75,20 @@ export default function LoginModal({ isVisible, setIsVisible }) {
         }, 100);
       }
     } catch (err) {
-      setErrorMessage(err?.data?.message || "Failed to send OTP. Please try again.");
+      const errorMessage =
+        err?.data?.message || "Failed to send OTP. Please try again.";
+
+      if (errorMessage.toLowerCase().includes("not found")) {
+        setErrorMessage("User not found");
+        toast.error("Redirecting to profile creation...");
+
+        setTimeout(() => {
+          router.push("/create-profile");
+        }, 1500);
+      } else {
+        setErrorMessage(errorMessage);
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -80,11 +100,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
     if (canResend) {
       // Reset OTP fields
       setOtp(["", "", "", ""]);
-      
+
       // Reset timer and error message
       setCanResend(false);
       setErrorMessage("");
-      
+
       // Send OTP again
       sendOTP();
     }
@@ -97,13 +117,13 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   };
 
   const handleOtpChange = (e, index) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 1);
-    
+    const value = e.target.value.replace(/\D/g, "").slice(0, 1);
+
     // Update the OTP array
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Clear error message when user types
     setErrorMessage("");
 
@@ -120,11 +140,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
         // Move to previous input if current is empty
         inputRefs.current[index - 1].focus();
       }
-    } 
+    }
     // Handle left arrow
     else if (e.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1].focus();
-    } 
+    }
     // Handle right arrow
     else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1].focus();
@@ -134,12 +154,15 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   // Handle paste event to auto-fill all inputs
   const handlePaste = (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").replace(/\D/g, '').slice(0, 4);
-    
+    const pastedData = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 4);
+
     if (pastedData.length === 4) {
-      const newOtp = pastedData.split('');
+      const newOtp = pastedData.split("");
       setOtp(newOtp);
-      
+
       // Focus the last input
       if (inputRefs.current[3]) {
         inputRefs.current[3].focus();
@@ -155,12 +178,12 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
     try {
       const res = await verifyLoginOtp({ phone, otp: otp.join("") }).unwrap();
-      
+
       if (res.success && res.data.token) {
         // Show success animation
         setIsSuccess(true);
         localStorage.setItem("token", res.data.token);
-        
+
         // Wait for animation to complete before redirecting
         setTimeout(() => {
           setIsVisible(false);
@@ -176,12 +199,13 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
   return (
     <>
+      <Toaster position="bottom-right" />
       {isVisible && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 sm:px-0 overflow-hidden">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md relative overflow-hidden">
             {/* Close button */}
-            <button 
-              onClick={() => setIsVisible(false)} 
+            <button
+              onClick={() => setIsVisible(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               aria-label="Close"
             >
@@ -194,10 +218,20 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                   {/* Login Header */}
                   <div className="text-center mb-6">
                     <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                      <Image src="/images/jodi4ever_logo.png" alt="Logo" width={50} height={50} className="invert" />
+                      <Image
+                        src="/images/jodi4ever_logo.png"
+                        alt="Logo"
+                        width={50}
+                        height={50}
+                        className="invert"
+                      />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800">Welcome Back!</h2>
-                    <p className="text-gray-600 mt-2">Log in to access your account</p>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Welcome Back!
+                    </h2>
+                    <p className="text-gray-600 mt-2">
+                      Log in to access your account
+                    </p>
                   </div>
 
                   {/* Phone Input Form */}
@@ -247,7 +281,9 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                     <button
                       type="submit"
                       className={`w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                        !isValid || isLoginLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
+                        !isValid || isLoginLoading
+                          ? "bg-primary/60"
+                          : "bg-primary hover:bg-primary/90"
                       }`}
                       disabled={!isValid || isLoginLoading}
                     >
@@ -278,13 +314,23 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                   {/* OTP Header */}
                   <div className="text-center mb-6">
                     <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                      <Image src="/images/jodi4ever_logo.png" alt="Logo" width={50} height={50} className="invert" />
+                      <Image
+                        src="/images/jodi4ever_logo.png"
+                        alt="Logo"
+                        width={50}
+                        height={50}
+                        className="invert"
+                      />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800">Verify Your Phone</h2>
+                    <h2 className="text-2xl font-bold text-gray-800">
+                      Verify Your Phone
+                    </h2>
                     <p className="text-gray-600 mt-2">
                       We&apos;ve sent a verification code to
                       <br />
-                      <span className="font-medium">+91 {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}</span>
+                      <span className="font-medium">
+                        +91 {phone.replace(/(\d{5})(\d{5})/, "$1 $2")}
+                      </span>
                     </p>
                   </div>
 
@@ -312,9 +358,13 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
                     {/* Error message */}
                     {errorMessage && (
-                      <div className={`text-center text-sm ${
-                        errorMessage.includes("success") ? "text-green-600" : "text-red-600"
-                      }`}>
+                      <div
+                        className={`text-center text-sm ${
+                          errorMessage.includes("success")
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
                         {errorMessage}
                       </div>
                     )}
@@ -326,7 +376,9 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                         onClick={handleVerifyOtp}
                         disabled={!allOtpEntered || isOtpLoading || isSuccess}
                         className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                          !allOtpEntered || isOtpLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
+                          !allOtpEntered || isOtpLoading
+                            ? "bg-primary/60"
+                            : "bg-primary hover:bg-primary/90"
                         }`}
                       >
                         {isOtpLoading ? (
@@ -368,7 +420,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                       ) : (
                         <div className="flex items-center justify-center text-gray-600">
                           <Clock size={14} className="mr-1" />
-                          Resend OTP in <span className="mx-1 font-medium">{formatTime(timer)}</span>
+                          Resend OTP in{" "}
+                          <span className="mx-1 font-medium">
+                            {formatTime(timer)}
+                          </span>
                         </div>
                       )}
                     </div>

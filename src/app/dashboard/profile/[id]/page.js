@@ -46,7 +46,7 @@ import { useRouter } from "next/navigation";
 
 // Define the base URL for images as a constant
 const IMAGE_BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://65.1.117.252:5002";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com";
 
 export default function ProfilePage({ params }) {
   const router = useRouter();

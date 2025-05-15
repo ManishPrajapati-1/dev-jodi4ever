@@ -3,6 +3,7 @@ import StoreProvider from "@/app/store/StoreProvider";
 import Image from "next/image";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer/footer";
+import Script from "next/script";
 
 import "@/app/globals.css";
 
@@ -23,6 +24,9 @@ export const metadata = {
     "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships",
   author: "Jodi4Ever Team",
   robots: "index, follow", // to ensure search engines index and follow links
+  alternates: {
+  canonical: "https://www.jodi4ever.com", // canonical tag to prevent duplicate content
+  },
   // Open Graph tags for Facebook and other social media platforms
   openGraph: {
     title: "Jodi4Ever – Find Your Perfect Match",
@@ -32,12 +36,14 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "https://www.jodi4ever.com/images/og-image.jpg", // replace with actual image URL
+        url: "https://www.jodi4ever.com/images/jodi4ever_logo_named.png", // replace with actual image URL
         width: 1200,
         height: 630,
         alt: "Jodi4Ever - Matrimony Platform",
       },
     ],
+    locale: "en_US", // added locale information
+    siteName: "Jodi4Ever", // added site name
   },
 
   // Twitter Card tags for Twitter
@@ -48,13 +54,33 @@ export const metadata = {
       "Join Jodi4Ever, a trusted matrimony platform that connects like-minded singles. Find your soulmate today.",
     image: "https://www.jodi4ever.com/images/twitter-card.jpg", // replace with actual image URL
     site: "@jodi4ever", // Replace with your Twitter handle if available
+    creator: "@jodi4ever", // Added creator tag for attribution
   },
 
   // Additional metadata for better search engine visibility
   additionalMetaTags: [
     { name: "theme-color", content: "#ff4081" }, // color of browser toolbar on mobile devices
     { name: "apple-mobile-web-app-title", content: "Jodi4Ever" }, // iOS app title if applicable
+    { name: "application-name", content: "Jodi4Ever" }, // application name for Windows
+    { name: "msapplication-TileColor", content: "#ff4081" }, // tile color for Windows
+    { name: "viewport", content: "width=device-width, initial-scale=1.0" }, // responsive design
+    { name: "format-detection", content: "telephone=no" }, // prevent phone number formatting
+    { property: "og:site_name", content: "Jodi4Ever" }, // redundant but good for SEO
+    { name: "google-site-verification", content: "YOUR_VERIFICATION_CODE" }, // replace with your Google verification code
   ],
+
+  // Structured data for rich snippets (optional but recommended)
+  jsonLd: {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Jodi4Ever",
+    url: "https://www.jodi4ever.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://www.jodi4ever.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  },
 };
 
 // console.log("metadata", metadata);
@@ -62,10 +88,27 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Analytics - implemented properly using next/script with strategy */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-8WFJLKS5CQ"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-8WFJLKS5CQ');
+            `,
+          }}
+        />
+      </head>
       <body className={`${poppins.className} antialiased`}>
-        {/* <Header /> */}
         <StoreProvider>
-          {/* <Header /> */}
           <>
             <Image
               src={"/images/leafl.png"}

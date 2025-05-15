@@ -110,7 +110,7 @@ const Step6ProfileImage = () => {
       }
   
       // Append heightInCm
-      formDataToSend.append('heightInCm', 23);
+      // formDataToSend.append('heightInCm', 23);
   
       // Append images separately - using the previews array which contains the actual files
       if (previews && previews.length > 0) {
