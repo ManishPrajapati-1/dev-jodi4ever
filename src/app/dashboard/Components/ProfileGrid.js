@@ -111,7 +111,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
     >
       {/* Profile Image with Slider */}
       <div 
-        className={`relative aspect-[4/5] cursor-pointer group ${isHovered ? 'transform scale-[1.02] transition-transform duration-500' : 'transition-transform duration-500'}`} 
+        className={`relative aspect-[5/4] md:aspect-[4/3] cursor-pointer group ${isHovered ? 'transform scale-[1.02] transition-transform duration-500' : 'transition-transform duration-500'}`} 
         // onClick={() => onProfileClick(profile._id)}
       >
         {profile.profile_image && profile.profile_image.length > 0 ? (
@@ -121,10 +121,10 @@ const ProfileCard = ({ profile, onProfileClick }) => {
               <Image
                 src={`${baseUrl}${profile.profile_image[currentImageIndex]}`}
                 alt={`${profile.fullName || 'Profile'}`}
-                width={500}
-                height={600}
+                width={200}
+                height={400}
                 priority={true}
-                className="object-cover w-full h-full"
+                className="object-contain w-full h-full"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
@@ -135,14 +135,14 @@ const ProfileCard = ({ profile, onProfileClick }) => {
                 {/* Left/Right arrows */}
                 <div className="absolute flex justify-between transform -translate-y-1/2 left-3 right-3 top-1/2 z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button 
-                    className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
+                    className="bg-primary/20 hover:bg-primary/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToPrevImage}
                     aria-label="Previous image"
                   >
                     <ChevronLeft size={20} />
                   </button>
                   <button 
-                    className="bg-white/20 hover:bg-white/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
+                    className="bg-primary/20 hover:bg-primary/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToNextImage}
                     aria-label="Next image"
                   >

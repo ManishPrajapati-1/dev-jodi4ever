@@ -331,8 +331,8 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsCourseVisible(
       highestEducation === "Below High School" ||
-        highestEducation === "High School (12th)" ||
-        highestEducation === ""
+      highestEducation === "High School (12th)" ||
+      highestEducation === ""
     );
 
     let availableCourses = [];
@@ -535,9 +535,8 @@ export default function ProfilePage() {
   // Create Tab Button component
   const TabButton = ({ id, label, isActive, onClick }) => (
     <button
-      className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${
-        isActive ? "text-red-600" : "text-gray-600 hover:text-red-600"
-      }`}
+      className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${isActive ? "text-red-600" : "text-gray-600 hover:text-red-600"
+        }`}
       onClick={() => onClick(id)}
     >
       {label}
@@ -548,135 +547,132 @@ export default function ProfilePage() {
   );
 
   // Create FormField component for consistent styling
-// Add this at the component level
+  // Add this at the component level
 
 
-// Modify your FormField component to use this approach
-const FormField = ({
-  label,
-  id,
-  type = "text",
-  name,
-  placeholder,
-  className = "",
-  options = [],
-}) => (
-  <div className={className}>
-    <label
-      htmlFor={id}
-      className="block text-sm font-medium text-gray-700 mb-2"
-    >
-      {label}
-    </label>
-    {type === "select" ? (
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <select
-            id={id}
-            {...field}
-            ref={(el) => {
-              inputRefs.current[name] = el;
-              field.ref(el);
-            }}
-            className={`w-full px-3 py-2.5 border ${
-              errors[name] ? "border-red-500" : "border-gray-300"
-            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
-          >
-            <option value="">{placeholder || `Select ${label}`}</option>
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        )}
-      />
-    ) : type === "textarea" ? (
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <textarea
-            id={id}
-            rows="4"
-            placeholder={placeholder}
-            {...field}
-            ref={(el) => {
-              inputRefs.current[name] = el;
-              field.ref(el);
-            }}
-            onChange={(e) => {
-              const selectionStart = e.target.selectionStart;
-              const selectionEnd = e.target.selectionEnd;
-              field.onChange(e);
-              
-              // Use setTimeout to restore focus after render
-              setTimeout(() => {
-                const input = inputRefs.current[name];
-                if (input) {
-                  input.focus();
-                  if (input.setSelectionRange) {
-                    input.setSelectionRange(selectionStart, selectionEnd);
+  // Modify your FormField component to use this approach
+  const FormField = ({
+    label,
+    id,
+    type = "text",
+    name,
+    placeholder,
+    className = "",
+    options = [],
+  }) => (
+    <div className={className}>
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-gray-700 mb-2"
+      >
+        {label}
+      </label>
+      {type === "select" ? (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field }) => (
+            <select
+              id={id}
+              {...field}
+              ref={(el) => {
+                inputRefs.current[name] = el;
+                field.ref(el);
+              }}
+              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
+            >
+              <option value="">{placeholder || `Select ${label}`}</option>
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+        />
+      ) : type === "textarea" ? (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field }) => (
+            <textarea
+              id={id}
+              rows="4"
+              placeholder={placeholder}
+              {...field}
+              ref={(el) => {
+                inputRefs.current[name] = el;
+                field.ref(el);
+              }}
+              onChange={(e) => {
+                const selectionStart = e.target.selectionStart;
+                const selectionEnd = e.target.selectionEnd;
+                field.onChange(e);
+
+                // Use setTimeout to restore focus after render
+                setTimeout(() => {
+                  const input = inputRefs.current[name];
+                  if (input) {
+                    input.focus();
+                    if (input.setSelectionRange) {
+                      input.setSelectionRange(selectionStart, selectionEnd);
+                    }
                   }
+                }, 0);
+              }}
+              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+            />
+          )}
+        />
+      ) : (
+        <Controller
+          name={name}
+          control={control}
+          render={({ field }) => (
+            <input
+              type={type}
+              id={id}
+              placeholder={placeholder}
+              {...field}
+              ref={(el) => {
+                inputRefs.current[name] = el;
+                field.ref(el);
+              }}
+              onChange={(e) => {
+                const selectionStart = e.target.selectionStart;
+                const selectionEnd = e.target.selectionEnd;
+                field.onChange(e);
+
+                // Apply any additional changes needed
+                if (name === "height") {
+                  setValue("heightInCm", getSelectedCm(e.target.value));
                 }
-              }, 0);
-            }}
-            className={`w-full px-3 py-2.5 border ${
-              errors[name] ? "border-red-500" : "border-gray-300"
-            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
-          />
-        )}
-      />
-    ) : (
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => (
-          <input
-            type={type}
-            id={id}
-            placeholder={placeholder}
-            {...field}
-            ref={(el) => {
-              inputRefs.current[name] = el;
-              field.ref(el);
-            }}
-            onChange={(e) => {
-              const selectionStart = e.target.selectionStart;
-              const selectionEnd = e.target.selectionEnd;
-              field.onChange(e);
-              
-              // Apply any additional changes needed
-              if (name === "height") {
-                setValue("heightInCm", getSelectedCm(e.target.value));
-              }
-              
-              // Use setTimeout to restore focus after render
-              setTimeout(() => {
-                const input = inputRefs.current[name];
-                if (input) {
-                  input.focus();
-                  if (name === "dob") { return; } // Skip for date inputs
-                  if (input.setSelectionRange) {
-                    input.setSelectionRange(selectionStart, selectionEnd);
+
+                // Use setTimeout to restore focus after render
+                setTimeout(() => {
+                  const input = inputRefs.current[name];
+                  if (input) {
+                    input.focus();
+                    if (name === "dob") { return; } // Skip for date inputs
+                    if (input.setSelectionRange) {
+                      input.setSelectionRange(selectionStart, selectionEnd);
+                    }
                   }
-                }
-              }, 0);
-            }}
-            className={`w-full px-3 py-2.5 border ${
-              errors[name] ? "border-red-500" : "border-gray-300"
-            } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
-          />
-        )}
-      />
-    )}
-    {errors[name] && (
-      <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
-    )}
-  </div>
-);
+                }, 0);
+              }}
+              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+            />
+          )}
+        />
+      )}
+      {errors[name] && (
+        <p className="mt-1 text-sm text-red-600">{errors[name].message}</p>
+      )}
+    </div>
+  );
 
   // Create InfoItem component for display mode
   const InfoItem = ({ icon, label, value }) => (
@@ -732,35 +728,11 @@ const FormField = ({
           onChange={handleReplaceFileChange}
         />
 
-        {/* Page Header - Back to Dashboard Link */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform duration-200"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span className="font-medium">Back to Dashboard</span>
-          </Link>
-        </div>
-
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
           {/* Cover Photo */}
           <div className="h-60 bg-gradient-to-r from-red-600 to-red-400 relative">
-            <div className="bottom-0 left-0 w-full p-6 flex flex-col md:flex-col justify-center items-center">
+            <div className="w-full p-6 flex flex-col md:flex-col justify-center items-center">
               <div className="relative h-32 w-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white group">
                 <Image
                   src={profileImage}
@@ -770,13 +742,8 @@ const FormField = ({
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="bg-white p-2 rounded-full">
-                    <Camera size={18} className="text-gray-700" />
-                  </button>
-                </div>
               </div>
-              <div className="flex flex-col gap-4">
+              <div className="relative flex flex-col justify-between gap-4">
                 <h1 className="text-2xl text-center font-bold text-white">
                   {profileData.fullName}
                 </h1>
@@ -807,7 +774,7 @@ const FormField = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end px-6 py-4 border-b">
+          <div className="flex justify-end px-6 py-2 border-b">
             <button
               onClick={toggleEditMode}
               className={`px-5 py-2.5 rounded-lg transition flex items-center shadow-sm mr-2 ${
@@ -970,7 +937,7 @@ const FormField = ({
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {userProfile.profile_image &&
-                  userProfile.profile_image.length > 0 ? (
+                    userProfile.profile_image.length > 0 ? (
                     userProfile.profile_image.map((photo, index) => {
                       const photoUrl = photo.startsWith("http")
                         ? photo
@@ -1198,11 +1165,10 @@ const FormField = ({
                         label="Education"
                         value={
                           profileData.highest_education
-                            ? `${profileData.highest_education}${
-                                profileData.course
-                                  ? ` in ${profileData.course}`
-                                  : ""
-                              }`
+                            ? `${profileData.highest_education}${profileData.course
+                              ? ` in ${profileData.course}`
+                              : ""
+                            }`
                             : null
                         }
                       />
@@ -1426,8 +1392,8 @@ const FormField = ({
                             profileData.diet === "Veg"
                               ? "Vegetarian"
                               : profileData.diet === "Non-Veg"
-                              ? "Non-Vegetarian"
-                              : profileData.diet
+                                ? "Non-Vegetarian"
+                                : profileData.diet
                           }
                         />
                         <InfoItem
@@ -1480,13 +1446,13 @@ const FormField = ({
                           value={
                             profileData.dob
                               ? `${new Date(profileData.dob).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
-                                  }
-                                )} (${calculateAge(profileData.dob)} years)`
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )} (${calculateAge(profileData.dob)} years)`
                               : null
                           }
                         />

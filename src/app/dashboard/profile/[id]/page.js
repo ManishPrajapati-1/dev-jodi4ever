@@ -278,7 +278,7 @@ export default function ProfilePage({ params }) {
           <div className="lg:w-2/5">
             {/* Photos Section */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-              <div className="relative aspect-[3/4]">
+              <div className="relative aspect-[4/3]">
                 {profileData.profile_image &&
                 profileData.profile_image.length > 0 ? (
                   <div className="relative w-full h-full">
@@ -288,7 +288,7 @@ export default function ProfilePage({ params }) {
                       alt={`${profileData.fullName || "Profile"} photo`}
                       fill
                       priority
-                      className="object-cover"
+                      className="object-contain"
                     />
 
                     {/* Premium badge */}
