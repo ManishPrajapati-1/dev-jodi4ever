@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useGetStatesQuery, useGetCitiesQuery } from "@/lib/services/api";
+import { useGetStatesQuery, useGetCitiesQuery, use } from "@/lib/services/api";
 import { setStep, updateFormData } from "@/lib/features/profile/profileSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { CalendarIcon, ChevronRightIcon, MapPinIcon, RulerIcon, UserIcon } from "lucide-react";
 
 const Step1PersonalDetails = () => {
+  const formData = useSelector((state) => state.profile.formData);
   const preferencesData = useSelector((state) => state.profile.preferences);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,13 +30,14 @@ const Step1PersonalDetails = () => {
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
-    defaultValues: {
-      gender: "",
-      marital_status: "",
-      height: "",
-      state: "",
-      city: "",
-    }
+    // defaultValues: {
+    //   gender: "",
+    //   marital_status: "",
+    //   height: "",
+    //   state: "",
+    //   city: "",
+    // }
+    defaultValues: formData
   });
   
   const {
@@ -57,8 +59,18 @@ const Step1PersonalDetails = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+  // This runs only when formData changes or component mounts
+    if (formData.state) {
+      setValue("state", formData.stateCode);
+      if (formData.city) {
+        setValue("city", formData.city);
+      }
+    }
+  }, [formData, setValue, citiesLoading, statesLoading]);
+
+  useEffect(() => {
     if (selectedStateCode) {
-      setValue("city", "");
+      // setValue("city", ""); // May need to uncomment if there is problem for Selecting city
     }
     if (preferencesData?.lookingFor) {
       const oppositeGender =
@@ -67,17 +79,27 @@ const Step1PersonalDetails = () => {
     }
   }, [preferencesData, selectedStateCode, setValue]);
 
-  const onSubmit = (data) => {
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      data.heightInCm = getSelectedCm(data.height);
-      dispatch(updateFormData(data));
-      dispatch(setStep(2));
-      setIsSubmitting(false);
-    }, 200);
+const onSubmit = (data) => {
+  setIsSubmitting(true);
+  
+  // Get the state name from the selected isoCode
+  const selectedState = states?.data?.find(state => state.isoCode === data.state);
+  console.log(selectedState)
+  // Create the final data object
+  const finalData = {
+    ...data,
+    heightInCm: getSelectedCm(data.height),
+    stateName: selectedState?.name || "", // Store the state name
+    stateCode: data.state // Store the state code (isoCode)
   };
+  
+  // Simulate API call
+  setTimeout(() => {
+    dispatch(updateFormData(finalData));
+    dispatch(setStep(2));
+    setIsSubmitting(false);
+  }, 200);
+};
 
   const getAgeFromDOB = (dob) => {
     if (!dob) return null;
@@ -102,12 +124,12 @@ const Step1PersonalDetails = () => {
     <div className="max-w-2xl mx-auto">
       <div className="bg-gradient-to-r from-pink-500 via-primary to-indigo-500 p-1 rounded-2xl shadow-lg">
         <div className="bg-white p-6 sm:p-8 rounded-2xl">
-          <div className="text-center mb-8">
+          <div className="text-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Personal Details</h2>
             <p className="text-gray-500 mt-2">Tell us about yourself to find your perfect match</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="">
             {/* Date of Birth */}
             <div className="bg-gray-50 p-4 rounded-xl">
               <div className="flex items-start mb-1">
@@ -335,7 +357,8 @@ const Step1PersonalDetails = () => {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={isSubmitting || !isValid}
+                disabled={isSubmitting || !errors}
+                // disabled={isSubmitting || !isValid}
                 className="w-full bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (

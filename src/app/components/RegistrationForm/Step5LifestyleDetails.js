@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setStep, updateFormData } from "@/lib/features/profile/profileSlice";
 import { 
   UtensilsIcon, 
@@ -15,6 +15,7 @@ const Step5LifestyleDetails = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const maxChars = 300;
+  const formData = useSelector((state) => state.profile.formData);
   
   const {
     register,
@@ -23,11 +24,12 @@ const Step5LifestyleDetails = () => {
     formState: { errors },
   } = useForm({
     mode: "onChange",
-    defaultValues: {
-      diet: "",
-      living_with_family: "",
-      description: "",
-    }
+    // defaultValues: {
+    //   diet: "",
+    //   living_with_family: "",
+    //   description: "",
+    // }
+    defaultValues: formData
   });
   
   const dispatch = useDispatch();

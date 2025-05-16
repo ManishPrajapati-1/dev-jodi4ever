@@ -68,7 +68,7 @@ export default function ProfilePage() {
 
   // Assuming this is how your redux state is structured
   const userProfile = useSelector((state) => state.user.data?.user);
-
+  console.log(userProfile)
   const MAX_IMAGES = 5;
 
   // Main form for profile data
@@ -81,31 +81,33 @@ export default function ProfilePage() {
     reset,
     formState: { errors, isDirty, isSubmitting },
   } = useForm({
-    defaultValues: {
-      fullName: "",
-      dob: "",
-      height: "",
-      country: "",
-      state: "",
-      city: "",
-      annual_income: "",
-      employed_in: "",
-      highest_education: "",
-      course: "",
-      occupation: "",
-      mother_tongue: "",
-      religion: "",
-      caste: "",
-      marital_status: "",
-      diet: "",
-      living_with_family: "",
-      description: "",
-      heightInCm: 23,
-      profile_image: [],
-      images: [],
-      sect: "",
-      jammat: "",
-    },
+    // defaultValues: {
+    //   fullName: "",
+    //   dob: "",
+    //   height: "",
+    //   country: "",
+    //   state: "",
+    //   stateCode: "",
+    //   city: "",
+    //   annual_income: "",
+    //   employed_in: "",
+    //   highest_education: "",
+    //   course: "",
+    //   occupation: "",
+    //   mother_tongue: "",
+    //   religion: "",
+    //   caste: "",
+    //   marital_status: "",
+    //   diet: "",
+    //   living_with_family: "",
+    //   description: "",
+    //   heightInCm: 23,
+    //   profile_image: [],
+    //   images: [],
+    //   sect: "",
+    //   jammat: "",
+    // },
+    defaultValues: userProfile,
   });
 
   // Watch for education changes to update course options
@@ -316,6 +318,7 @@ export default function ProfilePage() {
         height: userProfile.height || "",
         country: userProfile.country || "",
         state: userProfile.state || "",
+        stateCode: userProfile.stateCode || "",
         city: userProfile.city || "",
         annual_income: userProfile.annual_income || "",
         employed_in: userProfile.employed_in || "",
@@ -405,6 +408,7 @@ export default function ProfilePage() {
         height: userProfile.height || "",
         country: userProfile.country || "",
         state: userProfile.state || "",
+        stateCode: userProfile.stateCode || "",
         city: userProfile.city || "",
         annual_income: userProfile.annual_income || "",
         employed_in: userProfile.employed_in || "",

@@ -2,23 +2,26 @@
 
 import { useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setStep, updateFormData } from '@/lib/features/profile/profileSlice';
 import fieldsData from './fieldsData.json';
 import { BookOpenIcon, BriefcaseIcon, ChevronRightIcon, GraduationCapIcon, Banknote } from 'lucide-react';
 
 const Step2EducationalDetails = () => {
+  const formData = useSelector((state) => state.profile.formData);
+  
   const { register, handleSubmit, watch, setValue, formState: { errors, isValid } } = useForm({
     mode: "onChange",
-    defaultValues: {
-      highest_education: "",
-      course: "",
-      occupation: "",
-      employed_in: "",
-      annual_income: "",
-    }
+    // defaultValues: {
+    //   highest_education: "",
+    //   course: "",
+    //   occupation: "",
+    //   employed_in: "",
+    //   annual_income: "",
+    // }
+    defaultValues: formData
   });
-  
+
   const [isCourseVisible, setIsCourseVisible] = useState(false);
   const [courses, setCourses] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +35,6 @@ const Step2EducationalDetails = () => {
     
     // Simulate API call
     setTimeout(() => {
-      console.log('Step2 Data:', data);
       dispatch(updateFormData(data));
       dispatch(setStep(3));
       setIsSubmitting(false);
@@ -42,7 +44,7 @@ const Step2EducationalDetails = () => {
   useEffect(() => {
     setIsCourseVisible(education === 'Below High School' || education === 'High School (12th)' || education === '');
     let availableCourses = [];
-    setValue('course', ''); // Reset course when education changes
+    // setValue('course', ''); // Reset course when education changes
     
     switch (education) {
       case "Bachelor's":

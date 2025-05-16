@@ -2,15 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useSignUpUserMutation } from "@/lib/services/api";
-import { useDispatch } from "react-redux";
-import { updateFormData, updatePreferences } from "@/lib/features/profile/profileSlice";
+import { useSignUpUserMutation, useGetUserProfileQuery } from "@/lib/services/api";
+import { useDispatch, useSelector } from "react-redux";
+import { setStep, updateFormData, updatePreferences } from "@/lib/features/profile/profileSlice";
 import OtpModal from "./OtpModal";
 import { useSearchParams } from "next/navigation";
 import { User, Mail, Phone, Send, AlertCircle } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast'
 
 export default function Step0BasicInfo() {
+  const {data: userData, isLoading: isUserLoading, isError: isUserError } = useGetUserProfileQuery();
+  // console.log(userData?.data?.user?.profileStatus);
+  const formData = useSelector((state) => state.profile.formData);
+  const isOTPVerified = useSelector((state) => state.profile.isOTPVerified);
+
   const searchParams = useSearchParams();
   const {
     register,
@@ -19,6 +24,7 @@ export default function Step0BasicInfo() {
     formState: { errors, isSubmitting, isValid },
   } = useForm({
     mode: "onChange",
+    defaultValues: formData
   });
   const [signUpUser, { isLoading }] = useSignUpUserMutation();
 
@@ -52,15 +58,42 @@ export default function Step0BasicInfo() {
     }
   };
 
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  
+  if (token && !isUserError && userData?.data?.user) {
+    // Create a new object instead of mutating the original
+    const updatedUser = {
+      ...userData.data.user,
+      dob: userData.data.user.dob ? userData.data.user.dob.split("T")[0] : undefined,
+
+    };
+    if (updatedUser.location) {
+      delete updatedUser.location;
+    }
+    dispatch(updateFormData(updatedUser));
+    
+    if (updatedUser.profileStatus === "Incomplete") {
+      dispatch(setStep(1));
+    }
+    else if(updatedUser.preferenceStatus === "Incomplete"){
+      dispatch(setStep(6));
+    }
+    else {
+      dispatch(setStep(0));
+    }
+  }
+}, [userData, isUserError, dispatch]);
+
   return (
     <div className="max-w-md mx-auto">
-      <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div className="text-center mb-8">
+      <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+        <div className="text-center mb-4">
           <h2 className="text-2xl font-bold text-gray-800">Create Your Profile</h2>
           <p className="text-gray-600 mt-2">Let&apos;s start with your basic information</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* {errorMessage && (
             <div className="bg-red-50 text-red-700 px-4 py-3 rounded-md flex items-start">
               <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
@@ -210,14 +243,14 @@ export default function Step0BasicInfo() {
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+        <div className="mt-4 pt-2 border-t border-gray-200 text-center">
           <p className="text-sm text-gray-600">
             By continuing, you agree to our{" "}
-            <a href="#" className="text-btn hover:underline">
+            <a href="/terms" className="text-btn hover:underline">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="text-btn hover:underline">
+            <a href="/privacy" className="text-btn hover:underline">
               Privacy Policy
             </a>
           </p>

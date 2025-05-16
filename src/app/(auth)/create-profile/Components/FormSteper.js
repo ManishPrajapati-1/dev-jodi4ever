@@ -16,7 +16,7 @@ export default function FormStepper() {
 
   return (
     <div className="flex items-center space-x-4">
-      {step > 0 && (
+      {step > 1 && (
         <button
           onClick={decrementStep}
           className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors"

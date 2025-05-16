@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useVerifyOtpSignUpMutation } from "@/lib/services/api";
 import { useDispatch } from "react-redux";
-import { setStep } from "@/lib/features/profile/profileSlice";
+import { setStep, setOTPVerified } from "@/lib/features/profile/profileSlice";
 import Image from "next/image";
 import { Check, X, Clock, RefreshCw, Phone } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -76,6 +76,11 @@ export default function OtpModal({ phone, onClose }) {
     else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1].focus();
     }
+    else if (e.key === "Enter") {
+      if (otp.every((digit) => digit !== "")) {
+        document.getElementById("otp-btn")?.click(); // manually trigger submit
+      }
+    }
   };
 
   // Handle paste event to auto-fill all inputs
@@ -113,6 +118,7 @@ export default function OtpModal({ phone, onClose }) {
         toast.success("OTP verified successfully! Redirecting...");
         // Wait for animation to complete before redirecting
         setTimeout(() => {
+          dispatch(setOTPVerified(true));
           dispatch(setStep(1));
           onClose();
         }, 1500);
@@ -218,6 +224,8 @@ export default function OtpModal({ phone, onClose }) {
               {/* Verify button */}
               <button
                 onClick={handleVerifyOtp}
+                type="submit"
+                id="otp-btn"
                 disabled={!allOtpEntered || isLoading || isSuccess}
                 className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
                   !allOtpEntered || isLoading

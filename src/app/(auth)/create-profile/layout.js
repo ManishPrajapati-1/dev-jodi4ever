@@ -34,15 +34,18 @@ export default function CreateProfileLayout({ children }) {
             <Header />
 
             {/* Back to home link */}
-            <div className="container mx-auto px-4 pt-4">
+            {/* <div className="container mx-auto px-4 pt-4">
               <FormStepper />
-            </div>
+            </div> */}
 
             {/* Main Content Area */}
-            <main className="flex-1 flex items-center justify-center px-4 md:px-8 py-8">
+            <main className="flex-1 flex items-center justify-center px-4 md:px-8">
               <div className="bg-white shadow-xl rounded-2xl w-full max-w-4xl overflow-hidden">
                 {/* Progress indicator could go here */}
                 <div className="relative">
+                  <div className="container mx-auto px-4 pt-4">
+                    <FormStepper />
+                  </div>
                   {children}
                 </div>
               </div>

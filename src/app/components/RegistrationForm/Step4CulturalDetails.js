@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setStep, updateFormData } from "@/lib/features/profile/profileSlice";
 import fieldsData from "./fieldsData.json";
 import { useEffect, useState } from "react";
@@ -16,6 +16,7 @@ import {
 
 const Step4CulturalDetails = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formData = useSelector((state) => state.profile.formData);
   
   const {
     register,
@@ -25,15 +26,16 @@ const Step4CulturalDetails = () => {
     formState: { errors, isValid },
   } = useForm({
     mode: "onChange",
-    defaultValues: {
-      mother_tongue: "",
-      thoughts_on_horoscope: "",
-      religion: "",
-      sect: "",
-      jamaat: "",
-      caste: "",
-      manglik: "Non-Manglik",
-    }
+    // defaultValues: {
+    //   mother_tongue: "",
+    //   thoughts_on_horoscope: "",
+    //   religion: "",
+    //   sect: "",
+    //   jamaat: "",
+    //   caste: "",
+    //   manglik: "Non-Manglik",
+    // }
+    defaultValues: formData
   });
   
   const dispatch = useDispatch();
@@ -49,7 +51,7 @@ const Step4CulturalDetails = () => {
     }
     
     // Reset caste when religion changes
-    setValue("caste", "");
+    // setValue("caste", "");
   }, [religion, setValue]);
 
   // Reset Jamaat when sect changes
