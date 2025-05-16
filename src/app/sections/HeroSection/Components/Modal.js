@@ -149,6 +149,12 @@ export default function LoginModal({ isVisible, setIsVisible }) {
     else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1].focus();
     }
+    else if (e.key === "Enter") {
+    // Optional: check if all OTP fields are filled
+      if (otp.every((digit) => digit !== "")) {
+        document.getElementById("otp-btn")?.click(); // manually trigger submit
+      }
+    }
   };
 
   // Handle paste event to auto-fill all inputs
@@ -374,6 +380,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                       {/* Verify button */}
                       <button
                         onClick={handleVerifyOtp}
+                        type="submit"
+                        id="otp-btn"
                         disabled={!allOtpEntered || isOtpLoading || isSuccess}
                         className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
                           !allOtpEntered || isOtpLoading

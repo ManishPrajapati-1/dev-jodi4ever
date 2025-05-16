@@ -189,8 +189,8 @@ export default function NotificationsPage() {
     { id: 'all', label: 'All', count: notifications.length, unread: unreadCount, icon: <Bell size={18} className="mr-2" /> },
     { id: 'unread', label: 'Unread', count: unreadCount, unread: unreadCount, icon: <Bell size={18} className="mr-2" /> },
     { id: 'like', label: 'Likes', count: likesCount, unread: likesUnreadCount, icon: <Heart size={18} className="mr-2" /> },
-    { id: 'visit', label: 'Profile Views', count: visitCount, unread: visitUnreadCount, icon: <Eye size={18} className="mr-2" /> },
-    { id: 'message', label: 'Messages', count: messageCount, unread: messageUnreadCount, icon: <MessageCircle size={18} className="mr-2" /> },
+    // { id: 'visit', label: 'Profile Views', count: visitCount, unread: visitUnreadCount, icon: <Eye size={18} className="mr-2" /> },
+    // { id: 'message', label: 'Messages', count: messageCount, unread: messageUnreadCount, icon: <MessageCircle size={18} className="mr-2" /> },
     { id: 'match', label: 'Matches', count: matchCount, unread: matchUnreadCount, icon: <UserCheck size={18} className="mr-2" /> },
     { id: 'request', label: 'Requests', count: requestCount, unread: requestUnreadCount, icon: <UserPlus size={18} className="mr-2" /> }
   ];
@@ -328,9 +328,9 @@ export default function NotificationsPage() {
                           <p className={`font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
                             {notification.title && <span className="font-semibold">{notification.title}</span>}
                           </p>
-                          <p className={`${!notification.isRead ? 'text-gray-800' : 'text-gray-600'}`}>
+                          {/* <p className={`${!notification.isRead ? 'text-gray-800' : 'text-gray-600'}`}>
                             {notification.message}
-                          </p>
+                          </p> */}
                         </div>
                         <div className="flex items-center text-sm text-gray-500 whitespace-nowrap">
                           <Clock size={14} className="mr-1.5 flex-shrink-0" />

@@ -15,6 +15,7 @@ export default function Footer() {
         { href: "/faqs", label: "FAQs" },
         { href: "/terms", label: "Terms & Conditions" },
         { href: "/privacy", label: "Privacy Policy" },
+        { href: "/sitemap", label: "SiteMap" },
       ],
       services: [
         { href: "/premium", label: "Premium Membership" },

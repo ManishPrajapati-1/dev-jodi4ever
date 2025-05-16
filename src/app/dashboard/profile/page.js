@@ -163,11 +163,15 @@ export default function ProfilePage() {
       file.type.startsWith("image/")
     );
 
+    // Get current images and check if new total will exceed the maximum
+    const currentFiles = previews.map(preview => preview.file);
+    const totalFiles = [...currentFiles, ...imageFiles];
+
     // Check if total images exceed the maximum
-    if (imageFiles.length > MAX_IMAGES - userProfile.profile_image?.length) {
-      toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
-      return;
-    }
+    // if (imageFiles.length > MAX_IMAGES - userProfile.profile_image?.length) {
+    //   toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+    //   return;
+    // }
 
     // Generate previews for the files
     const newPreviews = imageFiles.map((file) => ({
@@ -175,9 +179,16 @@ export default function ProfilePage() {
       file: file,
     }));
 
-    setPreviews(newPreviews);
-
-    setValue("images", imageFiles, { shouldValidate: true });
+    // Combine existing previews with new ones
+    const updatedPreviews = [...previews, ...newPreviews];
+    if (updatedPreviews.length > MAX_IMAGES - userProfile.profile_image?.length) {
+      toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
+      return;
+    }
+    setPreviews(updatedPreviews);
+    
+    // Update form value with all files
+    setValue('images', totalFiles, { shouldValidate: true });
   };
 
   const handleImageChange = (e) => {
@@ -480,10 +491,15 @@ export default function ProfilePage() {
       setPreviews([]);
       setValue("images", []);
     } catch (error) {
-      console.error("Error uploading photos:", error);
-      toast.error(
-        error?.data?.message || "Failed to upload photos. Please try again."
-      );
+      if(error?.status == "FETCH_ERROR") {
+        toast.error("Image size is too large Try to upload Images one by one!");
+      }
+      else {
+        console.error("Error uploading photos:", error);
+        toast.error(
+          error?.data?.message || "Failed to upload photos. Please try again."
+        );
+      }
     } finally {
       setIsUploading(false);
     }
@@ -502,7 +518,7 @@ export default function ProfilePage() {
           >
             <X size={24} className="text-gray-800" />
           </button>
-          <div className="relative h-[80vh] w-[90vw] md:w-[80vw]">
+          <div className="relative h-[80vh] w-[90vw] md:w-[50vw]">
             <Image
               src={imageUrl}
               alt="Full size preview"

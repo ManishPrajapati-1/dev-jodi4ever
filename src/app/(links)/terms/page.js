@@ -15,7 +15,7 @@ export default function Terms() {
     <>
       <Header />
       <div className="flex flex-col min-h-screen bg-gradient-to-b">
-        <div className="container mx-auto py-10 px-4 md:px-8 max-w-5xl">
+        <div className="container mx-auto py-4 px-4 md:px-8 max-w-5xl">
           {/* Header Section */}
           <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-8">
             <div className="bg-gradient-to-r from-primary to-btn-hover px-6 py-8 text-center">
