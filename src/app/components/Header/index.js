@@ -41,8 +41,8 @@ export default function Header() {
       <header
         className={`sticky top-0 w-full z-30 transition-all duration-300 ${
           scrolled
-            ? "bg-white shadow-md py-3"
-            : "bg-white/90 shadow-sm backdrop-blur-sm py-4"
+            ? "bg-white shadow-md py-1"
+            : "bg-white/90 shadow-sm backdrop-blur-sm py-2"
         }`}
       >
         <div className="container mx-auto px-4">
@@ -59,7 +59,7 @@ export default function Header() {
                           alt="Jodi Banao Logo"
                           width={100} 
                           height={100} 
-                          className="w-14 md:w-16 transition-transform hover:scale-105"
+                          className="w-10 md:w-12 transition-transform hover:scale-105"
                           priority
                         />
                       </Link>

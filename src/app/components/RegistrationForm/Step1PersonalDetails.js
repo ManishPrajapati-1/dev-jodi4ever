@@ -122,8 +122,8 @@ const onSubmit = (data) => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-gradient-to-r from-pink-500 via-primary to-indigo-500 p-1 rounded-2xl shadow-lg">
-        <div className="bg-white p-6 sm:p-8 rounded-2xl">
+      <div className="p-1 rounded-2xl shadow-lg">
+        <div className="bg-white sm:p-4 rounded-2xl">
           <div className="text-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Personal Details</h2>
             <p className="text-gray-500 mt-2">Tell us about yourself to find your perfect match</p>
@@ -131,7 +131,7 @@ const onSubmit = (data) => {
 
           <form onSubmit={handleSubmit(onSubmit)} className="">
             {/* Date of Birth */}
-            <div className="bg-gray-50 p-4 rounded-xl">
+            <div className="bg-gray-50 px-4 py-1.5 rounded-xl">
               <div className="flex items-start mb-1">
                 <CalendarIcon className="w-5 h-5 text-primary mr-2 mt-0.5" />
                 <div className="flex-1">
@@ -168,7 +168,7 @@ const onSubmit = (data) => {
             </div>
 
             {/* Gender */}
-            <div className="bg-gray-50 p-4 rounded-xl">
+            <div className="bg-gray-50 px-4 py-1.5 rounded-xl">
               <div className="flex items-start">
                 <UserIcon className="w-5 h-5 text-primary mr-2 mt-0.5" />
                 <div className="flex-1">
@@ -218,7 +218,7 @@ const onSubmit = (data) => {
             </div>
 
             {/* Marital Status */}
-            <div className="bg-gray-50 p-4 rounded-xl">
+            <div className="bg-gray-50 px-4 py-1.5 rounded-xl">
               <div className="flex items-start">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +260,7 @@ const onSubmit = (data) => {
             </div>
 
             {/* Height */}
-            <div className="bg-gray-50 p-4 rounded-xl">
+            <div className="bg-gray-50 px-4 py-1.5 rounded-xl">
               <div className="flex items-start">
                 <RulerIcon className="h-5 w-5 text-primary mr-2 mt-0.5" />
                 <div className="flex-1">
@@ -291,7 +291,7 @@ const onSubmit = (data) => {
             </div>
 
             {/* Location */}
-            <div className="bg-gray-50 p-4 rounded-xl">
+            <div className="bg-gray-50 px-4 py-1.5 rounded-xl">
               <div className="flex items-start">
                 <MapPinIcon className="h-5 w-5 text-primary mr-2 mt-0.5" />
                 <div className="flex-1">
@@ -354,7 +354,7 @@ const onSubmit = (data) => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-4 px-4">
               <button
                 type="submit"
                 disabled={isSubmitting || !errors}
