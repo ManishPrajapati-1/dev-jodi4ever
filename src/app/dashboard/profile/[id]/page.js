@@ -43,6 +43,7 @@ import {
 } from "@/lib/services/api";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import AppDownloadModal from "@/app/components/AppDownloadModal"
 
 // Define the base URL for images as a constant
 const IMAGE_BASE_URL =
@@ -59,7 +60,7 @@ export default function ProfilePage({ params }) {
   const [dislikeProfile, { isLoadingDislike }] = useDislikeProfileMutation();
   const [isLiked, setIsLiked] = useState(false);
   const [activeTab, setActiveTab] = useState("about"); // Tabs: about, career, family, preferences
-  const [isBottomSheetOpen, setBottomSheetOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleShare = async () => {
     const currentUrl = window.location.href;
@@ -406,7 +407,8 @@ export default function ProfilePage({ params }) {
                 <button
                   className="w-full py-3 border border-red-600 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center justify-center"
                   onClick={() =>
-                    toast.error("This feature is only available in app.")
+                    setIsModalOpen(true)
+                    // toast.error("This feature is only available in app.")
                   }
                 >
                   <MessageCircle size={20} className="mr-2" />
@@ -825,6 +827,10 @@ export default function ProfilePage({ params }) {
           </div>
         </div>
       </div>
+      <AppDownloadModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
       <Toaster
         position="bottom-right"
         toastOptions={{

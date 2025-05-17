@@ -13,13 +13,15 @@ export default function Header() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setProfileMenuOpen] = useState(false);
   const { data: userProfile, isLoading, isError } = useGetUserProfileQuery();
-  const { data: notificationData } = useGetNotificationsQuery();
+  // It is causing Hydration Error when I open notifications page.
+  // const { data: notificationD } = useGetNotificationsQuery(); 
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
   const profileMenuRef = useRef(null);
 
   // Get unread notifications count
-  const unreadCount = notificationData?.data?.filter(notification => !notification.isRead)?.length || 0;
+  // const unreadCount = notificationD?.data?.filter(notification => !notification.isRead)?.length || 0;
+  const unreadCount = 0;
 
   useEffect(() => {
     if (userProfile && !isLoading && !isError) {

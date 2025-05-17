@@ -27,6 +27,7 @@ import {
 import { useConnectProfileMutation, useLikeProfileMutation, useDislikeProfileMutation, useViewSingleProfileQuery } from '@/lib/services/api';
 import toast, { Toaster } from 'react-hot-toast';
 import ProfileModal from './ProfileModal';
+import AppDownloadModal from "@/app/components/AppDownloadModal"
 
 // Base URL for profile images
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jodi4ever.com/';
@@ -38,6 +39,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
   const [dislikeProfile, { isLoadingDislike }] = useDislikeProfileMutation();
   const [isLiked, setIsLiked] = useState(profile.isLiked);
   const [isHovered, setIsHovered] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hasMultipleImages = profile.profile_image && profile.profile_image.length > 1;
 
@@ -294,13 +296,18 @@ const ProfileCard = ({ profile, onProfileClick }) => {
           onClick={(e) => {
             e.stopPropagation();
             // toast.error("Messaging is only available for premium members");
-            toast.error("This feature is only available in app.")
+            // toast.error("This feature is only available in app.")
+            setIsModalOpen(true)
           }}
         >
           <MessageCircle size={18} className="mr-2 text-red-600" />
           Message
         </button>
       </div>
+      <AppDownloadModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };
