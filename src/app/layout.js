@@ -17,11 +17,11 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Jodi4Ever – Find Your Perfect Match | Trusted Matrimony Platform",
+  title: "Jodi4Ever - Find Your Perfect Life Partner | Trusted Matrimony Platform",
   description:
-    "Join Jodi4Ever, a trusted matrimony platform to connect with like-minded singles and discover your soulmate for a lifetime of happiness. Find your partner today and start your journey to love.",
+    "Find your life partner with a safe and trusted Indian matrimony platform. Register free and start your meaningful search for a compatible match today.",
   keywords:
-    "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships",
+    "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships, Matrimonial services",
   author: "Jodi4Ever Team",
   robots: "index, follow", // to ensure search engines index and follow links
   alternates: {
@@ -31,7 +31,7 @@ export const metadata = {
   openGraph: {
     title: "Jodi4Ever – Find Your Perfect Match",
     description:
-      "Discover your soulmate with Jodi4Ever, the leading matrimony platform. Join now and begin your journey to lifelong love and happiness.",
+      "Find your life partner with a safe and trusted Indian matrimony platform. Register free and start your meaningful search for a compatible match today - jodi4ever.com",
     url: "https://www.jodi4ever.com", // replace with your website URL
     type: "website",
     images: [
@@ -46,16 +46,16 @@ export const metadata = {
     siteName: "Jodi4Ever", // added site name
   },
 
-  // Twitter Card tags for Twitter
-  twitter: {
-    card: "summary_large_image", // use a large image summary card
-    title: "Jodi4Ever – Find Your Perfect Match",
-    description:
-      "Join Jodi4Ever, a trusted matrimony platform that connects like-minded singles. Find your soulmate today.",
-    image: "https://www.jodi4ever.com/images/twitter-card.jpg", // replace with actual image URL
-    site: "@jodi4ever", // Replace with your Twitter handle if available
-    creator: "@jodi4ever", // Added creator tag for attribution
-  },
+  // // Twitter Card tags for Twitter
+  // twitter: {
+  //   card: "summary_large_image", // use a large image summary card
+  //   title: "Jodi4Ever – Find Your Perfect Match",
+  //   description:
+  //     "Join Jodi4Ever, a trusted matrimony platform that connects like-minded singles. Find your soulmate today.",
+  //   image: "https://www.jodi4ever.com/images/twitter-card.jpg", // replace with actual image URL
+  //   site: "@jodi4ever", // Replace with your Twitter handle if available
+  //   creator: "@jodi4ever", // Added creator tag for attribution
+  // },
 
   // Additional metadata for better search engine visibility
   additionalMetaTags: [
