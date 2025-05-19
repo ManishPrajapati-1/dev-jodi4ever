@@ -39,6 +39,8 @@ import {
 import {
   useUpdateProfileMutation,
   useDeleteProfileImageMutation,
+  useGetStatesQuery,
+  useGetCitiesQuery,
 } from "@/lib/services/api";
 import { updateUserProfile } from "@/lib/features/user/userSlice";
 
@@ -63,12 +65,10 @@ export default function ProfilePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentModalImage, setCurrentModalImage] = useState("");
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
 
   // Assuming this is how your redux state is structured
   const userProfile = useSelector((state) => state.user.data?.user);
-  console.log(userProfile)
   const MAX_IMAGES = 5;
 
   // Main form for profile data
@@ -81,34 +81,34 @@ export default function ProfilePage() {
     reset,
     formState: { errors, isDirty, isSubmitting },
   } = useForm({
-    // defaultValues: {
-    //   fullName: "",
-    //   dob: "",
-    //   height: "",
-    //   country: "",
-    //   state: "",
-    //   stateCode: "",
-    //   city: "",
-    //   annual_income: "",
-    //   employed_in: "",
-    //   highest_education: "",
-    //   course: "",
-    //   occupation: "",
-    //   mother_tongue: "",
-    //   religion: "",
-    //   caste: "",
-    //   marital_status: "",
-    //   diet: "",
-    //   living_with_family: "",
-    //   description: "",
-    //   heightInCm: 23,
-    //   profile_image: [],
-    //   images: [],
-    //   sect: "",
-    //   jammat: "",
-    // },
     defaultValues: userProfile,
   });
+
+  const {
+    data: states,
+    error: statesError,
+    isLoading: statesLoading,
+  } = useGetStatesQuery();
+
+  const selectedStateCode = watch("state");
+
+  const {
+    data: cities,
+    error: citiesError,
+    isLoading: citiesLoading,
+  } = useGetCitiesQuery(selectedStateCode, {
+    skip: !selectedStateCode,
+  });
+
+  useEffect(() => {
+    // This runs only when userProfile changes or component mounts
+    if (userProfile.stateCode) {
+      setValue("state", userProfile.stateCode);
+      if (userProfile.city) {
+        setValue("city", userProfile.city);
+      }
+    }
+  }, [userProfile, setValue, citiesLoading, statesLoading]);
 
   // Watch for education changes to update course options
   const highestEducation = watch("highest_education");
@@ -166,7 +166,7 @@ export default function ProfilePage() {
     );
 
     // Get current images and check if new total will exceed the maximum
-    const currentFiles = previews.map(preview => preview.file);
+    const currentFiles = previews.map((preview) => preview.file);
     const totalFiles = [...currentFiles, ...imageFiles];
 
     // Check if total images exceed the maximum
@@ -183,14 +183,17 @@ export default function ProfilePage() {
 
     // Combine existing previews with new ones
     const updatedPreviews = [...previews, ...newPreviews];
-    if (updatedPreviews.length > MAX_IMAGES - userProfile.profile_image?.length) {
+    if (
+      updatedPreviews.length >
+      MAX_IMAGES - userProfile.profile_image?.length
+    ) {
       toast.error(`You can only upload a maximum of ${MAX_IMAGES} images.`);
       return;
     }
     setPreviews(updatedPreviews);
-    
+
     // Update form value with all files
-    setValue('images', totalFiles, { shouldValidate: true });
+    setValue("images", totalFiles, { shouldValidate: true });
   };
 
   const handleImageChange = (e) => {
@@ -345,8 +348,8 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsCourseVisible(
       highestEducation === "Below High School" ||
-      highestEducation === "High School (12th)" ||
-      highestEducation === ""
+        highestEducation === "High School (12th)" ||
+        highestEducation === ""
     );
 
     let availableCourses = [];
@@ -434,9 +437,21 @@ export default function ProfilePage() {
 
   const onSubmit = async (data) => {
     try {
-      data.heightInCm = getSelectedCm(data.height);
+      // data.heightInCm = getSelectedCm(data.height);
+      const selectedState = states?.data?.find(
+        (state) => state.isoCode === data.state
+      );
+
+      // Create the final data object
+      const finalData = {
+        ...data,
+        heightInCm: getSelectedCm(data.height),
+        stateName: selectedState?.name || "", // Store the state name
+        stateCode: data.state, // Store the state code (isoCode)
+      };
+
       // Call API to update profile
-      const response = await updateProfile(data).unwrap();
+      const response = await updateProfile(finalData).unwrap();
       toast.success("Profile updated successfully!", {
         icon: <Check className="text-green-500" />,
         duration: 3000,
@@ -495,10 +510,9 @@ export default function ProfilePage() {
       setPreviews([]);
       setValue("images", []);
     } catch (error) {
-      if(error?.status == "FETCH_ERROR") {
+      if (error?.status == "FETCH_ERROR") {
         toast.error("Image size is too large Try to upload Images one by one!");
-      }
-      else {
+      } else {
         console.error("Error uploading photos:", error);
         toast.error(
           error?.data?.message || "Failed to upload photos. Please try again."
@@ -555,8 +569,9 @@ export default function ProfilePage() {
   // Create Tab Button component
   const TabButton = ({ id, label, isActive, onClick }) => (
     <button
-      className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${isActive ? "text-red-600" : "text-gray-600 hover:text-red-600"
-        }`}
+      className={`py-3 px-4 font-medium transition-colors relative text-sm md:text-lg ${
+        isActive ? "text-red-600" : "text-gray-600 hover:text-red-600"
+      }`}
       onClick={() => onClick(id)}
     >
       {label}
@@ -568,7 +583,6 @@ export default function ProfilePage() {
 
   // Create FormField component for consistent styling
   // Add this at the component level
-
 
   // Modify your FormField component to use this approach
   const FormField = ({
@@ -599,8 +613,9 @@ export default function ProfilePage() {
                 inputRefs.current[name] = el;
                 field.ref(el);
               }}
-              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white`}
             >
               <option value="">{placeholder || `Select ${label}`}</option>
               {options.map((option) => (
@@ -641,8 +656,9 @@ export default function ProfilePage() {
                   }
                 }, 0);
               }}
-              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
             />
           )}
         />
@@ -675,15 +691,18 @@ export default function ProfilePage() {
                   const input = inputRefs.current[name];
                   if (input) {
                     input.focus();
-                    if (name === "dob") { return; } // Skip for date inputs
+                    if (name === "dob") {
+                      return;
+                    } // Skip for date inputs
                     if (input.setSelectionRange) {
                       input.setSelectionRange(selectionStart, selectionEnd);
                     }
                   }
                 }, 0);
               }}
-              className={`w-full px-3 py-2.5 border ${errors[name] ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
+              className={`w-full px-3 py-2.5 border ${
+                errors[name] ? "border-red-500" : "border-gray-300"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500`}
             />
           )}
         />
@@ -957,7 +976,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {userProfile.profile_image &&
-                    userProfile.profile_image.length > 0 ? (
+                  userProfile.profile_image.length > 0 ? (
                     userProfile.profile_image.map((photo, index) => {
                       const photoUrl = photo.startsWith("http")
                         ? photo
@@ -1185,10 +1204,14 @@ export default function ProfilePage() {
                         label="Education"
                         value={
                           profileData.highest_education
-                            ? `${profileData.highest_education}${profileData.course
-                              ? ` in ${profileData.course}`
-                              : ""
-                            }`
+                            ? `${profileData.highest_education}${
+                                highestEducation ==
+                                  "High School (12th)" ||
+                                highestEducation ==
+                                  "Below High School"
+                                  ? ""
+                                  : ` in ${profileData.course}`
+                              }`
                             : null
                         }
                       />
@@ -1241,7 +1264,9 @@ export default function ProfilePage() {
                           const inches = i % 12;
                           const cm = (feet * 30.48 + inches * 2.54).toFixed(2);
                           return {
-                            value: `${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`,
+                            value: `${feet}'${inches}" (${getSelectedCm(
+                              `${feet}'${inches}"`
+                            )} cm)`,
                             label: `${feet}'${inches}" (${cm} cm)`,
                           };
                         })}
@@ -1357,9 +1382,41 @@ export default function ProfilePage() {
                       Location
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-                      <FormField label="Country" id="country" name="country" />
-                      <FormField label="State" id="state" name="state" />
-                      <FormField label="City" id="city" name="city" />
+                      {/* <FormField label="Country" id="country" name="country" /> */}
+                      {/* <FormField label="State" id="state" name="state" />
+                      <FormField label="City" id="city" name="city" /> */}
+                      <FormField
+                        label="State"
+                        id="state"
+                        type="select"
+                        name="state"
+                        options={
+                          statesLoading
+                            ? []
+                            : states?.data?.map((state) => ({
+                                value: state.isoCode,
+                                label: state.name,
+                              }))
+                        }
+                      />
+
+                      <FormField
+                        label="City"
+                        id="city"
+                        type="select"
+                        name="city"
+                        disabled={!selectedStateCode}
+                        options={
+                          !selectedStateCode
+                            ? []
+                            : citiesLoading
+                            ? []
+                            : cities?.data?.map((city) => ({
+                                value: city.name,
+                                label: city.name,
+                              }))
+                        }
+                      />
                     </div>
                   </form>
                 ) : (
@@ -1412,8 +1469,8 @@ export default function ProfilePage() {
                             profileData.diet === "Veg"
                               ? "Vegetarian"
                               : profileData.diet === "Non-Veg"
-                                ? "Non-Vegetarian"
-                                : profileData.diet
+                              ? "Non-Vegetarian"
+                              : profileData.diet
                           }
                         />
                         <InfoItem
@@ -1466,13 +1523,13 @@ export default function ProfilePage() {
                           value={
                             profileData.dob
                               ? `${new Date(profileData.dob).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                }
-                              )} (${calculateAge(profileData.dob)} years)`
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )} (${calculateAge(profileData.dob)} years)`
                               : null
                           }
                         />

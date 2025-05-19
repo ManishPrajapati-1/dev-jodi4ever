@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useGetStatesQuery, useGetCitiesQuery, use } from "@/lib/services/api";
+import { useGetStatesQuery, useGetCitiesQuery } from "@/lib/services/api";
 import { setStep, updateFormData } from "@/lib/features/profile/profileSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { CalendarIcon, ChevronRightIcon, MapPinIcon, RulerIcon, UserIcon } from "lucide-react";

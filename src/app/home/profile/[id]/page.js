@@ -684,7 +684,7 @@ export default function ProfilePage({ params }) {
                       label="Annual Income"
                       value={profileData.annual_income}
                     />
-                    <InfoItem
+                    {/* <InfoItem
                       icon={<GraduationCap size={18} />}
                       label="College/University"
                       value={profileData.college || "Not specified"}
@@ -693,7 +693,7 @@ export default function ProfilePage({ params }) {
                       icon={<Building size={18} />}
                       label="Company"
                       value={profileData.company || "Not specified"}
-                    />
+                    /> */}
                   </div>
                 </div>
               )}

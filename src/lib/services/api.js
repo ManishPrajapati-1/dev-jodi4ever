@@ -18,12 +18,11 @@ export const api = createApi({
   baseQuery: baseQuery,
   tagTypes: ["State", "City"],
   endpoints: (builder) => ({
-
     // Links (T&C, FAQs)
     getTermsPrivacyAbout: builder.query({
       query: () => ({
         url: "user/get_terms_privacy_about",
-        method: "GET"
+        method: "GET",
       }),
     }),
 
@@ -80,7 +79,7 @@ export const api = createApi({
         url: "user/deleteProfileImage",
         method: "POST",
         body: data,
-      })
+      }),
     }),
 
     // Matching/Profiles
@@ -95,7 +94,7 @@ export const api = createApi({
 
     // Connect Profiles - Fixed with optional status parameter
     connectProfile: builder.mutation({
-      query: ({ profileId, status = '' }) => ({
+      query: ({ profileId, status = "" }) => ({
         url: `user/connection/`,
         method: "POST",
         body: { receiverId: profileId, status },
@@ -117,51 +116,59 @@ export const api = createApi({
       }),
     }),
 
-    // Get Notifications
+    // Notifications
     getNotifications: builder.query({
       query: () => ({
         url: `user/get_notification`,
         method: "GET",
+      }),
+    }),
+
+    deleteNotifications: builder.mutation({
+      query: () => ({
+        url: "user/delete_notification",
+        method: "DELETE",
       })
     }),
+
 
     // Get Favourites
     getFavourites: builder.query({
       query: () => ({
-        url: 'user/get_liked_users',
-        method: "GET"
-      })
+        url: "user/get_liked_users",
+        method: "GET",
+      }),
     }),
 
     // Get Connections List
     getConnections: builder.query({
       query: () => ({
         url: "user/connections",
-        method: "GET"
-      })
+        method: "GET",
+      }),
     }),
 
     // Get Send and Receive requests List - Fixed request functions
     sendRequest: builder.query({
       query: () => ({
         url: "user/connections/sent",
-        method: "GET"
-      })
+        method: "GET",
+      }),
     }),
 
     getRequests: builder.query({
       query: () => ({
         url: "user/connections/received",
-        method: "GET"
-      })
+        method: "GET",
+      }),
     }),
 
     // Cancel send request - Fixed to use parameter
     cancelRequest: builder.mutation({
       query: (connectionId) => ({
         url: `user/connections/${connectionId}`,
-        method: "DELETE"
-      })
+        method: "DELETE",
+      }),
     }),
 
     // Update and get preferences
@@ -183,7 +190,7 @@ export const api = createApi({
     viewSingleProfile: builder.query({
       query: (id) => ({
         url: `user/single_match/${id}`,
-        method: "GET"
+        method: "GET",
       }),
     }),
 
@@ -204,6 +211,14 @@ export const api = createApi({
       }),
       providesTags: ["City"],
     }),
+
+    // Premium Plan
+    getPlans: builder.query({
+      query: () => ({
+        url: "user/plans",
+        method: "GET"
+      })
+    })
   }),
 });
 
@@ -224,6 +239,7 @@ export const {
   usePostUserPreferencesMutation,
   useViewSingleProfileQuery,
   useGetNotificationsQuery,
+  useDeleteNotificationsMutation,
   useGetFavouritesQuery,
   useGetConnectionsQuery,
   useSendRequestQuery,
@@ -231,4 +247,5 @@ export const {
   useCancelRequestMutation,
   useGetStatesQuery,
   useGetCitiesQuery,
+  useGetPlansQuery,
 } = api;

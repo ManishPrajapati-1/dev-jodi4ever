@@ -137,13 +137,13 @@ export default function Contact() {
                                                 <h3 className="font-medium text-gray-800">Connect With Us</h3>
                                             </div>
                                             <div className="flex space-x-4">
-                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                <a href="https://www.facebook.com/jodii4ever" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
                                                     <FaFacebookF />
                                                 </a>
-                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                <a href="https://www.instagram.com/jodi4.ever" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
                                                     <FaInstagram />
                                                 </a>
-                                                <a href="#" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                                <a href="https://www.x.com/Jodi4E7313" className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
                                                     <FaTwitter />
                                                 </a>
                                             </div>

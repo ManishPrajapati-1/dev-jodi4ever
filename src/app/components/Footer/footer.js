@@ -130,7 +130,7 @@ export default function Footer() {
                         {/* Play Store Button - ADDED HERE */}
                         <div className="w-fit h-fit">
                           <a href="https://play.google.com/store/apps/details?id=com.jodi4ever&hl=en_IN" target="_blank">
-                            <Image src={"/images/play_logo.png"} width={80} height={80} alt="PlayLogo"
+                            <Image src={"/images/play_logo.png"} width={100} height={100} alt="PlayLogo"
                             className="w-auto h-auto"/>
                           </a>
                         </div>
