@@ -219,11 +219,11 @@ const ProfileCard = ({ profile, onProfileClick }) => {
       </div>
       
       {/* Profile Info */}
-      <Link href={`/dashboard/profile/${profile._id}`} className="p-4">
+      <Link href={`/home/profile/${profile._id}`} className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div>
             <p 
-              // href={`/dashboard/profile/${profile._id}`}
+              // href={`/home/profile/${profile._id}`}
               className="text-lg font-bold text-gray-800 hover:text-red-600 transition-colors duration-200"
             >
               {profile.fullName || 'Name not available'}

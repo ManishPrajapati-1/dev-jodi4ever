@@ -199,7 +199,7 @@ export default function NotificationsPage({ params, searchParams }) {
       <div className="container mx-auto max-w-5xl">
         {/* Page Header - Back to Dashboard Link */}
         {/* <Link
-          href="/dashboard" 
+          href="/home" 
           className="mb-6 text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
         >
           <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />

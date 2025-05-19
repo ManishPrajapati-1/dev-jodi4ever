@@ -7,9 +7,9 @@ import Footer from "@/app/components/Footer/footer"
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Jodi4Ever - Find Your Perfect Match",
+  title: "Find Your Perfect Life Partner | Trusted Matrimony Platform",
   description:
-    "A matrimonial platform to help you find your perfect life partner",
+    "Find your life partner with a safe and trusted Indian matrimony platform. Register free and start your meaningful search for a compatible match today.",
 };
 
 // Loading component for suspense fallback

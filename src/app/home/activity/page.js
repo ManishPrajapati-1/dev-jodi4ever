@@ -230,7 +230,7 @@ export default function ActivityPage() {
         {/* Page Header - Back to Dashboard Link */}
         <div className="mb-6">
           <Link 
-            href="/dashboard" 
+            href="/home" 
             className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
@@ -326,7 +326,7 @@ export default function ActivityPage() {
                   {emptyStateMessages[activeTab].description}
                 </p>
                 <Link 
-                  href="/dashboard/profile" 
+                  href="/home/profile" 
                   className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 py-2.5 rounded-lg inline-flex items-center transition-colors duration-200 shadow-sm"
                 >
                   {activeTab === 'connections' || activeTab === 'sent' ? (
@@ -447,7 +447,7 @@ export default function ActivityPage() {
                             {/* Mobile-friendly action buttons below profile info on small screens */}
                             <div className="flex flex-wrap gap-2 mt-3 sm:mt-0 sm:justify-end">
                               <Link
-                                href={`/dashboard/profile/${profile._id}`}
+                                href={`/home/profile/${profile._id}`}
                                 className="inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200"
                               >
                                 <Eye size={16} className="mr-1.5" />

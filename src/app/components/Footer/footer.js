@@ -122,11 +122,18 @@ export default function Footer() {
                             Jodi4Ever
                           </h3> */}
                         </div>
-                        <p className="text-gray-300 mb-6 max-w-md">
+                        <p className="text-gray-300 max-w-md">
                           Find your perfect life partner with our trusted
                           matrimonial service. We connect compatible individuals
                           based on their preferences, values, and aspirations.
                         </p>
+                        {/* Play Store Button - ADDED HERE */}
+                        <div className="w-fit h-fit">
+                          <a href="https://play.google.com/store/apps/details?id=com.jodi4ever&hl=en_IN" target="_blank">
+                            <Image src={"/images/play_logo.png"} width={80} height={80} alt="PlayLogo"
+                            className="w-auto h-auto"/>
+                          </a>
+                        </div>
                         <div className="flex space-x-4 mb-6">
                           {socialLinks.map((social, index) => (
                             <a

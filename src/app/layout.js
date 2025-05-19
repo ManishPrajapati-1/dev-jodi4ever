@@ -17,19 +17,20 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Jodi4Ever - Find Your Perfect Life Partner | Trusted Matrimony Platform",
+  title: "Find Your Perfect Life Partner | Trusted Matrimony Platform",
   description:
     "Find your life partner with a safe and trusted Indian matrimony platform. Register free and start your meaningful search for a compatible match today.",
   keywords:
-    "matrimony, soulmate, marriage, find a partner, matchmaking, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships, Matrimonial services",
-  author: "Jodi4Ever Team",
+    "matrimony, soulmate, marriage, find a Life partner, matchmaking service, marriage partner, dating platform, best matrimony site, Indian matrimony, online matchmaking, love, relationships, Matrimonial services",
+  author: "Jodi4Ever",
   robots: "index, follow", // to ensure search engines index and follow links
   alternates: {
   canonical: "https://www.jodi4ever.com", // canonical tag to prevent duplicate content
   },
   // Open Graph tags for Facebook and other social media platforms
   openGraph: {
-    title: "Jodi4Ever – Find Your Perfect Match",
+    title: "Find Your Perfect Life Partner | Trusted Matrimony Platform - jodi4ever.com",
+    siteName: "Jodi4Ever",
     description:
       "Find your life partner with a safe and trusted Indian matrimony platform. Register free and start your meaningful search for a compatible match today - jodi4ever.com",
     url: "https://www.jodi4ever.com", // replace with your website URL
@@ -83,7 +84,6 @@ export const metadata = {
   },
 };
 
-// console.log("metadata", metadata);
 
 export default function RootLayout({ children }) {
   return (

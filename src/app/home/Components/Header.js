@@ -73,14 +73,14 @@ export default function Header() {
     : "/images/default-user.jpg";
 
   const navLinks = [
-    { href: "/dashboard", label: "Home" },
-    { href: "/dashboard/activity", label: "Activity" },
-    { href: "/dashboard/preferences", label: "Partner Preferences" }
+    { href: "/home", label: "Home" },
+    { href: "/home/activity", label: "Activity" },
+    { href: "/home/partner-preferences", label: "Partner Preferences" }
   ];
 
   const profileMenuItems = [
     { 
-      href: "/dashboard/profile", 
+      href: "/home/profile", 
       label: "My Profile",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -114,7 +114,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center">
+          <Link href="/home" className="flex items-center">
             <Image
               src="/images/wedding.png"
               alt="Jodi Banao Logo"
@@ -141,7 +141,7 @@ export default function Header() {
           {/* User Actions Section */}
           <div className="flex items-center space-x-6">
             {/* Favourites Link */}
-            <Link href="/dashboard/favourites" className="text-gray-700 hover:text-red-600 focus:outline-none transition-colors duration-200 relative">
+            <Link href="/home/favourites" className="text-gray-700 hover:text-red-600 focus:outline-none transition-colors duration-200 relative">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -160,7 +160,7 @@ export default function Header() {
             </Link>
 
             {/* Notifications Link */}
-            <Link href="/dashboard/notifications" className="text-gray-700 hover:text-red-600 focus:outline-none transition-colors duration-200 relative">
+            <Link href="/home/notifications" className="text-gray-700 hover:text-red-600 focus:outline-none transition-colors duration-200 relative">
               <div className="relative">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +249,7 @@ export default function Header() {
             </div>
 
             {/* Mobile Profile Link */}
-            <Link href="/dashboard/profile" className="md:hidden">
+            <Link href="/home/profile" className="md:hidden">
               <div className="relative overflow-hidden rounded-full border-2 border-gray-200 hover:border-red-400 transition-all duration-200">
                 <Image
                   src={profileImage}
@@ -309,7 +309,7 @@ export default function Header() {
               ))}
               
               <Link
-                href="/dashboard/favourites"
+                href="/home/favourites"
                 className="block px-4 py-3 font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -333,7 +333,7 @@ export default function Header() {
               </Link>
               
               <Link
-                href="/dashboard/notifications"
+                href="/home/notifications"
                 className="block px-4 py-3 font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-150"
                 onClick={() => setMobileMenuOpen(false)}
               >

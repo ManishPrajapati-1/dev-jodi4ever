@@ -47,6 +47,13 @@ export default function Home() {
     return () => clearInterval(interval);
   });
 
+  useEffect(() => {
+    if (hasToken) {
+      // User is logged in, navigate to their profile or dashboard
+      router.push('/home'); // Or wherever you want to direct them
+    }
+  }, [hasToken])
+
   const submitForm = (data) => {
     // console.log("Form submitted with data:", data);
     const queryString = new URLSearchParams(data).toString();
@@ -57,7 +64,7 @@ export default function Home() {
   const handleAuthAction = () => {
     if (hasToken && userProfile) {
       // User is logged in, navigate to their profile or dashboard
-      router.push('/dashboard'); // Or wherever you want to direct them
+      router.push('/home'); // Or wherever you want to direct them
     } else {
       // User is not logged in, show login modal
       setShowModal(true);
@@ -126,7 +133,7 @@ export default function Home() {
                   I&apos;m looking for
                 </label>
                 <select
-                  {...register("lookingFor", { required: true })}
+                  {...register("lookingFor", { required: false })}
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-btn"
                 >
                   <option value="">Select</option>
@@ -143,7 +150,7 @@ export default function Home() {
               <div className="mb-3">
                 <label className="block text-sm font-semibold mb-1">Age</label>
                 <select
-                  {...register("age", { required: true })}
+                  {...register("age", { required: false })}
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-btn"
                 >
                   <option value="">Select Age</option>
@@ -166,14 +173,20 @@ export default function Home() {
                   Religion
                 </label>
                 <select
-                  {...register("religion", { required: true })}
+                  {...register("religion", { required: false })}
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-btn"
                 >
                   <option value="">Select Religion</option>
                   <option value="Hindu">Hindu</option>
-                  <option value="Muslim">Muslim</option>
                   <option value="Sikh">Sikh</option>
-                  <option value="Others">Others</option>
+                  <option value="Muslim">Muslim</option>
+                  <option value="Christian">Christian</option>
+                  <option value="Jain">Jain</option>
+                  <option value="Parsi">Parsi</option>
+                  <option value="Jewish">Jewish</option>
+                  <option value="Bahai">Bahai</option>
+                  <option value="Buddhist">Buddhist</option>
+                  <option value="Other">Other</option>
                 </select>
                 {errors.religion && (
                   <p className="text-btn text-sm mt-1">Religion is required</p>
@@ -185,7 +198,7 @@ export default function Home() {
                   Location
                 </label>
                 <select
-                  {...register("location", { required: true })}
+                  {...register("location", { required: false })}
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-btn"
                 >
                   <option value="">Select Location</option>

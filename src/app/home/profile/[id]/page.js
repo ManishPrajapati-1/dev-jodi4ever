@@ -249,7 +249,7 @@ export default function ProfilePage({ params }) {
             not have permission to view it.
           </p>
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/home")}
             className="px-6 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors shadow-sm w-full"
           >
             Back to Profiles

@@ -122,7 +122,7 @@ export default function LikedUsersPage() {
         {/* Page Header - Back to Dashboard Link */}
         <div className="mb-6">
           <Link 
-            href="/dashboard" 
+            href="/home" 
             className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
           >
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
@@ -226,7 +226,7 @@ export default function LikedUsersPage() {
                 </p>
                 
                 <Link 
-                  href="/dashboard" 
+                  href="/home" 
                   className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-200 shadow-sm"
                 >
                   <UserPlus size={18} className="mr-2" />
@@ -264,7 +264,7 @@ export default function LikedUsersPage() {
                         {/* Action buttons on hover */}
                         <div className="absolute bottom-0 left-0 right-0 p-3 flex gap-2 opacity-0 hover:opacity-100 transition-opacity duration-300">
                           <Link 
-                            href={`/dashboard/profile/${item.userLikedTo?._id}`} 
+                            href={`/home/profile/${item.userLikedTo?._id}`} 
                             className="flex-1 flex items-center justify-center px-3 py-2 bg-white/90 backdrop-blur-sm text-gray-700 text-sm rounded-lg hover:bg-white transition-colors"
                           >
                             <Eye size={16} className="mr-1.5" />
@@ -368,7 +368,7 @@ export default function LikedUsersPage() {
                             {/* Action buttons */}
                             <div className="flex flex-wrap gap-2 mt-3 sm:mt-0">
                               <Link
-                                href={`/dashboard/profile/${item.userLikedTo?._id}`}
+                                href={`/home/profile/${item.userLikedTo?._id}`}
                                 className="inline-flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200"
                               >
                                 <Eye size={16} className="mr-1.5" />
@@ -414,7 +414,7 @@ export default function LikedUsersPage() {
               Showing {filteredUsers.length} of {likedByMe.length} favourites
             </div>
             <Link
-              href="/dashboard/activity"
+              href="/home/activity"
               className="text-red-600 hover:text-red-700 font-medium inline-flex items-center"
             >
               <span>View all activity</span>

@@ -104,14 +104,14 @@ export default function DashboardPage() {
               
               <div className="flex flex-wrap gap-3">
                 <Link 
-                  href="/dashboard/preferences"
+                  href="/home/partner-preferences"
                   className="bg-white/20 backdrop-blur-sm text-white font-medium px-4 py-2 rounded-lg hover:bg-white/30 transition-colors shadow-sm flex items-center"
                 >
                   <Filter size={18} className="mr-2" />
                   Update Preferences
                 </Link>
                 <Link 
-                  href="/dashboard/profile" 
+                  href="/home/profile" 
                   className="bg-white text-primary font-medium px-4 py-2 rounded-lg hover:bg-white/90 transition-colors shadow-sm flex items-center"
                 >
                   <Users size={18} className="mr-2" />
@@ -193,7 +193,7 @@ export default function DashboardPage() {
                 <h3 className="text-lg font-medium text-gray-800 mb-2">No matches found</h3>
                 <p className="text-gray-500 mb-4">Try adjusting your preferences to see more profiles</p>
                 <Link 
-                  href="/dashboard/preferences" 
+                  href="/home/partner-preferences" 
                   className="inline-flex items-center text-primary font-medium hover:text-primary/80"
                 >
                   <Filter size={16} className="mr-1" />
