@@ -225,11 +225,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                   <div className="text-center mb-6">
                     <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                       <Image
-                        src="/images/jodi4ever_logo.png"
+                        src="/images/wedding.png"
                         alt="Logo"
                         width={50}
                         height={50}
-                        className="invert"
+                        className="w-auto h-auto"
                       />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-800">

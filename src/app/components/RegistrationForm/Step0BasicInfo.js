@@ -11,7 +11,16 @@ import { User, Mail, Phone, Send, AlertCircle } from "lucide-react";
 import toast, { Toaster } from 'react-hot-toast'
 
 export default function Step0BasicInfo() {
-  const {data: userData, isLoading: isUserLoading, isError: isUserError } = useGetUserProfileQuery();
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+const {
+  data: userData,
+  isLoading: isUserLoading,
+  isError: isUserError,
+} = useGetUserProfileQuery(undefined, {
+  skip: !token, // only run if token exists
+});
+
   // console.log(userData?.data?.user?.profileStatus);
   const formData = useSelector((state) => state.profile.formData);
   const isOTPVerified = useSelector((state) => state.profile.isOTPVerified);

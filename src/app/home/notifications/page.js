@@ -33,21 +33,31 @@ export default function NotificationsPage({ params, searchParams }) {
   const [activeTab, setActiveTab] = useState("all");
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
 
-  // Use RTK Query hook to fetch notifications
-  const {
-    data: notificationData,
-    isLoading: isNotificationLoading,
-    isError: isNotificationError,
-  } = useGetNotificationsQuery();
+const [
+  deleteNotifications,
+  {
+    data: notificationUpdates,
+    isLoading: isDeleting,
+    isError: isNotificationDeleteError,
+    isSuccess: isDeleteSuccess,
+  },
+] = useDeleteNotificationsMutation();
 
-  const [
-    deleteNotifications,
-    {
-      data: notificationUpdates,
-      isLoading: isDeleting,
-      isError: isNotificationDeleteError,
-    },
-  ] = useDeleteNotificationsMutation();
+// Get notifications + the refetch function
+const {
+  data: notificationData,
+  isLoading: isNotificationLoading,
+  isError: isNotificationError,
+  refetch: refetchNotifications,
+} = useGetNotificationsQuery();
+
+// Refetch notifications after successful delete
+useEffect(() => {
+  if (isDeleteSuccess) {
+    refetchNotifications();
+  }
+}, [isDeleteSuccess, refetchNotifications]);
+
 
   // Extract notifications from the response if available
   const notifications = notificationData?.data || [];

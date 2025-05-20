@@ -7,6 +7,7 @@ import { ArrowLeft, Heart } from "lucide-react";
 import FormStepper from "./Components/FormSteper";
 
 export const metadata = {
+  metadataBase: "https://www.jodi4ever.com",
   title: "Create Your Profile | Jodi4Ever",
   description: "Complete your profile to get the most out of Jodi4Ever.",
   keywords: ["create profile", "onboarding", "user setup", "Jodi4Ever"],
@@ -17,7 +18,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/images/og-profile-creation.jpg",
+        url: "/images/wedding.png",
         width: 1200,
         height: 630,
         alt: "Create your Jodi4Ever profile",

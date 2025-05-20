@@ -17,7 +17,9 @@ export default function AppDownloadModal({ isOpen, onClose }) {
 
         <div className="flex items-center mb-6">
           <div className="h-16 w-16 rounded-xl bg-rose-100 flex items-center justify-center">
-            <img
+            <Image
+              width={100}
+              height={100}
               src="/images/wedding.png"
               alt="App Logo"
               className="h-12 w-12 rounded-xl"

@@ -25,7 +25,7 @@ export const metadata = {
   author: "Jodi4Ever",
   robots: "index, follow", // to ensure search engines index and follow links
   alternates: {
-  canonical: "https://www.jodi4ever.com", // canonical tag to prevent duplicate content
+    canonical: "https://www.jodi4ever.com", // canonical tag to prevent duplicate content
   },
   // Open Graph tags for Facebook and other social media platforms
   openGraph: {
