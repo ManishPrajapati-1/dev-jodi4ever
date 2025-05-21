@@ -90,7 +90,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         {/* Google Analytics - implemented properly using next/script with strategy */}
-        <Script
+        {/* <Script
           strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=G-8WFJLKS5CQ"
         />
@@ -105,7 +105,7 @@ export default function RootLayout({ children }) {
               gtag('config', 'G-8WFJLKS5CQ');
             `,
           }}
-        />
+        /> */}
       </head>
       <body className={`${poppins.className} antialiased`}>
         <StoreProvider>

@@ -13,9 +13,9 @@ export default function robots() {
           '/privacy',
           '/premium',
         ],
-        disallow: '/private/'
+        disallow: '/home/'
       }
     ],
-    sitemap: 'https://www.jodi4ever.com/sitemap.xml',
+    // sitemap: 'https://www.jodi4ever.com/sitemap.xml',
   }
 }

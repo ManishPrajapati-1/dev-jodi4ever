@@ -475,12 +475,12 @@ export default function ActivityPage() {
                                       </>
                                     )}
                                   </button>
-                                  <button 
+                                  {/* <button 
                                     className="inline-flex items-center justify-center px-3 py-2 text-sm rounded-lg transition-colors duration-200 bg-blue-50 text-blue-600 hover:bg-blue-100"
                                   >
                                     <MessageCircle size={16} className="mr-1.5" />
                                     Message
-                                  </button>
+                                  </button> */}
                                 </>
                               )}
                               

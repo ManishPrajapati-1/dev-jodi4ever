@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Save } from "lucide-react";
-import toast, { Toaster } from 'react-hot-toast';
-import fieldsData from '../fieldsData.json';
+import toast, { Toaster } from "react-hot-toast";
+import fieldsData from "../fieldsData.json";
 import {
   useGetUserPreferencesQuery,
   usePostUserPreferencesMutation,
@@ -15,15 +15,21 @@ import {
 export default function PartnerPreferencesPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("basics");
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({});
 
-  });
-  
   // Get user profile data
-  const { data: preferencesData, isLoading: profileLoading } = useGetUserPreferencesQuery();
+  const { data: preferencesData, isLoading: profileLoading } =
+    useGetUserPreferencesQuery();
   // Update user preferences
-  const [updateProfile, { isLoading, isSuccess, isError }] = usePostUserPreferencesMutation();
-  
+  const [updateProfile, { isLoading, isSuccess, isError }] =
+    usePostUserPreferencesMutation();
+
   // Fetch states for dropdown
   const {
     data: states,
@@ -49,19 +55,27 @@ export default function PartnerPreferencesPage() {
       console.log(preferences);
       if (preferences) {
         // Map specific fields correctly
-        if (preferences.min_age) setValue('min_age', preferences.min_age);
-        if (preferences.max_age) setValue('max_age', preferences.max_age);
-        if (preferences.min_height_in_cm) setValue('min_height_in_cm', preferences.min_height);
-        if (preferences.max_height_in_cm) setValue('max_height_in_cm', preferences.max_height);
-        if (preferences.marital_status) setValue('marital_status', preferences.marital_status);
-        if (preferences.religion) setValue('religion', preferences.religion);
-        if (preferences.any_caste !== undefined) setValue('any_caste', preferences.any_caste);
-        if (preferences.mother_tongue) setValue('mother_tongue', preferences.mother_tongue);
-        if (preferences.state) setValue('state', preferences.state);
-        if (preferences.manglik) setValue('manglik', preferences.manglik);
-        if (preferences.highest_education) setValue('highest_education', preferences.highest_education);
-        if (preferences.employed_in) setValue('employed_in', preferences.employed_in);
-        if (preferences.annual_income) setValue('annual_income', preferences.annual_income);
+        if (preferences.min_age) setValue("min_age", preferences.min_age);
+        if (preferences.max_age) setValue("max_age", preferences.max_age);
+        if (preferences.min_height_in_cm)
+          setValue("min_height_in_cm", preferences.min_height);
+        if (preferences.max_height_in_cm)
+          setValue("max_height_in_cm", preferences.max_height);
+        if (preferences.marital_status)
+          setValue("marital_status", preferences.marital_status);
+        if (preferences.religion) setValue("religion", preferences.religion);
+        if (preferences.any_caste !== undefined)
+          setValue("any_caste", preferences.any_caste);
+        if (preferences.mother_tongue)
+          setValue("mother_tongue", preferences.mother_tongue);
+        if (preferences.state) setValue("state", preferences.state);
+        if (preferences.manglik) setValue("manglik", preferences.manglik);
+        if (preferences.highest_education)
+          setValue("highest_education", preferences.highest_education);
+        if (preferences.employed_in)
+          setValue("employed_in", preferences.employed_in);
+        if (preferences.annual_income)
+          setValue("annual_income", preferences.annual_income);
       }
     }
   }, [preferencesData, setValue]);
@@ -79,14 +93,14 @@ export default function PartnerPreferencesPage() {
       console.error("Failed to save preferences:", error);
     }
   };
-  
+
   // Helper functions for formatting data
   const getHeightString = (heightInCm) => {
     const feet = Math.floor(heightInCm / 30.48);
     const inches = Math.round((heightInCm % 30.48) / 2.54);
     return `${feet}'${inches}" (${heightInCm.toFixed(2)} cm)`;
   };
-  
+
   const getSelectedCm = (heightString) => {
     const match = heightString.match(/(\d+)'(\d+)"/);
     if (match) {
@@ -125,14 +139,20 @@ export default function PartnerPreferencesPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="p-6">
           {/* Basic Info Section */}
           <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
-            <div 
-              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${activeSection === "basics" ? "border-l-4 border-red-600" : ""}`}
+            <div
+              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${
+                activeSection === "basics" ? "border-l-4 border-red-600" : ""
+              }`}
               onClick={() => toggleSection("basics")}
             >
               <h3 className="text-lg font-semibold">Basic Details</h3>
-              <ChevronDown className={`w-5 h-5 transform transition-transform ${activeSection === "basics" ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-5 h-5 transform transition-transform ${
+                  activeSection === "basics" ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            
+
             {activeSection === "basics" && (
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -144,8 +164,14 @@ export default function PartnerPreferencesPage() {
                     <div className="flex items-center space-x-2">
                       <div className="flex-1">
                         <select
-                          {...register("min_age", { required: "Min age is required" })}
-                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.min_age ? "border-red-500" : "border-gray-300"}`}
+                          {...register("min_age", {
+                            required: "Min age is required",
+                          })}
+                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                            errors.min_age
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                         >
                           {[...Array(43)].map((_, i) => (
                             <option key={i} value={i + 18}>
@@ -154,14 +180,22 @@ export default function PartnerPreferencesPage() {
                           ))}
                         </select>
                         {errors.min_age && (
-                          <p className="text-red-500 text-xs mt-1">{errors.min_age.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.min_age.message}
+                          </p>
                         )}
                       </div>
                       <span className="text-gray-500">to</span>
                       <div className="flex-1">
                         <select
-                          {...register("max_age", { required: "Max age is required" })}
-                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.max_age ? "border-red-500" : "border-gray-300"}`}
+                          {...register("max_age", {
+                            required: "Max age is required",
+                          })}
+                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                            errors.max_age
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                         >
                           {[...Array(43)].map((_, i) => (
                             <option key={i} value={i + 18}>
@@ -170,7 +204,9 @@ export default function PartnerPreferencesPage() {
                           ))}
                         </select>
                         {errors.max_age && (
-                          <p className="text-red-500 text-xs mt-1">{errors.max_age.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.max_age.message}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -184,43 +220,73 @@ export default function PartnerPreferencesPage() {
                     <div className="flex items-center space-x-2">
                       <div className="flex-1">
                         <select
-                          {...register("min_height_in_cm", { required: "Min height is required" })}
-                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.min_height_in_cm ? "border-red-500" : "border-gray-300"}`}
+                          {...register("min_height_in_cm", {
+                            required: "Min height is required",
+                          })}
+                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                            errors.min_height_in_cm
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                         >
                           {Array.from({ length: 37 }, (_, i) => {
                             const feet = Math.floor(i / 12) + 4; // Start at 4 feet
                             const inches = i % 12;
-                            const cm = (feet * 30.48 + inches * 2.54).toFixed(1);
+                            const cm = (feet * 30.48 + inches * 2.54).toFixed(
+                              1
+                            );
                             return (
-                              <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
+                              <option
+                                key={i}
+                                value={`${feet}'${inches}" (${getSelectedCm(
+                                  `${feet}'${inches}"`
+                                )} cm)`}
+                              >
                                 {feet}&apos;{inches}&quot; ({cm} cm)
                               </option>
                             );
                           })}
                         </select>
                         {errors.min_height_in_cm && (
-                          <p className="text-red-500 text-xs mt-1">{errors.min_height_in_cm.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.min_height_in_cm.message}
+                          </p>
                         )}
                       </div>
                       <span className="text-gray-500">to</span>
                       <div className="flex-1">
                         <select
-                          {...register("max_height_in_cm", { required: "Max height is required" })}
-                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.max_height_in_cm ? "border-red-500" : "border-gray-300"}`}
+                          {...register("max_height_in_cm", {
+                            required: "Max height is required",
+                          })}
+                          className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                            errors.max_height_in_cm
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
                         >
                           {Array.from({ length: 37 }, (_, i) => {
                             const feet = Math.floor(i / 12) + 4; // Start at 4 feet
                             const inches = i % 12;
-                            const cm = (feet * 30.48 + inches * 2.54).toFixed(1);
+                            const cm = (feet * 30.48 + inches * 2.54).toFixed(
+                              1
+                            );
                             return (
-                              <option key={i} value={`${feet}'${inches}" (${getSelectedCm(`${feet}'${inches}"`)} cm)`}>
+                              <option
+                                key={i}
+                                value={`${feet}'${inches}" (${getSelectedCm(
+                                  `${feet}'${inches}"`
+                                )} cm)`}
+                              >
                                 {feet}&apos;{inches}&quot; ({cm} cm)
                               </option>
                             );
                           })}
                         </select>
                         {errors.max_height_in_cm && (
-                          <p className="text-red-500 text-xs mt-1">{errors.max_height_in_cm.message}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.max_height_in_cm.message}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -232,17 +298,25 @@ export default function PartnerPreferencesPage() {
                       Marital Status<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("marital_status", { required: "Marital status is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.marital_status ? "border-red-500" : "border-gray-300"}`}
+                      {...register("marital_status", {
+                        required: "Marital status is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.marital_status
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                     >
                       <option value="Single">Single</option>
                       <option value="Divorced">Divorced</option>
                       <option value="Widowed">Widowed</option>
                       <option value="Separated">Separated</option>
-                      <option value="Any">Any</option>
+                      <option value="All">All</option>
                     </select>
                     {errors.marital_status && (
-                      <p className="text-red-500 text-xs mt-1">{errors.marital_status.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.marital_status.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -252,14 +326,20 @@ export default function PartnerPreferencesPage() {
 
           {/* Religion & Location Section */}
           <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
-            <div 
-              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${activeSection === "religion" ? "border-l-4 border-red-600" : ""}`}
+            <div
+              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${
+                activeSection === "religion" ? "border-l-4 border-red-600" : ""
+              }`}
               onClick={() => toggleSection("religion")}
             >
               <h3 className="text-lg font-semibold">Religion & Location</h3>
-              <ChevronDown className={`w-5 h-5 transform transition-transform ${activeSection === "religion" ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-5 h-5 transform transition-transform ${
+                  activeSection === "religion" ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            
+
             {activeSection === "religion" && (
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -269,8 +349,12 @@ export default function PartnerPreferencesPage() {
                       Religion<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("religion", { required: "Religion is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.religion ? "border-red-500" : "border-gray-300"}`}
+                      {...register("religion", {
+                        required: "Religion is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.religion ? "border-red-500" : "border-gray-300"
+                      }`}
                     >
                       <option value="Hindu">Hindu</option>
                       <option value="Muslim">Muslim</option>
@@ -278,10 +362,15 @@ export default function PartnerPreferencesPage() {
                       <option value="Sikh">Sikh</option>
                       <option value="Jain">Jain</option>
                       <option value="Buddhist">Buddhist</option>
+                      <option value="Parsi">Parsi</option>
+                      <option value="Jewish">Jewish</option>
+                      <option value="Bahai">Bahai</option>
                       <option value="Other">Other</option>
                     </select>
                     {errors.religion && (
-                      <p className="text-red-500 text-xs mt-1">{errors.religion.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.religion.message}
+                      </p>
                     )}
                   </div>
 
@@ -297,8 +386,11 @@ export default function PartnerPreferencesPage() {
                         {...register("any_caste")}
                         className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                       />
-                      <label htmlFor="any-caste" className="ml-2 block text-sm text-gray-700">
-                        Open to all castes
+                      <label
+                        htmlFor="any-caste"
+                        className="ml-2 block text-sm text-gray-700"
+                      >
+                        Caste No bar (I am open to marry people of all castes)
                       </label>
                     </div>
                   </div>
@@ -310,10 +402,14 @@ export default function PartnerPreferencesPage() {
                         Manglik<span className="text-red-500">*</span>
                       </label>
                       <select
-                        {...register("manglik", { 
-                          required: ["Hindu", "Jain", "Sikh"].includes(religion) ? "Required for this religion" : false 
+                        {...register("manglik", {
+                          required: ["Hindu", "Jain", "Sikh"].includes(religion)
+                            ? "Required for this religion"
+                            : false,
                         })}
-                        className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.manglik ? "border-red-500" : "border-gray-300"}`}
+                        className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                          errors.manglik ? "border-red-500" : "border-gray-300"
+                        }`}
                       >
                         <option value="">Select</option>
                         <option value="Non-manglik">Non-manglik</option>
@@ -321,7 +417,9 @@ export default function PartnerPreferencesPage() {
                         <option value="Anshik-manglik">Anshik-manglik</option>
                       </select>
                       {errors.manglik && (
-                        <p className="text-red-500 text-xs mt-1">{errors.manglik.message}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.manglik.message}
+                        </p>
                       )}
                     </div>
                   )}
@@ -332,24 +430,27 @@ export default function PartnerPreferencesPage() {
                       Mother Tongue<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("mother_tongue", { required: "Mother tongue is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.mother_tongue ? "border-red-500" : "border-gray-300"}`}
+                      {...register("mother_tongue", {
+                        required: "Mother tongue is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.mother_tongue
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                     >
-                      <option value="Hindi">Hindi</option>
-                      <option value="English">English</option>
-                      <option value="Marathi">Marathi</option>
-                      <option value="Tamil">Tamil</option>
-                      <option value="Bengali">Bengali</option>
-                      <option value="Telugu">Telugu</option>
-                      <option value="Malayalam">Malayalam</option>
-                      <option value="Kannada">Kannada</option>
-                      <option value="Gujarati">Gujarati</option>
-                      <option value="Punjabi">Punjabi</option>
-                      <option value="Urdu">Urdu</option>
-                      <option value="Other">Other</option>
+                      {fieldsData.motherTongue.map(
+                        (mother_tongue, index) => (
+                          <option key={index} value={mother_tongue}>
+                            {mother_tongue}
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.mother_tongue && (
-                      <p className="text-red-500 text-xs mt-1">{errors.mother_tongue.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.mother_tongue.message}
+                      </p>
                     )}
                   </div>
 
@@ -360,7 +461,9 @@ export default function PartnerPreferencesPage() {
                     </label>
                     <select
                       {...register("state", { required: "State is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.state ? "border-red-500" : "border-gray-300"}`}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.state ? "border-red-500" : "border-gray-300"
+                      }`}
                     >
                       <option value="">Select</option>
                       {statesLoading ? (
@@ -376,7 +479,9 @@ export default function PartnerPreferencesPage() {
                       )}
                     </select>
                     {errors.state && (
-                      <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.state.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -386,14 +491,22 @@ export default function PartnerPreferencesPage() {
 
           {/* Professional Section */}
           <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
-            <div 
-              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${activeSection === "professional" ? "border-l-4 border-red-600" : ""}`}
+            <div
+              className={`flex justify-between items-center p-4 bg-gray-50 cursor-pointer ${
+                activeSection === "professional"
+                  ? "border-l-4 border-red-600"
+                  : ""
+              }`}
               onClick={() => toggleSection("professional")}
             >
               <h3 className="text-lg font-semibold">Education & Career</h3>
-              <ChevronDown className={`w-5 h-5 transform transition-transform ${activeSection === "professional" ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`w-5 h-5 transform transition-transform ${
+                  activeSection === "professional" ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            
+
             {activeSection === "professional" && (
               <div className="p-4 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -403,18 +516,33 @@ export default function PartnerPreferencesPage() {
                       Education<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("highest_education", { required: "Education is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.highest_education ? "border-red-500" : "border-gray-300"}`}
+                      {...register("highest_education", {
+                        required: "Education is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.highest_education
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                     >
-                      <option value="Below High School">Below High School</option>
-                    <option value="High School (12th)">High School (12th)</option>
-                    <option value="Diploma">Diploma</option>
-                    <option value="Bachelor's">Bachelor&apos;s</option>
-                    <option value="Master's">Master&apos;s</option>
-                    <option value="Doctorate">Doctorate/PhD</option>
+                      <option value="Below High School">
+                        Below High School
+                      </option>
+                      <option value="High School (10th)">
+                        High School (10th)
+                      </option>
+                      <option value="Senior Secondary (12th)">
+                        Senior Secondary (12th)
+                      </option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="Bachelor's">Bachelor&apos;s</option>
+                      <option value="Master's">Master&apos;s</option>
+                      <option value="Doctorate">Doctorate</option>
                     </select>
                     {errors.highest_education && (
-                      <p className="text-red-500 text-xs mt-1">{errors.highest_education.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.highest_education.message}
+                      </p>
                     )}
                   </div>
 
@@ -424,17 +552,27 @@ export default function PartnerPreferencesPage() {
                       Employed In<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("employed_in", { required: "Employment is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.employed_in ? "border-red-500" : "border-gray-300"}`}
+                      {...register("employed_in", {
+                        required: "Employment is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.employed_in
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                     >
-                      {fieldsData.employeeInOptions.map((employed_in, index) => (
-                                            <option key={index} value={employed_in}>
-                                              {employed_in}
-                                            </option>
-                                          ))}
+                      {fieldsData.employeeInOptions.map(
+                        (employed_in, index) => (
+                          <option key={index} value={employed_in}>
+                            {employed_in}
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.employed_in && (
-                      <p className="text-red-500 text-xs mt-1">{errors.employed_in.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.employed_in.message}
+                      </p>
                     )}
                   </div>
 
@@ -444,17 +582,27 @@ export default function PartnerPreferencesPage() {
                       Annual Income<span className="text-red-500">*</span>
                     </label>
                     <select
-                      {...register("annual_income", { required: "Income is required" })}
-                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.annual_income ? "border-red-500" : "border-gray-300"}`}
+                      {...register("annual_income", {
+                        required: "Income is required",
+                      })}
+                      className={`w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                        errors.annual_income
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      }`}
                     >
-                      {fieldsData.annualIncomeOptions.map((annual_income, index) => (
-                        <option key={index} value={annual_income}>
-                          {annual_income}
-                        </option>
-                      ))}
+                      {fieldsData.annualIncomeOptions.map(
+                        (annual_income, index) => (
+                          <option key={index} value={annual_income}>
+                            {annual_income}
+                          </option>
+                        )
+                      )}
                     </select>
                     {errors.annual_income && (
-                      <p className="text-red-500 text-xs mt-1">{errors.annual_income.message}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.annual_income.message}
+                      </p>
                     )}
                   </div>
                 </div>

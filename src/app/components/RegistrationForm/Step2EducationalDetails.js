@@ -42,7 +42,7 @@ const Step2EducationalDetails = () => {
   };
 
   useEffect(() => {
-    setIsCourseVisible(education === 'Below High School' || education === 'High School (12th)' || education === '');
+    setIsCourseVisible(education === 'Below High School' || education === 'High School (10th)' || education === 'Senior Secondary (12th)' || education === '');
     let availableCourses = [];
     // setValue('course', ''); // Reset course when education changes
     
@@ -92,12 +92,19 @@ const Step2EducationalDetails = () => {
                     className="block w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all duration-200 bg-white"
                   >
                     <option value="">Select Your Education</option>
-                    <option value="Below High School">Below High School</option>
-                    <option value="High School (12th)">High School (12th)</option>
-                    <option value="Diploma">Diploma</option>
-                    <option value="Bachelor's">Bachelor&apos;s</option>
-                    <option value="Master's">Master&apos;s</option>
-                    <option value="Doctorate">Doctorate/PhD</option>
+                      <option value="Below High School">
+                        Below High School
+                      </option>
+                      <option value="High School (10th)">
+                        High School (10th)
+                      </option>
+                      <option value="Senior Secondary (12th)">
+                        Senior Secondary (12th)
+                      </option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="Bachelor's">Bachelor&apos;s</option>
+                      <option value="Master's">Master&apos;s</option>
+                      <option value="Doctorate">Doctorate</option>
                   </select>
                   {errors.highest_education && (
                     <p className="text-red-500 text-sm mt-1">{errors.highest_education.message}</p>

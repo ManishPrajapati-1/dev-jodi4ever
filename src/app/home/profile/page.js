@@ -348,7 +348,8 @@ export default function ProfilePage() {
   useEffect(() => {
     setIsCourseVisible(
       highestEducation === "Below High School" ||
-        highestEducation === "High School (12th)" ||
+        highestEducation === "High School (10th)" ||
+        highestEducation === "Senior Secondary (12th)" ||
         highestEducation === ""
     );
 
@@ -1111,13 +1112,17 @@ export default function ProfilePage() {
                             label: "Below High School",
                           },
                           {
-                            value: "High School (12th)",
-                            label: "High School (12th)",
+                            value: "High School (10th)",
+                            label: "High School (10th)",
+                          },
+                          {
+                            value: "Senior Secondary (12th)",
+                            label: "Senior Secondary (12th)",
                           },
                           { value: "Diploma", label: "Diploma" },
                           { value: "Bachelor's", label: "Bachelor's" },
                           { value: "Master's", label: "Master's" },
-                          { value: "Doctorate", label: "Doctorate/PhD" },
+                          { value: "Doctorate", label: "Doctorate" },
                         ]}
                       />
 
@@ -1205,10 +1210,9 @@ export default function ProfilePage() {
                         value={
                           profileData.highest_education
                             ? `${profileData.highest_education}${
-                                highestEducation ==
-                                  "High School (12th)" ||
-                                highestEducation ==
-                                  "Below High School"
+                                highestEducation == "High School (10th)" ||
+                                highestEducation == "Senior Secondary (12th)" ||
+                                highestEducation == "Below High School"
                                   ? ""
                                   : ` in ${profileData.course}`
                               }`
