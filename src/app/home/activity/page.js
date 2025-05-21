@@ -65,7 +65,9 @@ export default function ActivityPage() {
   // Extract data from API responses
   const connections = connectionsData?.data || []
   const sentRequests = sentRequestsData?.data?.filter(req => req.receiver !== null) || []
-  const receivedRequests = receivedRequestsData?.data || []
+  // const receivedRequests = receivedRequestsData?.data || []
+  // Below line helps to filter non active users and show data accordingly.
+  const receivedRequests = receivedRequestsData?.data.filter((item) => {item.sender != null}) || []
 
   useEffect(() => {
     const token = localStorage.getItem('token')
