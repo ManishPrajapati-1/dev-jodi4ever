@@ -81,7 +81,7 @@ export default function Footer() {
       },
       {
         name: "YouTube",
-        url: "#",
+        url: "https://www.youtube.com/@Jodi4Ever",
         icon: (
           <svg
             className="h-6 w-6"

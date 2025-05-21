@@ -116,7 +116,10 @@ const ProfileCard = ({ profile, onProfileClick }) => {
         className={`relative aspect-[5/4] md:aspect-[4/3] cursor-pointer group ${isHovered ? 'transform scale-[1.02] transition-transform duration-500' : 'transition-transform duration-500'}`} 
         // onClick={() => onProfileClick(profile._id)}
       >
+      <Link href={`/home/profile/${profile._id}`} className="p-4">
+
         {profile.profile_image && profile.profile_image.length > 0 ? (
+          
           <div className="relative w-full h-full">
             {/* Current image display */}
             <div className="w-full h-full">
@@ -137,14 +140,14 @@ const ProfileCard = ({ profile, onProfileClick }) => {
                 {/* Left/Right arrows */}
                 <div className="absolute flex justify-between transform -translate-y-1/2 left-3 right-3 top-1/2 z-20 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <button 
-                    className="bg-primary/20 hover:bg-primary/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
+                    className="bg-primary/40 hover:bg-primary/60 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToPrevImage}
                     aria-label="Previous image"
                   >
                     <ChevronLeft size={20} />
                   </button>
                   <button 
-                    className="bg-primary/20 hover:bg-primary/40 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
+                    className="bg-primary/40 hover:bg-primary/60 text-white rounded-full p-2 backdrop-blur-sm transition-colors duration-200"
                     onClick={goToNextImage}
                     aria-label="Next image"
                   >
@@ -216,6 +219,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
             <Cake size={14} className="mr-1.5" /> {profile.age || '??'} years
           </p>
         </div>
+</Link>
       </div>
       
       {/* Profile Info */}
@@ -468,14 +472,14 @@ const ProfileGrid = ({ profiles }) => {
       )}
       
       {/* Profile Modal */}
-      {singleProfileData && (
+      {/* {singleProfileData && (
         <ProfileModal 
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           profileData={singleProfileData.data}
           onLikeChange={handleLikeChange}
         />
-      )}
+      )} */}
     </div>
   );
 };
