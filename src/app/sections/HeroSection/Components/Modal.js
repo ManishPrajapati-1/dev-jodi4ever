@@ -131,6 +131,7 @@ export default function LoginModal({ isVisible, setIsVisible }) {
     if (value && index < 3 && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
     }
+
   };
 
   const handleKeyDown = (e, index) => {
@@ -150,7 +151,7 @@ export default function LoginModal({ isVisible, setIsVisible }) {
       inputRefs.current[index + 1].focus();
     }
     else if (e.key === "Enter") {
-    // Optional: check if all OTP fields are filled
+      // Optional: check if all OTP fields are filled
       if (otp.every((digit) => digit !== "")) {
         document.getElementById("otp-btn")?.click(); // manually trigger submit
       }
@@ -200,6 +201,14 @@ export default function LoginModal({ isVisible, setIsVisible }) {
       setErrorMessage(err?.data?.message || "Invalid OTP. Please try again.");
     }
   };
+
+
+  // Auto-submit OTP when all fields are filled
+  useEffect(() => {
+    if(otp.join("").length === 4) {
+      document.getElementById("otp-btn")?.click();
+    }
+  }, [otp]);
 
   const allOtpEntered = otp.every((digit) => digit !== "");
 
@@ -258,11 +267,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                           type="number"
                           inputMode="numeric"
                           placeholder="Enter your 10-digit number"
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${
-                            errors.phone
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${errors.phone
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500/50"
                               : "border-gray-300 focus:border-primary focus:ring-primary/50"
-                          }`}
+                            }`}
                           {...register("phone", {
                             required: "Phone number is required",
                             pattern: {
@@ -286,11 +294,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
                     <button
                       type="submit"
-                      className={`w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                        !isValid || isLoginLoading
+                      className={`w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${!isValid || isLoginLoading
                           ? "bg-primary/60"
                           : "bg-primary hover:bg-primary/90"
-                      }`}
+                        }`}
                       disabled={!isValid || isLoginLoading}
                     >
                       {isLoginLoading ? (
@@ -354,9 +361,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                           onChange={(e) => handleOtpChange(e, index)}
                           onKeyDown={(e) => handleKeyDown(e, index)}
                           onPaste={index === 0 ? handlePaste : undefined}
-                          className={`w-14 h-14 text-center text-xl font-semibold border-2 ${
-                            errorMessage ? "border-red-300" : "border-gray-300"
-                          } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
+                          className={`w-14 h-14 text-center text-xl font-semibold border-2 ${errorMessage ? "border-red-300" : "border-gray-300"
+                            } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
                           autoFocus={index === 0}
                         />
                       ))}
@@ -365,11 +371,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                     {/* Error message */}
                     {errorMessage && (
                       <div
-                        className={`text-center text-sm ${
-                          errorMessage.includes("success")
+                        className={`text-center text-sm ${errorMessage.includes("success")
                             ? "text-green-600"
                             : "text-red-600"
-                        }`}
+                          }`}
                       >
                         {errorMessage}
                       </div>
@@ -383,11 +388,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                         type="submit"
                         id="otp-btn"
                         disabled={!allOtpEntered || isOtpLoading || isSuccess}
-                        className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                          !allOtpEntered || isOtpLoading
+                        className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${!allOtpEntered || isOtpLoading
                             ? "bg-primary/60"
                             : "bg-primary hover:bg-primary/90"
-                        }`}
+                          }`}
                       >
                         {isOtpLoading ? (
                           <>
