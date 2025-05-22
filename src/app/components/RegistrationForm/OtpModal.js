@@ -150,6 +150,13 @@ export default function OtpModal({ phone, onClose }) {
     setTimeout(() => setErrorMessage(""), 3000);
   };
 
+  // Auto-submit OTP when all fields are filled
+  useEffect(() => {
+    if (otp.join("").length === 4) {
+      document.getElementById("otp-btn")?.click();
+    }
+  }, [otp]);
+
   const allOtpEntered = otp.every((digit) => digit !== "");
 
   return (
@@ -203,9 +210,8 @@ export default function OtpModal({ phone, onClose }) {
                     onChange={(e) => handleOtpChange(e, index)}
                     onKeyDown={(e) => handleKeyDown(e, index)}
                     onPaste={index === 0 ? handlePaste : undefined}
-                    className={`w-14 h-14 text-center text-xl font-semibold border-2 ${
-                      errorMessage ? "border-red-300" : "border-gray-300"
-                    } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
+                    className={`w-14 h-14 text-center text-xl font-semibold border-2 ${errorMessage ? "border-red-300" : "border-gray-300"
+                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
                     autoFocus={index === 0}
                   />
                 ))}
@@ -227,11 +233,10 @@ export default function OtpModal({ phone, onClose }) {
                 type="submit"
                 id="otp-btn"
                 disabled={!allOtpEntered || isLoading || isSuccess}
-                className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                  !allOtpEntered || isLoading
+                className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${!allOtpEntered || isLoading
                     ? "bg-primary/60"
                     : "bg-primary hover:bg-primary/90"
-                }`}
+                  }`}
               >
                 {isLoading ? (
                   <>

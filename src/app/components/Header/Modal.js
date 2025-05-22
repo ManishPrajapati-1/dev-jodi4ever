@@ -14,10 +14,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
   const [loginUser, { isLoading: isLoginLoading }] = useLoginUserMutation();
   const [verifyLoginOtp, { isLoading: isOtpLoading }] = useVerifyLoginOtpMutation();
-  
+
   const inputRefs = useRef([]);
 
   const {
@@ -52,14 +52,14 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
   const sendOTP = async () => {
     setErrorMessage("");
-    
+
     try {
       const response = await loginUser({ phone: phone }).unwrap();
       if (response.success) {
         setStep(2);
         setTimer(60);
         setCanResend(false);
-        
+
         // Focus first OTP input
         setTimeout(() => {
           if (inputRefs.current[0]) {
@@ -80,11 +80,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
     if (canResend) {
       // Reset OTP fields
       setOtp(["", "", "", ""]);
-      
+
       // Reset timer and error message
       setCanResend(false);
       setErrorMessage("");
-      
+
       // Send OTP again
       sendOTP();
     }
@@ -98,12 +98,12 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
   const handleOtpChange = (e, index) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 1);
-    
+
     // Update the OTP array
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Clear error message when user types
     setErrorMessage("");
 
@@ -120,16 +120,16 @@ export default function LoginModal({ isVisible, setIsVisible }) {
         // Move to previous input if current is empty
         inputRefs.current[index - 1].focus();
       }
-    } 
+    }
     // Handle left arrow
     else if (e.key === "ArrowLeft" && index > 0) {
       inputRefs.current[index - 1].focus();
-    } 
+    }
     // Handle right arrow
     else if (e.key === "ArrowRight" && index < 3) {
       inputRefs.current[index + 1].focus();
     }
-        else if (e.key === "Enter") {
+    else if (e.key === "Enter") {
       if (otp.every((digit) => digit !== "")) {
         document.getElementById("otp-btn")?.click(); // manually trigger submit
       }
@@ -140,11 +140,11 @@ export default function LoginModal({ isVisible, setIsVisible }) {
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").replace(/\D/g, '').slice(0, 4);
-    
+
     if (pastedData.length === 4) {
       const newOtp = pastedData.split('');
       setOtp(newOtp);
-      
+
       // Focus the last input
       if (inputRefs.current[3]) {
         inputRefs.current[3].focus();
@@ -160,12 +160,12 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
     try {
       const res = await verifyLoginOtp({ phone, otp: otp.join("") }).unwrap();
-      
+
       if (res.success && res.data.token) {
         // Show success animation
         setIsSuccess(true);
         localStorage.setItem("token", res.data.token);
-        
+
         // Wait for animation to complete before redirecting
         setTimeout(() => {
           setIsVisible(false);
@@ -177,6 +177,13 @@ export default function LoginModal({ isVisible, setIsVisible }) {
     }
   };
 
+  // Auto-submit OTP when all fields are filled
+  useEffect(() => {
+    if (otp.join("").length === 4) {
+      document.getElementById("otp-btn")?.click();
+    }
+  }, [otp]);
+
   const allOtpEntered = otp.every((digit) => digit !== "");
 
   return (
@@ -185,8 +192,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 sm:px-0 overflow-hidden">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md relative overflow-hidden">
             {/* Close button */}
-            <button 
-              onClick={() => setIsVisible(false)} 
+            <button
+              onClick={() => setIsVisible(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
               aria-label="Close"
             >
@@ -223,11 +230,10 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                           type="number"
                           inputMode="numeric"
                           placeholder="Enter your 10-digit number"
-                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${
-                            errors.phone
+                          className={`w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${errors.phone
                               ? "border-red-300 focus:border-red-500 focus:ring-red-500/50"
                               : "border-gray-300 focus:border-primary focus:ring-primary/50"
-                          }`}
+                            }`}
                           {...register("phone", {
                             required: "Phone number is required",
                             pattern: {
@@ -251,9 +257,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
                     <button
                       type="submit"
-                      className={`w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                        !isValid || isLoginLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
-                      }`}
+                      className={`w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${!isValid || isLoginLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
+                        }`}
                       disabled={!isValid || isLoginLoading}
                     >
                       {isLoginLoading ? (
@@ -307,9 +312,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                           onChange={(e) => handleOtpChange(e, index)}
                           onKeyDown={(e) => handleKeyDown(e, index)}
                           onPaste={index === 0 ? handlePaste : undefined}
-                          className={`w-14 h-14 text-center text-xl font-semibold border-2 ${
-                            errorMessage ? "border-red-300" : "border-gray-300"
-                          } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
+                          className={`w-14 h-14 text-center text-xl font-semibold border-2 ${errorMessage ? "border-red-300" : "border-gray-300"
+                            } rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition`}
                           autoFocus={index === 0}
                         />
                       ))}
@@ -317,9 +321,8 @@ export default function LoginModal({ isVisible, setIsVisible }) {
 
                     {/* Error message */}
                     {errorMessage && (
-                      <div className={`text-center text-sm ${
-                        errorMessage.includes("success") ? "text-green-600" : "text-red-600"
-                      }`}>
+                      <div className={`text-center text-sm ${errorMessage.includes("success") ? "text-green-600" : "text-red-600"
+                        }`}>
                         {errorMessage}
                       </div>
                     )}
@@ -328,13 +331,12 @@ export default function LoginModal({ isVisible, setIsVisible }) {
                     <div className="space-y-3">
                       {/* Verify button */}
                       <button
-                      id="otp-btn"
+                        id="otp-btn"
                         type="submit"
                         onClick={handleVerifyOtp}
                         disabled={!allOtpEntered || isOtpLoading || isSuccess}
-                        className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${
-                          !allOtpEntered || isOtpLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
-                        }`}
+                        className={`relative w-full py-3 rounded-lg text-white font-medium transition duration-300 flex items-center justify-center ${!allOtpEntered || isOtpLoading ? "bg-primary/60" : "bg-primary hover:bg-primary/90"
+                          }`}
                       >
                         {isOtpLoading ? (
                           <>
