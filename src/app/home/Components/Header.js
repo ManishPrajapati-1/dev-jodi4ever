@@ -117,7 +117,7 @@ export default function Header() {
           <Link href="/home" className="flex items-center">
             <Image
               src="/images/wedding.png"
-              alt="Jodi Banao Logo"
+              alt="Jodi4Ever Logo"
               width={100} 
               height={100} 
               className="w-14 md:w-16 transition-transform hover:scale-105"

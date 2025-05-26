@@ -90,7 +90,7 @@ export default function Home() {
         {/* Overlay + Main */}
         <div className="w-screen bg-black/80 p-8">
           <div className="flex justify-between items-center">
-            <Image src="/images/jodi4ever_logo_named.png" width={100} height={100} className="w-14 md:w-18" alt="Logo" />
+            <Image src="/images/jodi4ever_logo_named.png" width={100} height={100} className="w-14 md:w-18" alt="Jodi4Ever Logo" />
             
             {/* Conditional Login/Continue Button */}
             <span
@@ -109,17 +109,18 @@ export default function Home() {
             {/* Text Section */}
             <div className="text-center md:text-left text-white flex flex-col gap-4">
               <h3 className="text-3xl">
-                <span className="font-bold text-4xl">#</span>1 Matrimony
+                <span className="font-bold text-4xl">#</span>Matrimony
               </h3>
               <div>
-                <h2 className="text-5xl mt-2">Find your</h2>
-                <h1 className="text-4xl md:text-6xl mt-2">
-                  <span className="text-primary font-bold">Right Match</span>{" "}
+                <h2 className="text-4xl mt-2">Find your</h2>
+                <h1 className="text-2xl md:text-5xl mt-2">
+                  <span className="text-primary font-bold">Perfect Life Partner</span>{" "}
                   here
                 </h1>
               </div>
               <p className="text-2xl mt-4">
-                Most trusted Matrimony Brand in the World.
+                Trusted Matrimony Platform
+                {/* Most trusted Matrimony Brand in the World. */}
               </p>
             </div>
 
