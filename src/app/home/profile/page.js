@@ -65,7 +65,7 @@ export default function ProfilePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentModalImage, setCurrentModalImage] = useState("");
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.jodi4ever.com/";
 
   // Assuming this is how your redux state is structured
   const userProfile = useSelector((state) => state.user.data?.user);

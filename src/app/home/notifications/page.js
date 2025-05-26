@@ -31,7 +31,7 @@ import {
 export default function NotificationsPage({ params, searchParams }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.jodi4ever.com/";
 
 const [
   deleteNotifications,

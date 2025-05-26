@@ -30,7 +30,7 @@ import ProfileModal from './ProfileModal';
 import AppDownloadModal from "@/app/components/AppDownloadModal"
 
 // Base URL for profile images
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jodi4ever.com/';
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.jodi4ever.com/';
 
 const ProfileCard = ({ profile, onProfileClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -45,6 +45,7 @@ const ProfileCard = ({ profile, onProfileClick }) => {
 
   // Handle like/unlike
   const toggleLike = async (e) => {
+    e.preventDefault();
     e.stopPropagation();
     try {
       if(isLiked) {

@@ -47,7 +47,7 @@ import AppDownloadModal from "@/app/components/AppDownloadModal"
 
 // Define the base URL for images as a constant
 const IMAGE_BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://www.jodi4ever.com";
 
 export default function ProfilePage({ params }) {
   const router = useRouter();

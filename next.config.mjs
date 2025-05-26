@@ -10,7 +10,7 @@ const nextConfig = {
   //   ]
   // },
     images: {
-        remotePatterns: [new URL('https://jodi4ever.com/**')],
+        remotePatterns: [new URL('https://www.jodi4ever.com/**')],
       },
 };
 

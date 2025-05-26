@@ -16,7 +16,7 @@ export default function Header() {
   // It is causing Hydration Error when I open notifications page.
   // const { data: notificationD } = useGetNotificationsQuery(); 
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jodi4ever.com/";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.jodi4ever.com/";
   const profileMenuRef = useRef(null);
 
   // Get unread notifications count
