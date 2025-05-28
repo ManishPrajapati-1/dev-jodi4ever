@@ -37,7 +37,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "https://www.jodi4ever.com/images/jodi4ever_logo_named.png", // replace with actual image URL
+        url: "https://www.jodi4ever.com/images/weeding.png", // replace with actual image URL
         width: 1200,
         height: 630,
         alt: "Jodi4Ever - Matrimony Platform",
