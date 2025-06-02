@@ -404,7 +404,7 @@ export default function ProfilePage({ params }) {
                       }}
                       className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
                     >
-                      <Flag size={14} className="mr-2 text-orange-500" />
+                      <Flag size={14} className="mr-2 text-red-500" />
                       Report User
                     </button>
                   </div>
@@ -957,8 +957,8 @@ export default function ProfilePage({ params }) {
         {showReportModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md mx-4 h-auto overflow-y-auto">
-              <div className="flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mx-auto mb-4">
-                <Flag size={24} className="text-orange-600" />
+              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <Flag size={24} className="text-red-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Report User</h3>
 
@@ -1080,7 +1080,7 @@ export default function ProfilePage({ params }) {
                 <button
                   onClick={handleReportUser}
                   disabled={isLoadingReport || !reportReason || (reportReason === 'Other violations or misuse' && !customReason.trim())}
-                  className="flex-1 py-2.5 px-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoadingReport ? (
                     <Loader2 size={18} className="animate-spin" />
