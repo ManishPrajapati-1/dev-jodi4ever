@@ -143,12 +143,15 @@ export default function ProfilePage({ params }) {
 
   // Report reasons
   const reportReasons = [
-    'Inappropriate content',
-    'Fake profile',
-    'Harassment',
-    'Spam',
-    'Inappropriate behavior',
-    'Other'
+    'Profile information seems false or misleading',
+    'Multiple accounts by the same user',
+    'Invalid or incorrect contact details',
+    'Images appear inappropriate or deceptive',
+    'Received abusive or inappropriate messages',
+    'User is already married or engaged',
+    'User is asking for money or seems fraudulent',
+    'Not responding after showing interest',
+    'Other violations or misuse'
   ];
 
   // Format date to readable format
@@ -218,8 +221,8 @@ export default function ProfilePage({ params }) {
   // Handle report user
   const handleReportUser = async () => {
     // Determine the final reason to send
-    const finalReason = reportReason === 'Other' ? customReason.trim() : reportReason;
-    
+    const finalReason = reportReason === 'Other violations or misuse' ? customReason.trim() : reportReason;
+
     if (!finalReason) {
       toast.error('Please provide a reason for reporting');
       return;
@@ -230,7 +233,7 @@ export default function ProfilePage({ params }) {
         reportedUserId: profileData._id,
         reason: finalReason,
       };
-      
+
       // Add evidence if an image was uploaded
       if (reportEvidence) {
         reportData.evidence = reportEvidence;
@@ -299,11 +302,10 @@ export default function ProfilePage({ params }) {
   const TabButton = ({ id, label, icon, isActive, onClick }) => (
     <button
       onClick={() => onClick(id)}
-      className={`flex items-center px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 ${
-        isActive
+      className={`flex items-center px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 ${isActive
           ? "bg-red-600 text-white"
           : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
-      }`}
+        }`}
     >
       {icon}
       <span className="ml-2">{label}</span>
@@ -379,7 +381,7 @@ export default function ProfilePage({ params }) {
                 >
                   <MoreVertical size={18} />
                 </button>
-                
+
                 {/* Options Dropdown */}
                 {showOptionsMenu && (
                   <div className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-40">
@@ -411,7 +413,7 @@ export default function ProfilePage({ params }) {
 
               <div className="relative aspect-[4/3]">
                 {profileData.profile_image &&
-                profileData.profile_image.length > 0 ? (
+                  profileData.profile_image.length > 0 ? (
                   <div className="relative w-full h-full">
                     {/* Main image */}
                     <Image
@@ -472,19 +474,17 @@ export default function ProfilePage({ params }) {
                     {profileData.profile_image.map((img, index) => (
                       <button
                         key={index}
-                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-200 ${
-                          index === currentImageIndex
+                        className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all duration-200 ${index === currentImageIndex
                             ? "ring-2 ring-red-600 ring-offset-2"
                             : "ring-1 ring-gray-200 hover:ring-red-200"
-                        }`}
+                          }`}
                         onClick={(e) => goToImage(index, e)}
                         aria-label={`View image ${index + 1}`}
                       >
                         <Image
                           src={`${IMAGE_BASE_URL}/${img}`}
-                          alt={`${profileData.fullName || "Profile"} photo ${
-                            index + 1
-                          }`}
+                          alt={`${profileData.fullName || "Profile"} photo ${index + 1
+                            }`}
                           fill
                           className="object-cover"
                         />
@@ -664,19 +664,19 @@ export default function ProfilePage({ params }) {
                 isActive={activeTab === "career"}
                 onClick={setActiveTab}
               />
-              <TabButton 
-                id="family" 
-                label="Family" 
+              <TabButton
+                id="family"
+                label="Family"
                 icon={<Users size={18} />}
-                isActive={activeTab === 'family'} 
-                onClick={setActiveTab} 
+                isActive={activeTab === 'family'}
+                onClick={setActiveTab}
               />
-              <TabButton 
-                id="preferences" 
-                label="Preferences" 
+              <TabButton
+                id="preferences"
+                label="Preferences"
                 icon={<Heart size={18} />}
-                isActive={activeTab === 'preferences'} 
-                onClick={setActiveTab} 
+                isActive={activeTab === 'preferences'}
+                onClick={setActiveTab}
               />
             </div>
 
@@ -961,7 +961,7 @@ export default function ProfilePage({ params }) {
                 <Flag size={24} className="text-orange-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Report User</h3>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -971,7 +971,7 @@ export default function ProfilePage({ params }) {
                     value={reportReason}
                     onChange={(e) => {
                       setReportReason(e.target.value);
-                      if (e.target.value !== 'Other') {
+                      if (e.target.value !== 'Other violations or misuse') {
                         setCustomReason(''); // Clear custom reason if not "Other"
                       }
                     }}
@@ -988,7 +988,7 @@ export default function ProfilePage({ params }) {
                 </div>
 
                 {/* Show textarea only when "Other" is selected */}
-                {reportReason === 'Other' && (
+                {reportReason === 'Other violations or misuse' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Please specify the reason *
@@ -1003,7 +1003,7 @@ export default function ProfilePage({ params }) {
                     />
                   </div>
                 )}
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Evidence (optional)
@@ -1063,7 +1063,7 @@ export default function ProfilePage({ params }) {
                   )}
                 </div>
               </div>
-              
+
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => {
@@ -1079,7 +1079,7 @@ export default function ProfilePage({ params }) {
                 </button>
                 <button
                   onClick={handleReportUser}
-                  disabled={isLoadingReport || !reportReason || (reportReason === 'Other' && !customReason.trim())}
+                  disabled={isLoadingReport || !reportReason || (reportReason === 'Other violations or misuse' && !customReason.trim())}
                   className="flex-1 py-2.5 px-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoadingReport ? (
@@ -1093,12 +1093,12 @@ export default function ProfilePage({ params }) {
           </div>
         )}
       </div>
-      
-      <AppDownloadModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+
+      <AppDownloadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
       />
-      
+
       <Toaster
         position="bottom-right"
         toastOptions={{

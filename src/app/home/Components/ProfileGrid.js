@@ -114,7 +114,7 @@ const ProfileCard = ({ profile, onProfileClick, onProfileBlocked }) => {
   // Handle report user
   const handleReportUser = async () => {
     // Determine the final reason to send
-    const finalReason = reportReason === 'Other' ? customReason.trim() : reportReason;
+    const finalReason = reportReason === 'Other violations or misuse' ? customReason.trim() : reportReason;
 
     if (!finalReason) {
       toast.error('Please provide a reason for reporting');
@@ -486,7 +486,7 @@ const ProfileCard = ({ profile, onProfileClick, onProfileBlocked }) => {
                   value={reportReason}
                   onChange={(e) => {
                     setReportReason(e.target.value);
-                    if (e.target.value !== 'Other') {
+                    if (e.target.value !== 'Other violations or misuse') {
                       setCustomReason(''); // Clear custom reason if not "Other"
                     }
                   }}
@@ -503,7 +503,7 @@ const ProfileCard = ({ profile, onProfileClick, onProfileBlocked }) => {
               </div>
 
               {/* Show textarea only when "Other" is selected */}
-              {reportReason === 'Other' && (
+              {reportReason === 'Other violations or misuse' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Please specify the reason *
@@ -593,7 +593,7 @@ const ProfileCard = ({ profile, onProfileClick, onProfileBlocked }) => {
               </button>
               <button
                 onClick={handleReportUser}
-                disabled={isLoadingReport || !reportReason || (reportReason === 'Other' && !customReason.trim())}
+                disabled={isLoadingReport || !reportReason || (reportReason === 'Other violations or misuse' && !customReason.trim())}
                 className="flex-1 py-2.5 px-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoadingReport ? (
