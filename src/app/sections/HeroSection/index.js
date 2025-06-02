@@ -52,7 +52,7 @@ export default function Home() {
       // User is logged in, navigate to their profile or dashboard
       router.push('/home'); // Or wherever you want to direct them
     }
-  }, [hasToken])
+  }, [hasToken, router])
 
   const submitForm = (data) => {
     // console.log("Form submitted with data:", data);

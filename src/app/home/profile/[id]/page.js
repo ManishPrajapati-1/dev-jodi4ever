@@ -34,12 +34,18 @@ import {
   UserRound,
   Loader2,
   Home,
+  MoreVertical,
+  UserX,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import {
   useConnectProfileMutation,
   useLikeProfileMutation,
   useDislikeProfileMutation,
   useViewSingleProfileQuery,
+  useBlockUserMutation,
+  useReportUserMutation,
 } from "@/lib/services/api";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -58,9 +64,17 @@ export default function ProfilePage({ params }) {
   const [connectProfile, { isLoadingConnect }] = useConnectProfileMutation();
   const [likeProfile, { isLoadingLike }] = useLikeProfileMutation();
   const [dislikeProfile, { isLoadingDislike }] = useDislikeProfileMutation();
+  const [blockUser, { isLoading: isLoadingBlock }] = useBlockUserMutation();
+  const [reportUser, { isLoading: isLoadingReport }] = useReportUserMutation();
   const [isLiked, setIsLiked] = useState(false);
   const [activeTab, setActiveTab] = useState("about"); // Tabs: about, career, family, preferences
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
+  const [reportEvidence, setReportEvidence] = useState(null);
 
   const handleShare = async () => {
     const currentUrl = window.location.href;
@@ -112,6 +126,31 @@ export default function ProfilePage({ params }) {
       setIsLiked(profileData.isLiked || false);
     }
   }, [profileData]);
+
+  // Close options menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showOptionsMenu && !event.target.closest('.options-menu')) {
+        setShowOptionsMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOptionsMenu]);
+
+  // Report reasons
+  const reportReasons = [
+    'Inappropriate content',
+    'Fake profile',
+    'Harassment',
+    'Spam',
+    'Inappropriate behavior',
+    'Other'
+  ];
+
   // Format date to readable format
   const formatDate = (dateString) => {
     if (!dateString) return "Not specified";
@@ -158,6 +197,55 @@ export default function ProfilePage({ params }) {
     } catch (error) {
       console.log("Connection failed:", error);
       toast.error("Failed to send connection request. Please try again.");
+    }
+  };
+
+  // Handle block user
+  const handleBlockUser = async () => {
+    try {
+      const res = await blockUser(profileData._id).unwrap();
+      toast.success(res.message || 'User blocked successfully');
+      setShowBlockModal(false);
+      setShowOptionsMenu(false);
+      // Redirect back to profiles after blocking
+      router.push('/home');
+    } catch (error) {
+      console.log('Block failed:', error);
+      toast.error(error?.data?.message || 'Failed to block user. Please try again.');
+    }
+  };
+
+  // Handle report user
+  const handleReportUser = async () => {
+    // Determine the final reason to send
+    const finalReason = reportReason === 'Other' ? customReason.trim() : reportReason;
+    
+    if (!finalReason) {
+      toast.error('Please provide a reason for reporting');
+      return;
+    }
+
+    try {
+      const reportData = {
+        reportedUserId: profileData._id,
+        reason: finalReason,
+      };
+      
+      // Add evidence if an image was uploaded
+      if (reportEvidence) {
+        reportData.evidence = reportEvidence;
+      }
+
+      const res = await reportUser(reportData).unwrap();
+      toast.success(res.message || 'User reported successfully');
+      setShowReportModal(false);
+      setShowOptionsMenu(false);
+      setReportReason('');
+      setCustomReason('');
+      setReportEvidence(null);
+    } catch (error) {
+      console.log('Report failed:', error);
+      toast.error(error?.data?.message || 'Failed to report user. Please try again.');
     }
   };
 
@@ -221,6 +309,7 @@ export default function ProfilePage({ params }) {
       <span className="ml-2">{label}</span>
     </button>
   );
+
   // Loading state
   if (isLoadingProfile) {
     return (
@@ -278,7 +367,48 @@ export default function ProfilePage({ params }) {
           {/* Left Column: Photos & Actions */}
           <div className="lg:w-2/5">
             {/* Photos Section */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 relative">
+              {/* Options Menu Button */}
+              <div className="absolute top-4 right-4 z-30 options-menu">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowOptionsMenu(!showOptionsMenu);
+                  }}
+                  className="p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white text-gray-600 hover:text-gray-800 shadow-sm transition-colors"
+                >
+                  <MoreVertical size={18} />
+                </button>
+                
+                {/* Options Dropdown */}
+                {showOptionsMenu && (
+                  <div className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-40">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowBlockModal(true);
+                        setShowOptionsMenu(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                    >
+                      <UserX size={14} className="mr-2 text-red-500" />
+                      Block User
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowReportModal(true);
+                        setShowOptionsMenu(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center"
+                    >
+                      <Flag size={14} className="mr-2 text-orange-500" />
+                      Report User
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="relative aspect-[4/3]">
                 {profileData.profile_image &&
                 profileData.profile_image.length > 0 ? (
@@ -299,28 +429,6 @@ export default function ProfilePage({ params }) {
                         PREMIUM
                       </div>
                     )}
-
-                    {/* Like button */}
-                    {/* <button 
-                      onClick={toggleLike} 
-                      className={`absolute top-4 right-4 p-2.5 rounded-full shadow-sm z-10 ${
-                        isLiked
-                          ? 'bg-red-50 text-red-600'
-                          : 'bg-white/90 backdrop-blur-sm hover:bg-white text-gray-600 hover:text-red-600'
-                      }`}
-                      disabled={isLoadingLike || isLoadingDislike}
-                      aria-label={isLiked ? 'Unlike profile' : 'Like profile'}
-                    >
-                      {isLoadingLike || isLoadingDislike ? (
-                        <Loader2 size={22} className="animate-spin" />
-                      ) : (
-                        <Heart 
-                          size={22} 
-                          fill={isLiked ? "#dc2626" : "none"} 
-                          strokeWidth={isLiked ? 0 : 2} 
-                        />
-                      )}
-                    </button> */}
 
                     {/* Image navigation controls */}
                     {hasMultipleImages && (
@@ -344,7 +452,7 @@ export default function ProfilePage({ params }) {
                         </div>
 
                         {/* Image counter */}
-                        <div className="absolute top-8 right-4 bg-black/40 text-white text-xs font-medium px-2.5 py-1.5 rounded-full backdrop-blur-sm">
+                        <div className="absolute top-8 right-16 bg-black/40 text-white text-xs font-medium px-2.5 py-1.5 rounded-full backdrop-blur-sm">
                           {currentImageIndex + 1}/
                           {profileData.profile_image.length}
                         </div>
@@ -408,7 +516,6 @@ export default function ProfilePage({ params }) {
                   className="w-full py-3 border border-red-600 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center justify-center"
                   onClick={() =>
                     setIsModalOpen(true)
-                    // toast.error("This feature is only available in app.")
                   }
                 >
                   <MessageCircle size={20} className="mr-2" />
@@ -423,14 +530,6 @@ export default function ProfilePage({ params }) {
                     <Share2 size={18} className="mr-2 text-gray-500" />
                     Share
                   </button>
-
-                  {/* <button 
-                    className="flex-1 py-2.5 border border-gray-200 bg-gray-50 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center"
-                    onClick={() => toast.error("Please specify the reason for reporting this profile")}
-                  >
-                    <Flag size={18} className="mr-2 text-gray-500" />
-                    Report
-                  </button> */}
                 </div>
               </div>
             </div>
@@ -476,6 +575,7 @@ export default function ProfilePage({ params }) {
               </div>
             )}
           </div>
+
           {/* Right Column: Profile Details */}
           <div className="lg:w-3/5">
             {/* Profile Header */}
@@ -564,20 +664,20 @@ export default function ProfilePage({ params }) {
                 isActive={activeTab === "career"}
                 onClick={setActiveTab}
               />
-              {/* <TabButton 
+              <TabButton 
                 id="family" 
                 label="Family" 
                 icon={<Users size={18} />}
                 isActive={activeTab === 'family'} 
                 onClick={setActiveTab} 
-              /> */}
-              {/* <TabButton 
+              />
+              <TabButton 
                 id="preferences" 
                 label="Preferences" 
                 icon={<Heart size={18} />}
                 isActive={activeTab === 'preferences'} 
                 onClick={setActiveTab} 
-              /> */}
+              />
             </div>
 
             {/* Tab Content */}
@@ -684,19 +784,10 @@ export default function ProfilePage({ params }) {
                       label="Annual Income"
                       value={profileData.annual_income}
                     />
-                    {/* <InfoItem
-                      icon={<GraduationCap size={18} />}
-                      label="College/University"
-                      value={profileData.college || "Not specified"}
-                    />
-                    <InfoItem
-                      icon={<Building size={18} />}
-                      label="Company"
-                      value={profileData.company || "Not specified"}
-                    /> */}
                   </div>
                 </div>
               )}
+
               {/* Family Tab */}
               {activeTab === "family" && (
                 <div>
@@ -826,11 +917,188 @@ export default function ProfilePage({ params }) {
             </div>
           </div>
         </div>
+
+        {/* Block Confirmation Modal */}
+        {showBlockModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl max-w-md mx-4">
+              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <UserX size={24} className="text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">Block User</h3>
+              <p className="text-gray-600 text-center mb-6">
+                Are you sure you want to block {profileData.fullName}? They won't be able to contact you or see your profile.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowBlockModal(false)}
+                  className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={isLoadingBlock}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBlockUser}
+                  disabled={isLoadingBlock}
+                  className="flex-1 py-2.5 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+                >
+                  {isLoadingBlock ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    'Block User'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Report Modal */}
+        {showReportModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md mx-4 h-auto overflow-y-auto">
+              <div className="flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mx-auto mb-4">
+                <Flag size={24} className="text-orange-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Report User</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Reason for reporting *
+                  </label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => {
+                      setReportReason(e.target.value);
+                      if (e.target.value !== 'Other') {
+                        setCustomReason(''); // Clear custom reason if not "Other"
+                      }
+                    }}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    required
+                  >
+                    <option value="">Select a reason</option>
+                    {reportReasons.map((reason) => (
+                      <option key={reason} value={reason}>
+                        {reason}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Show textarea only when "Other" is selected */}
+                {reportReason === 'Other' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Please specify the reason *
+                    </label>
+                    <textarea
+                      value={customReason}
+                      onChange={(e) => setCustomReason(e.target.value)}
+                      placeholder="Please describe the issue in detail..."
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"
+                      rows={3}
+                      required
+                    />
+                  </div>
+                )}
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Evidence (optional)
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                            toast.error('File size must be less than 5MB');
+                            e.target.value = '';
+                            return;
+                          }
+                          setReportEvidence(file);
+                        }
+                      }}
+                      className="hidden"
+                      id="evidence-upload"
+                    />
+                    <label htmlFor="evidence-upload" className="cursor-pointer">
+                      <div className="flex flex-col items-center">
+                        {reportEvidence ? (
+                          <>
+                            <ImageIcon size={24} className="text-green-600 mb-2" />
+                            <p className="text-sm text-green-600 font-medium">
+                              {reportEvidence.name}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Click to change
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <Upload size={24} className="text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-600">
+                              Upload screenshot or image evidence
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              PNG, JPG up to 5MB
+                            </p>
+                          </>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+                  {reportEvidence && (
+                    <button
+                      type="button"
+                      onClick={() => setReportEvidence(null)}
+                      className="mt-2 text-sm text-red-600 hover:text-red-700"
+                    >
+                      Remove file
+                    </button>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setReportReason('');
+                    setCustomReason('');
+                    setReportEvidence(null);
+                  }}
+                  className="flex-1 py-2.5 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={isLoadingReport}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReportUser}
+                  disabled={isLoadingReport || !reportReason || (reportReason === 'Other' && !customReason.trim())}
+                  className="flex-1 py-2.5 px-4 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoadingReport ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    'Submit Report'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+      
       <AppDownloadModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
       />
+      
       <Toaster
         position="bottom-right"
         toastOptions={{

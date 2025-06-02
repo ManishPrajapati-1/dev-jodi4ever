@@ -175,7 +175,7 @@ export default function Header() {
                 Log In
               </button>
               <Link
-                href="/register"
+                href="/create-profile"
                 className="w-full px-4 py-2 text-center bg-primary text-white rounded-md hover:bg-primary transition"
               >
                 Register

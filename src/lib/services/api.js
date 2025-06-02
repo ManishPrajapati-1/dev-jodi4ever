@@ -56,8 +56,23 @@ export const api = createApi({
         method: "POST",
         body: data,
       }),
-    }),
+    }), 
 
+    // Block and report user
+    blockUser: builder.mutation({
+      query: (receiverId) => ({
+        url: "user/connections/block",
+        method: "POST",
+        body: { receiverId}
+      })
+    }),
+    reportUser: builder.mutation({
+      query: ({reportedUser, reason, evidence}) => ({
+        url: "user/connections/report",
+        method: "POST",
+        body: { reportedUser, reason, evidence }
+      })
+    }),
     // Profile
     getUserProfile: builder.query({
       query: () => ({
@@ -228,6 +243,8 @@ export const {
   useVerifyLoginOtpMutation,
   useSignUpUserMutation,
   useVerifyOtpSignUpMutation,
+  useBlockUserMutation,
+  useReportUserMutation,
   useGetUserProfileQuery,
   useUpdateProfileMutation,
   useDeleteProfileImageMutation,
