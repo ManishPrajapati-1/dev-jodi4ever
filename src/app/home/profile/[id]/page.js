@@ -664,20 +664,20 @@ export default function ProfilePage({ params }) {
                 isActive={activeTab === "career"}
                 onClick={setActiveTab}
               />
-              <TabButton
+              {/* <TabButton
                 id="family"
                 label="Family"
                 icon={<Users size={18} />}
                 isActive={activeTab === 'family'}
                 onClick={setActiveTab}
-              />
-              <TabButton
+              /> */}
+              {/* <TabButton
                 id="preferences"
                 label="Preferences"
                 icon={<Heart size={18} />}
                 isActive={activeTab === 'preferences'}
                 onClick={setActiveTab}
-              />
+              /> */}
             </div>
 
             {/* Tab Content */}

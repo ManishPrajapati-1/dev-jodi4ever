@@ -56,18 +56,18 @@ export const api = createApi({
         method: "POST",
         body: data,
       }),
-    }), 
+    }),
 
     // Block and report user
     blockUser: builder.mutation({
       query: (receiverId) => ({
         url: "user/connections/block",
         method: "POST",
-        body: { receiverId}
+        body: { receiverId }
       })
     }),
     reportUser: builder.mutation({
-      query: ({reportedUser, reason, evidence}) => ({
+      query: ({ reportedUser, reason, evidence }) => ({
         url: "user/connections/report",
         method: "POST",
         body: { reportedUser, reason, evidence }
@@ -99,10 +99,31 @@ export const api = createApi({
 
     // Matching/Profiles
     getMatchingProfiles: builder.query({
-      query: (page) => ({
-        url: `user/matchedProfiles?page=${page}`,
-        method: "GET",
-      }),
+      query: ({ page, filter }) => {
+        // console.log(`Filtered type = ${filter}`);
+
+        let url = '';
+
+        switch (filter) {
+          case "new":
+            url = `user/new_matches?page=${page}`;
+            break;
+          case "daily":
+            url = `user/today_matches?page=${page}`;
+            break;
+          case "nearby":
+            url = `user/near_me?page=${page}`;
+            break;
+          default:
+            url = `user/my_matches?page=${page}`;
+            break;
+        }
+
+        return {
+          url,
+          method: "GET"
+        };
+      },
       // Optional: Add caching configuration if needed
       // keepUnusedDataFor: 300, // Keep data for 5 minutes
     }),

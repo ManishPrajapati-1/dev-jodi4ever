@@ -230,7 +230,7 @@ export default function ActivityPage() {
     <div className="min-h-screen bg-gray-50 py-6 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Page Header - Back to Dashboard Link */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <Link 
             href="/home" 
             className="text-gray-600 hover:text-red-600 transition-colors duration-200 flex items-center group"
@@ -238,7 +238,7 @@ export default function ActivityPage() {
             <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
             <span className="font-medium">Back to Dashboard</span>
           </Link>
-        </div>
+        </div> */}
 
         {/* Activity Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

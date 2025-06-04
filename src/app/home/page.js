@@ -25,11 +25,11 @@ export default function DashboardPage() {
   const [currentPage, setCurrentPage] = useState(1)
   
   // Pass the currentPage parameter to the query
-  const { data: profilesData, isLoading, isError } = useGetMatchingProfilesQuery(currentPage, { refetchOnMountOrArgChange: true });
+  const { data: profilesData, isLoading, isError } = useGetMatchingProfilesQuery({page: currentPage, filter: activeFilter}, { refetchOnMountOrArgChange: true });
  
   // Profiles will be undefined if data is still loading  
-  const profiles = profilesData?.data || [];
-  const pagination = profilesData?.pagination;  
+  const profiles = profilesData?.data?.matches || [];
+  const pagination = profilesData?.data?.pagination;  
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -39,6 +39,11 @@ export default function DashboardPage() {
       setLoading(false)
     }
   }, [router])
+
+  useEffect(() => {
+    // Reset to first page when filter changes
+    setCurrentPage(1);
+  },[activeFilter])
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -151,11 +156,11 @@ export default function DashboardPage() {
             </button>
             <button 
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
-                activeFilter === 'favorites' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                activeFilter === 'daily' ? 'bg-primary text-white shadow-sm' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
-              onClick={() => setActiveFilter('favorites')}
+              onClick={() => setActiveFilter('daily')}
             >
-              Favorites
+              Daily Matches
             </button>
           </div>
           
@@ -217,11 +222,11 @@ export default function DashboardPage() {
                     Prev
                   </button>
                   
-                  {pagination && Array.from({ length: pagination.totalPages }, (_, i) => {
+                  {pagination && Array.from({ length: pagination.pages }, (_, i) => {
                     // Only show a few page numbers for better UX
                     if (
                       i === 0 || // Always show first page
-                      i === pagination.totalPages - 1 || // Always show last page
+                      i === pagination.pages - 1 || // Always show last page
                       (i >= currentPage - 2 && i <= currentPage + 1) // Show current page and a few around it
                     ) {
                       return (
@@ -242,7 +247,7 @@ export default function DashboardPage() {
                     // Add ellipsis for skipped pages
                     if (
                       (i === 1 && currentPage > 3) || 
-                      (i === pagination.totalPages - 2 && currentPage < pagination.totalPages - 3)
+                      (i === pagination.pages - 2 && currentPage < pagination.pages - 3)
                     ) {
                       return (
                         <span 
